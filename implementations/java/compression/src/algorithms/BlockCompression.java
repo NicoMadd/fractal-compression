@@ -22,13 +22,12 @@ public class BlockCompression {
     private Block[][] domainBlocks;
 
     private float[] meansR;
-    private float[] meansD;
 
     // FIXME HARD VALUES
     // RANGE BLOCK DIMENSION
-    int RBD = 4;
+    public static int RBD = 4;
     // DOMAIN BLOCK DIMENSION
-    int DBD = 8;
+    public static int DBD = 8;
 
     /**
      * Calculate S is the summation of the differences between each Di minus the
