@@ -122,12 +122,12 @@ public class Main {
 
                 Block domainBlock = new Block(xDomain, yDomain, domainPixels);
 
-                Block reducedBlock = domainBlock.reduce(4);
+                Block reducedBlock = domainBlock.reduce(BlockCompression.RBD);
 
-                Pixel[][] newPixels = new Pixel[4][4];
+                Pixel[][] newPixels = new Pixel[BlockCompression.RBD][BlockCompression.RBD];
 
-                for (int i = 0; i < 4; i++) {
-                    for (int j = 0; j < 4; j++) {
+                for (int i = 0; i < BlockCompression.RBD; i++) {
+                    for (int j = 0; j < BlockCompression.RBD; j++) {
                         Pixel p = reducedBlock.pixels()[i][j];
 
                         int[] newColors = new int[3];
