@@ -1,4 +1,4 @@
-package implementations.java.compression.src.utils.ppm;
+package implementations.java.compression.src.utils.image.ppm;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
