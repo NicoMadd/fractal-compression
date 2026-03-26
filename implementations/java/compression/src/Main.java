@@ -17,10 +17,10 @@ import implementations.java.compression.src.utils.fractal.RangeMatch;
 import implementations.java.compression.src.utils.image.Pixel;
 import implementations.java.compression.src.utils.image.PixelUtils;
 import implementations.java.compression.src.utils.image.RGB;
+import implementations.java.compression.src.utils.image.ppm.IntPixel;
+import implementations.java.compression.src.utils.image.ppm.PPMImageMetadata;
+import implementations.java.compression.src.utils.image.ppm.PPMUtils;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
-import implementations.java.compression.src.utils.ppm.IntPixel;
-import implementations.java.compression.src.utils.ppm.PPMImageMetadata;
-import implementations.java.compression.src.utils.ppm.PPMUtils;
 
 public class Main {
 

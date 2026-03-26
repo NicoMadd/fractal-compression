@@ -2,7 +2,7 @@ package implementations.java.compression.src.utils.image;
 
 import java.util.List;
 
-import implementations.java.compression.src.utils.ppm.IntPixel;
+import implementations.java.compression.src.utils.image.ppm.IntPixel;
 
 public class PixelUtils {
 

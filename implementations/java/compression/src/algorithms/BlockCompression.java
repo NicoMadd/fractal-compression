@@ -9,8 +9,8 @@ import implementations.java.compression.src.utils.fractal.RangeMatch;
 import implementations.java.compression.src.utils.fractal.ReducedPair;
 import implementations.java.compression.src.utils.image.Pixel;
 import implementations.java.compression.src.utils.image.RGB;
+import implementations.java.compression.src.utils.image.ppm.PPMImageMetadata;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
-import implementations.java.compression.src.utils.ppm.PPMImageMetadata;
 
 public class BlockCompression {
 
