@@ -8,6 +8,16 @@ import java.io.IOException;
 import implementations.java.compression.src.utils.image.Pixel;
 import implementations.java.compression.src.utils.readers.SequenceReader;
 
+/*
+ * Class to hold the metadata of a PPM image.
+ * width: width of the image
+ * height: height of the image
+ * maxVal: maximum value of the image
+ * maxValType: type of the maximum value
+ * pixels: pixels of the image
+ * 
+ * This was made following the PPM format specification: https://netpbm.sourceforge.net/doc/ppm.html
+ */
 public class PPMImageMetadata {
 
     private int width;
