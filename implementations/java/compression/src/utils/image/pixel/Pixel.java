@@ -1,4 +1,4 @@
-package implementations.java.compression.src.utils.image;
+package implementations.java.compression.src.utils.image.pixel;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

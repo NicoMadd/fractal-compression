@@ -5,7 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import implementations.java.compression.src.utils.image.Pixel;
+import implementations.java.compression.src.utils.image.pixel.BytePixel;
+import implementations.java.compression.src.utils.image.pixel.IntPixel;
+import implementations.java.compression.src.utils.image.pixel.MaxValType;
+import implementations.java.compression.src.utils.image.pixel.Pixel;
 import implementations.java.compression.src.utils.readers.SequenceReader;
 
 /*
@@ -27,6 +30,7 @@ public class PPMImageMetadata {
     private Pixel[][] pixels;
 
     private static final int MAGIC_NUMBER_BYTES_SIZE = 2;
+    private static final String MAGIC_NUMBER = "P6";
 
     public PPMImageMetadata(int width, int height, int maxVal, Pixel[][] pixels) {
         this.width = width;
@@ -41,7 +45,8 @@ public class PPMImageMetadata {
         SequenceReader sr = new SequenceReader(s);
 
         // Read magic number
-        sr.readNBytes(MAGIC_NUMBER_BYTES_SIZE);
+        byte[] magicNumber = sr.readNBytes(MAGIC_NUMBER_BYTES_SIZE);
+        validateMagicNumber(magicNumber);
         sr.readWhitespace();
 
         skipComment(sr);
@@ -63,6 +68,14 @@ public class PPMImageMetadata {
             }
         }
 
+    }
+
+    private void validateMagicNumber(byte[] magicNumber) {
+        String magicNumberRead = new String(magicNumber);
+        if (!MAGIC_NUMBER.equals(magicNumberRead)) {
+            throw new IllegalArgumentException(
+                    "Magic number of image is not correct. Expected " + MAGIC_NUMBER + "but was: " + magicNumberRead);
+        }
     }
 
     public Pixel[][] getPixels() {

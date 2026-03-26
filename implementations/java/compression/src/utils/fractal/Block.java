@@ -1,7 +1,7 @@
 package implementations.java.compression.src.utils.fractal;
 
-import implementations.java.compression.src.utils.image.Pixel;
-import implementations.java.compression.src.utils.image.PixelUtils;
+import implementations.java.compression.src.utils.image.pixel.Pixel;
+import implementations.java.compression.src.utils.image.pixel.PixelUtils;
 
 /* 
 x: is the x point of the left-top pixel of the pixels.

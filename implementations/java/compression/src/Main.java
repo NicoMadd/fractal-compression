@@ -14,10 +14,10 @@ import implementations.java.compression.src.benchmarks.SimpleCompressionBenchmar
 import implementations.java.compression.src.utils.fractal.Block;
 import implementations.java.compression.src.utils.fractal.CompressedBlock;
 import implementations.java.compression.src.utils.fractal.RangeMatch;
-import implementations.java.compression.src.utils.image.Pixel;
-import implementations.java.compression.src.utils.image.PixelUtils;
-import implementations.java.compression.src.utils.image.RGB;
-import implementations.java.compression.src.utils.image.ppm.IntPixel;
+import implementations.java.compression.src.utils.image.pixel.IntPixel;
+import implementations.java.compression.src.utils.image.pixel.Pixel;
+import implementations.java.compression.src.utils.image.pixel.PixelUtils;
+import implementations.java.compression.src.utils.image.pixel.RGB;
 import implementations.java.compression.src.utils.image.ppm.PPMImageMetadata;
 import implementations.java.compression.src.utils.image.ppm.PPMUtils;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;

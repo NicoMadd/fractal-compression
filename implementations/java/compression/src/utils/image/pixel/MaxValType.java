@@ -1,4 +1,4 @@
-package implementations.java.compression.src.utils.image.ppm;
+package implementations.java.compression.src.utils.image.pixel;
 
 public enum MaxValType {
     SINGLE(1), DOUBLE(2);

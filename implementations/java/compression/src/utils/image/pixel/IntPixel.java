@@ -1,16 +1,14 @@
-package implementations.java.compression.src.utils.image.ppm;
+package implementations.java.compression.src.utils.image.pixel;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.IOException;;
 
-import implementations.java.compression.src.utils.image.Pixel;
+public class IntPixel extends Pixel {
+    int red;
+    int green;
+    int blue;
 
-public class BytePixel extends Pixel {
-    byte red;
-    byte green;
-    byte blue;
-
-    public BytePixel(byte red, byte green, byte blue) {
+    public IntPixel(int red, int green, int blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;

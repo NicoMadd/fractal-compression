@@ -4,7 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import implementations.java.compression.src.utils.image.Pixel;
+import implementations.java.compression.src.utils.image.pixel.Pixel;;
 
 public class PPMUtils {
 
