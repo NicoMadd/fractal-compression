@@ -1,29 +1,32 @@
-package implementations.java.compression.src.utils.image.pixel;
+package implementations.java.compression.src.utils.image.pixel.utils;
 
 import java.util.List;
 
-public class PixelUtils {
+import implementations.java.compression.src.utils.image.pixel.IntPixel;
+import implementations.java.compression.src.utils.image.pixel.RGB;
+import implementations.java.compression.src.utils.image.pixel.RGBPixel;
+
+public class RGBPixelUtils {
 
     /**
      * @param pixels pixels to reduce to a single pixel
      * @return
      */
-    public static Pixel reduce(List<Pixel> pixels) {
-        return reduce(pixels.toArray(new Pixel[0]));
-
+    public static RGBPixel reduce(List<RGBPixel> pixels) {
+        return reduce(pixels.toArray(new RGBPixel[0]));
     }
 
     /**
      * @param pixels array of pixels to reduce
      * @return a single Pixel composed of the average of each color channel.
      */
-    public static Pixel reduce(Pixel[] pixels) {
+    public static RGBPixel reduce(RGBPixel[] pixels) {
         int[] colorAvgs = new int[3];
 
         // For each color, sum the pixel value
         for (RGB c : RGB.values()) {
             int sum = 0;
-            for (Pixel p : pixels) {
+            for (RGBPixel p : pixels) {
                 sum += p.color(c);
             }
 
@@ -35,7 +38,7 @@ public class PixelUtils {
 
     }
 
-    public static Pixel getRandomPixel() {
+    public static RGBPixel getRandomPixel() {
 
         Double red = Math.random() * 255;
         Double green = Math.random() * 255;

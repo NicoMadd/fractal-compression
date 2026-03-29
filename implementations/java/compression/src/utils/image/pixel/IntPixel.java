@@ -3,7 +3,7 @@ package implementations.java.compression.src.utils.image.pixel;
 import java.io.FileOutputStream;
 import java.io.IOException;;
 
-public class IntPixel extends Pixel {
+public class IntPixel extends RGBPixel {
     int red;
     int green;
     int blue;
@@ -37,4 +37,5 @@ public class IntPixel extends Pixel {
     public int blue() {
         return blue;
     }
+
 }

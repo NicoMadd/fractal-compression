@@ -4,11 +4,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import implementations.java.compression.src.utils.image.pixel.Pixel;;
+import implementations.java.compression.src.utils.image.pixel.RGBPixel;;
 
 public class PPMUtils {
 
-    public static void saveToImage(Pixel[][] pixels, String path) throws FileNotFoundException, IOException {
+    public static void saveToImage(RGBPixel[][] pixels, String path) throws FileNotFoundException, IOException {
         int rows = pixels.length;
         int cols = pixels[0].length;
         PPMImageMetadata metadata = new PPMImageMetadata(rows, cols, 255, pixels);
@@ -26,15 +26,15 @@ public class PPMUtils {
         int width = originalImg.getWidth();
         int height = originalImg.getHeight();
 
-        Pixel[][] originalPixels = originalImg.getPixels();
-        Pixel[][] finaPixels = finalImg.getPixels();
+        RGBPixel[][] originalPixels = originalImg.getPixels();
+        RGBPixel[][] finaPixels = finalImg.getPixels();
 
         double totalError = 0;
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                Pixel originalPixel = originalPixels[i][j];
-                Pixel finalPixel = finaPixels[i][j];
+                RGBPixel originalPixel = originalPixels[i][j];
+                RGBPixel finalPixel = finaPixels[i][j];
 
                 totalError += originalPixel.sqDiff(finalPixel);
             }

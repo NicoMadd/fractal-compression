@@ -3,7 +3,7 @@ package implementations.java.compression.src.utils.image.pixel;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class BytePixel extends Pixel {
+public class BytePixel extends RGBPixel {
     byte red;
     byte green;
     byte blue;

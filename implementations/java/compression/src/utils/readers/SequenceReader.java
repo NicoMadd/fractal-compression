@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class SequenceReader {
 
@@ -11,6 +12,55 @@ public class SequenceReader {
 
     public SequenceReader(FileInputStream bis) {
         this.bis = new BufferedInputStream(bis);
+    }
+
+    public void skipFollowingWhitespaces() throws IOException {
+
+        char c;
+
+        do {
+
+            this.bis.mark(1);
+            int ic = this.bis.read();
+            c = (char) ic;
+
+        } while (Character.isWhitespace(c));
+
+        this.bis.reset();
+
+    }
+
+    public byte[] readUntilWhitespace() throws IOException {
+        int arraySize = 10;
+        byte[] bytes = new byte[arraySize];
+        int idx = 0;
+
+        do {
+            this.bis.mark(1);
+            int ic = this.bis.read();
+            char c = (char) ic;
+
+            if (Character.isWhitespace(c)) {
+                this.bis.reset();
+                return Arrays.copyOfRange(bytes, 0, idx);
+            }
+
+            bytes[idx++] = (byte) c;
+
+            // topped array -> should increase
+            if (idx >= arraySize) {
+                arraySize += 10;
+                bytes = Arrays.copyOf(bytes, arraySize);
+            }
+
+        } while (true);
+    }
+
+    public int readNextInt() throws IOException {
+        skipFollowingWhitespaces();
+        byte[] readBytes = readUntilWhitespace();
+        String rawNumber = new String(readBytes);
+        return Integer.parseInt(rawNumber);
     }
 
     public char readWhitespace() throws IOException {

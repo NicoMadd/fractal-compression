@@ -8,18 +8,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import implementations.java.compression.src.algorithms.BlockCompression;
+import implementations.java.compression.src.algorithms.GrayBlockCompression;
+import implementations.java.compression.src.algorithms.RGBBlockCompression;
 import implementations.java.compression.src.benchmarks.Iteration;
 import implementations.java.compression.src.benchmarks.SimpleCompressionBenchmark;
-import implementations.java.compression.src.utils.fractal.Block;
-import implementations.java.compression.src.utils.fractal.CompressedBlock;
-import implementations.java.compression.src.utils.fractal.RangeMatch;
-import implementations.java.compression.src.utils.image.pixel.IntPixel;
-import implementations.java.compression.src.utils.image.pixel.Pixel;
-import implementations.java.compression.src.utils.image.pixel.PixelUtils;
-import implementations.java.compression.src.utils.image.pixel.RGB;
-import implementations.java.compression.src.utils.image.ppm.PPMImageMetadata;
-import implementations.java.compression.src.utils.image.ppm.PPMUtils;
+import implementations.java.compression.src.utils.fractal.block.GrayBlock;
+import implementations.java.compression.src.utils.fractal.block.compressed.GrayCompressedBlock;
+import implementations.java.compression.src.utils.fractal.rangematch.GrayRangeMatch;
+import implementations.java.compression.src.utils.image.pgm.PGMAImageMetadata;
+import implementations.java.compression.src.utils.image.pgm.PGMAUtils;
+import implementations.java.compression.src.utils.image.pixel.GrayPixel;
+import implementations.java.compression.src.utils.image.pixel.GrayPixelUtils;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
 public class Main {
@@ -60,39 +59,46 @@ public class Main {
 
         String imagePath = args[0];
 
-        PPMImageMetadata metadata = null;
+        PGMAImageMetadata metadata = null;
 
         // Load the image
         try (FileInputStream fis = new FileInputStream(imagePath)) {
             System.out.println("File Input Stream opened.");
-            metadata = new PPMImageMetadata(fis);
+            metadata = new PGMAImageMetadata(fis);
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         } finally {
             System.out.println("File Input Stream closed.");
         }
 
+        compressImage(imagePath, metadata);
+
+    }
+
+    private static void compressImage(String originalImagePath, PGMAImageMetadata metadata) throws IOException {
+
         long t0 = System.nanoTime();
 
-        BlockCompression bc = new BlockCompression();
-        List<RangeMatch> rangeMatches = bc.compress(metadata);
+        GrayBlockCompression bc = new GrayBlockCompression();
+
+        List<GrayRangeMatch> rangeMatches = bc.compress(metadata);
 
         long t1 = System.nanoTime();
 
         System.out.println("Starting Decompression");
 
         // declare decode images
-        Pixel[][] img = new Pixel[metadata.getWidth()][metadata.getHeight()];
-        Pixel[][] next = new Pixel[metadata.getWidth()][metadata.getHeight()];
+        GrayPixel[][] img = new GrayPixel[metadata.getWidth()][metadata.getHeight()];
+        GrayPixel[][] next = new GrayPixel[metadata.getWidth()][metadata.getHeight()];
 
         // fill random values
-        MatrixUtils.fill(img, () -> PixelUtils.getRandomPixel());
-        MatrixUtils.fill(next, () -> PixelUtils.getRandomPixel());
+        MatrixUtils.fill(img, () -> GrayPixelUtils.getRandomPixel());
+        MatrixUtils.fill(next, () -> GrayPixelUtils.getRandomPixel());
 
         // Save random image
-        PPMUtils.saveToImage(img, getStorageFile("initial.ppm"));
+        PGMAUtils.saveToImage(img, getStorageFile("initial"));
 
-        int iterations = 25;
+        int iterations = 10;
 
         System.out.println("Iterating over " + iterations + " iterations");
 
@@ -106,50 +112,42 @@ public class Main {
             System.out.println("Iteration " + iter);
 
             // loop compressed blocks
-            for (RangeMatch rm : rangeMatches) {
-                CompressedBlock cb = rm.compressed();
+            for (GrayRangeMatch rm : rangeMatches) {
+                GrayCompressedBlock cb = rm.compressed();
 
                 int xDomain = cb.domain().x();
                 int yDomain = cb.domain().y();
 
-                Pixel[][] domainPixels = new Pixel[BlockCompression.DBD][BlockCompression.DBD];
+                GrayPixel[][] domainPixels = new GrayPixel[RGBBlockCompression.DBD][RGBBlockCompression.DBD];
 
-                for (int i = 0; i < BlockCompression.DBD; i++) {
-                    for (int j = 0; j < BlockCompression.DBD; j++) {
+                for (int i = 0; i < RGBBlockCompression.DBD; i++) {
+                    for (int j = 0; j < RGBBlockCompression.DBD; j++) {
                         domainPixels[i][j] = img[xDomain + i][yDomain + j];
                     }
                 }
 
-                Block domainBlock = new Block(xDomain, yDomain, domainPixels);
+                GrayBlock domainBlock = new GrayBlock(xDomain, yDomain, domainPixels);
 
-                Block reducedBlock = domainBlock.reduce(BlockCompression.RBD);
+                GrayBlock reducedBlock = domainBlock.reduce(RGBBlockCompression.RBD);
 
-                Pixel[][] newPixels = new Pixel[BlockCompression.RBD][BlockCompression.RBD];
+                GrayPixel[][] newPixels = new GrayPixel[RGBBlockCompression.RBD][RGBBlockCompression.RBD];
 
-                for (int i = 0; i < BlockCompression.RBD; i++) {
-                    for (int j = 0; j < BlockCompression.RBD; j++) {
-                        Pixel p = reducedBlock.pixels()[i][j];
+                for (int i = 0; i < RGBBlockCompression.RBD; i++) {
+                    for (int j = 0; j < RGBBlockCompression.RBD; j++) {
+                        GrayPixel p = reducedBlock.pixels()[i][j];
 
-                        int[] newColors = new int[3];
+                        // gray has the same value for all colors
+                        // here we take red to simplify it, for now.
+                        float gray = p.gray();
 
-                        for (RGB c : RGB.values()) {
+                        // for gray its just one pixel for s and o.
+                        float s = cb.s();
+                        float o = cb.o();
 
-                            float s = cb.s()[c.ordinal()];
-                            float o = cb.o()[c.ordinal()];
+                        // new generated value with s/o
+                        int newColorValue = Math.max(0, Math.min(255, (int) (s * gray + o)));
 
-                            // previous value
-                            int colorValue = p.color(c);
-
-                            // new generated value with s/o
-                            int newColorValue = Math.max(0, Math.min(255, (int) (s * colorValue + o)));
-
-                            newColors[c.ordinal()] = newColorValue;
-                        }
-
-                        Pixel newPixel = new IntPixel(
-                                newColors[RGB.RED.ordinal()],
-                                newColors[RGB.GREEN.ordinal()],
-                                newColors[RGB.BLUE.ordinal()]);
+                        GrayPixel newPixel = new GrayPixel(newColorValue);
 
                         newPixels[i][j] = newPixel;
                     }
@@ -169,10 +167,11 @@ public class Main {
 
             long iterationEndTs = System.nanoTime();
 
-            String currentIterationPath = getStorageFile("iter_" + iter + ".ppm");
-            PPMUtils.saveToImage(next, currentIterationPath);
+            String currentIterationPathRaw = getStorageFile("iter_" + iter);
+            String currentIterationPath = currentIterationPathRaw + ".pgm";
+            PGMAUtils.saveToImage(next, currentIterationPathRaw);
 
-            double mse = PPMUtils.calculateMSE(imagePath, currentIterationPath);
+            double mse = PGMAUtils.calculateMSE(originalImagePath, currentIterationPath);
             System.out.println("MSE: " + mse);
 
             double psnr = calculatePSNR(mse);
@@ -198,4 +197,5 @@ public class Main {
         scb.saveTo(getStorageFile(""));
 
     }
+
 }

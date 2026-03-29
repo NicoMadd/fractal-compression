@@ -1,13 +1,17 @@
-package implementations.java.compression.src.utils.fractal;
+package implementations.java.compression.src.utils.fractal.block;
 
-import implementations.java.compression.src.utils.image.pixel.Pixel;
-import implementations.java.compression.src.utils.image.pixel.PixelUtils;
+import implementations.java.compression.src.utils.image.pixel.RGBPixel;
+import implementations.java.compression.src.utils.image.pixel.utils.RGBPixelUtils;
 
 /* 
 x: is the x point of the left-top pixel of the pixels.
 y: is the y point of the left-top pixel of the pixels.
 */
-public record Block(int x, int y, Pixel[][] pixels) {
+public class RGBBlock extends Block<RGBPixel> {
+
+    public RGBBlock(int x, int y, RGBPixel[][] pixels) {
+        super(x, y, pixels);
+    }
 
     public float[] means() {
 
@@ -15,8 +19,8 @@ public record Block(int x, int y, Pixel[][] pixels) {
         float[] means = new float[3];
         int total = 0;
 
-        for (Pixel[] row : pixels) {
-            for (Pixel p : row) {
+        for (RGBPixel[] row : this.pixels) {
+            for (RGBPixel p : row) {
                 sums[0] += p.red();
                 sums[1] += p.green();
                 sums[2] += p.blue();
@@ -36,7 +40,7 @@ public record Block(int x, int y, Pixel[][] pixels) {
      * @return a new Block with the array reduced to a square matrix of reduceTo
      *         dim.
      */
-    public Block reduce(int reduceTo) {
+    public RGBBlock reduce(int reduceTo) {
 
         int blockDim = this.pixels.length;
 
@@ -53,7 +57,7 @@ public record Block(int x, int y, Pixel[][] pixels) {
         int reduceRatio = blockDim / reduceTo;
         int totalReducedPixels = (int) Math.round(Math.pow(reduceRatio, 2));
 
-        Pixel[][] reducedPixels = new Pixel[reduceTo][reduceTo];
+        RGBPixel[][] reducedPixels = new RGBPixel[reduceTo][reduceTo];
 
         for (int i = 0; i < reduceTo; i++) {
             for (int j = 0; j < reduceTo; j++) {
@@ -61,7 +65,7 @@ public record Block(int x, int y, Pixel[][] pixels) {
                 int mainOffsetI = i * reduceRatio;
                 int mainOffsetJ = j * reduceRatio;
 
-                Pixel[] innerPixels = new Pixel[totalReducedPixels];
+                RGBPixel[] innerPixels = new RGBPixel[totalReducedPixels];
                 int idx = 0;
 
                 for (int ri = 0; ri < reduceRatio; ri++) {
@@ -70,7 +74,7 @@ public record Block(int x, int y, Pixel[][] pixels) {
                     }
                 }
 
-                Pixel reducedPixel = PixelUtils.reduce(innerPixels);
+                RGBPixel reducedPixel = RGBPixelUtils.reduce(innerPixels);
 
                 reducedPixels[i][j] = reducedPixel;
 
@@ -78,7 +82,7 @@ public record Block(int x, int y, Pixel[][] pixels) {
 
         }
 
-        Block reducedBlock = new Block(this.x(), this.y(), reducedPixels);
+        RGBBlock reducedBlock = new RGBBlock(this.x(), this.y(), reducedPixels);
 
         return reducedBlock;
     }

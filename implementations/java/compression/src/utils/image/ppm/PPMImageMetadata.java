@@ -5,10 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import implementations.java.compression.src.utils.image.ImageMetadata;
 import implementations.java.compression.src.utils.image.pixel.BytePixel;
 import implementations.java.compression.src.utils.image.pixel.IntPixel;
 import implementations.java.compression.src.utils.image.pixel.MaxValType;
-import implementations.java.compression.src.utils.image.pixel.Pixel;
+import implementations.java.compression.src.utils.image.pixel.RGBPixel;
 import implementations.java.compression.src.utils.readers.SequenceReader;
 
 /*
@@ -21,18 +22,18 @@ import implementations.java.compression.src.utils.readers.SequenceReader;
  * 
  * This was made following the PPM format specification: https://netpbm.sourceforge.net/doc/ppm.html
  */
-public class PPMImageMetadata {
+public class PPMImageMetadata implements ImageMetadata<RGBPixel> {
 
     private int width;
     private int height;
     private int maxVal;
     private MaxValType maxValType;
-    private Pixel[][] pixels;
+    private RGBPixel[][] pixels;
 
     private static final int MAGIC_NUMBER_BYTES_SIZE = 2;
     private static final String MAGIC_NUMBER = "P6";
 
-    public PPMImageMetadata(int width, int height, int maxVal, Pixel[][] pixels) {
+    public PPMImageMetadata(int width, int height, int maxVal, RGBPixel[][] pixels) {
         this.width = width;
         this.height = height;
         this.maxVal = maxVal;
@@ -60,7 +61,7 @@ public class PPMImageMetadata {
 
         sr.readWhitespace();
 
-        this.pixels = new Pixel[height][width];
+        this.pixels = new RGBPixel[height][width];
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
@@ -78,7 +79,7 @@ public class PPMImageMetadata {
         }
     }
 
-    public Pixel[][] getPixels() {
+    public RGBPixel[][] getPixels() {
         return pixels;
     }
 
@@ -104,7 +105,7 @@ public class PPMImageMetadata {
         return maxVal < 256 ? MaxValType.SINGLE : MaxValType.DOUBLE;
     }
 
-    private Pixel readPixel(SequenceReader sr) throws IOException {
+    private RGBPixel readPixel(SequenceReader sr) throws IOException {
         if (maxValType.equals(MaxValType.SINGLE)) {
             byte red = sr.read();
             byte green = sr.read();
@@ -128,7 +129,7 @@ public class PPMImageMetadata {
             // Pixels
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
-                    Pixel p = pixels[row][col];
+                    RGBPixel p = pixels[row][col];
                     p.addToFile(fos);
                 }
             }

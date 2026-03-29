@@ -3,23 +3,23 @@ package implementations.java.compression.src.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
-import implementations.java.compression.src.utils.fractal.Block;
-import implementations.java.compression.src.utils.fractal.CompressedBlock;
-import implementations.java.compression.src.utils.fractal.RangeMatch;
-import implementations.java.compression.src.utils.fractal.ReducedPair;
-import implementations.java.compression.src.utils.image.pixel.Pixel;
+import implementations.java.compression.src.utils.fractal.block.RGBBlock;
+import implementations.java.compression.src.utils.fractal.block.compressed.RGBCompressedBlock;
+import implementations.java.compression.src.utils.fractal.rangematch.RGBRangeMatch;
+import implementations.java.compression.src.utils.fractal.reducedpair.RGBReducedPair;
+import implementations.java.compression.src.utils.image.ImageMetadata;
 import implementations.java.compression.src.utils.image.pixel.RGB;
-import implementations.java.compression.src.utils.image.ppm.PPMImageMetadata;
+import implementations.java.compression.src.utils.image.pixel.RGBPixel;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
-public class BlockCompression {
+public class RGBBlockCompression {
 
-    private Pixel[][] imagePixels;
+    private RGBPixel[][] imagePixels;
     private int imageWidth;
     private int imageHeight;
 
-    private Block[][] rangeBlocks;
-    private Block[][] domainBlocks;
+    private RGBBlock[][] rangeBlocks;
+    private RGBBlock[][] domainBlocks;
 
     private float[] meansR;
 
@@ -43,7 +43,7 @@ public class BlockCompression {
      * @return s value calculated for these blocks
      * 
      */
-    private float calculateS(List<Pixel> rangePixels, List<Pixel> rdPixels, float[] meansD, RGB c) {
+    private float calculateS(List<RGBPixel> rangePixels, List<RGBPixel> rdPixels, float[] meansD, RGB c) {
         // calculate s
         // numerator: summation of the diff between each
         // Di minus the avgD times
@@ -78,20 +78,20 @@ public class BlockCompression {
         return this.meansR[c.ordinal()] - s * meansD[c.ordinal()];
     }
 
-    private CompressedBlock findBestDomainMatch(Block range, ReducedPair[][] reducedDomainsPairs) {
+    private RGBCompressedBlock findBestDomainMatch(RGBBlock range, RGBReducedPair[][] reducedDomainsPairs) {
 
         this.meansR = range.means();
 
-        CompressedBlock bestCompression = null;
+        RGBCompressedBlock bestCompression = null;
         float bestError = Float.MAX_VALUE;
 
-        for (ReducedPair[] row : reducedDomainsPairs) {
-            for (ReducedPair rdp : row) {
-                Block rd = rdp.reduced();
+        for (RGBReducedPair[] row : reducedDomainsPairs) {
+            for (RGBReducedPair rdp : row) {
+                RGBBlock rd = rdp.reduced();
                 float[] meansD = rd.means();
 
-                List<Pixel> rangePixels = MatrixUtils.flatMap(range.pixels());
-                List<Pixel> rdPixels = MatrixUtils.flatMap(rd.pixels());
+                List<RGBPixel> rangePixels = MatrixUtils.flatMap(range.pixels());
+                List<RGBPixel> rdPixels = MatrixUtils.flatMap(rd.pixels());
 
                 int totalPixels = rangePixels.size();
 
@@ -131,7 +131,7 @@ public class BlockCompression {
                 // decide wether to keep this block or discard it.
                 // if block error is less than the actual best, then keep it.
                 if (blockError < bestError) {
-                    bestCompression = new CompressedBlock(range, rdp.domain(), sArr, oArr);
+                    bestCompression = new RGBCompressedBlock(range, rdp.domain(), sArr, oArr);
                     bestError = blockError;
                 }
             }
@@ -141,7 +141,7 @@ public class BlockCompression {
 
     }
 
-    public List<RangeMatch> compress(PPMImageMetadata metadata) {
+    public List<RGBRangeMatch> compress(ImageMetadata<RGBPixel> metadata) {
 
         this.imagePixels = metadata.getPixels();
         this.imageWidth = metadata.getWidth();
@@ -151,11 +151,11 @@ public class BlockCompression {
         int domainBlockNumber = this.imageHeight / DBD; // 256 / (4 * 2) = 32
 
         // create 4x4 blocks - range blocks - BxB blocks
-        this.rangeBlocks = new Block[rangeBlocksNumber][rangeBlocksNumber];
+        this.rangeBlocks = new RGBBlock[rangeBlocksNumber][rangeBlocksNumber];
 
         for (int i = 0; i < rangeBlocksNumber; i++) {
             for (int j = 0; j < rangeBlocksNumber; j++) {
-                Pixel[][] blockPixels = new Pixel[RBD][RBD];
+                RGBPixel[][] blockPixels = new RGBPixel[RBD][RBD];
 
                 for (int k = 0; k < RBD; k++) {
                     for (int l = 0; l < RBD; l++) {
@@ -163,17 +163,17 @@ public class BlockCompression {
                     }
                 }
 
-                Block block = new Block(4 * i, 4 * j, blockPixels);
+                RGBBlock block = new RGBBlock(4 * i, 4 * j, blockPixels);
                 rangeBlocks[i][j] = block;
             }
         }
 
         // create 8x8 blocks - domain blocks - 2Bx2B - DxD
-        this.domainBlocks = new Block[domainBlockNumber][domainBlockNumber];
+        this.domainBlocks = new RGBBlock[domainBlockNumber][domainBlockNumber];
 
         for (int i = 0; i < domainBlockNumber; i++) {
             for (int j = 0; j < domainBlockNumber; j++) {
-                Pixel[][] blockPixels = new Pixel[DBD][DBD];
+                RGBPixel[][] blockPixels = new RGBPixel[DBD][DBD];
 
                 for (int k = 0; k < DBD; k++) {
                     for (int l = 0; l < DBD; l++) {
@@ -182,27 +182,27 @@ public class BlockCompression {
                     }
                 }
 
-                Block block = new Block(8 * i, 8 * j, blockPixels);
+                RGBBlock block = new RGBBlock(DBD * i, DBD * j, blockPixels);
                 domainBlocks[i][j] = block;
             }
         }
 
         // For each domain find the reduced domain block.
-        ReducedPair[][] reducedDomainBlocksPair = new ReducedPair[domainBlockNumber][domainBlockNumber];
+        RGBReducedPair[][] reducedDomainBlocksPair = new RGBReducedPair[domainBlockNumber][domainBlockNumber];
 
         for (int i = 0; i < domainBlockNumber; i++) {
             for (int j = 0; j < domainBlockNumber; j++) {
-                Block reducedBlock = domainBlocks[i][j].reduce(RBD);
-                reducedDomainBlocksPair[i][j] = new ReducedPair(domainBlocks[i][j], reducedBlock);
+                RGBBlock reducedBlock = domainBlocks[i][j].reduce(RBD);
+                reducedDomainBlocksPair[i][j] = new RGBReducedPair(domainBlocks[i][j], reducedBlock);
             }
         }
 
-        List<RangeMatch> rangeMatches = new ArrayList<>();
+        List<RGBRangeMatch> rangeMatches = new ArrayList<>();
 
-        for (Block[] rangesRow : rangeBlocks) {
-            for (Block range : rangesRow) {
-                CompressedBlock bestDomain = findBestDomainMatch(range, reducedDomainBlocksPair);
-                RangeMatch rangeMatch = new RangeMatch(range, bestDomain);
+        for (RGBBlock[] rangesRow : rangeBlocks) {
+            for (RGBBlock range : rangesRow) {
+                RGBCompressedBlock bestDomain = findBestDomainMatch(range, reducedDomainBlocksPair);
+                RGBRangeMatch rangeMatch = new RGBRangeMatch(range, bestDomain);
 
                 rangeMatches.add(rangeMatch);
             }
