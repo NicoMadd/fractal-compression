@@ -18,7 +18,7 @@ import implementations.java.compression.src.utils.fractal.rangematch.GrayRangeMa
 import implementations.java.compression.src.utils.image.pgm.PGMAImageMetadata;
 import implementations.java.compression.src.utils.image.pgm.PGMAUtils;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
-import implementations.java.compression.src.utils.image.pixel.GrayPixelUtils;
+import implementations.java.compression.src.utils.image.pixel.utils.GrayPixelUtils;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
 public class Main {
@@ -98,7 +98,7 @@ public class Main {
         // Save random image
         PGMAUtils.saveToImage(img, getStorageFile("initial"));
 
-        int iterations = 10;
+        int iterations = 25;
 
         System.out.println("Iterating over " + iterations + " iterations");
 
@@ -179,7 +179,11 @@ public class Main {
             Iteration iteration = new Iteration(iter, iterationEndTs, iterationEndTs - iterationStartTs, mse, psnr);
             scb.add(iteration);
 
+            // Jacobi: keep two buffers; swap references so next pass reads the image
+            // we just wrote and writes into the other buffer.
+            GrayPixel[][] tmp = img;
             img = next;
+            next = tmp;
 
         }
 
