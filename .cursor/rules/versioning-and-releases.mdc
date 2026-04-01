@@ -1,0 +1,10 @@
+---
+description: Provisional 0.x.0 release lines map to feature/x-... branches; keep CHANGELOG aligned.
+alwaysApply: true
+---
+
+# Versioning and changelog
+
+**Versioning (provisional):** each release line is **`0.x.0`**, where **`x`** is the branch prefix on **`feature/x-...`**. Those branches *mark* that line for now (e.g. `feature/1-raw-block-compression` → `0.1.0`, `feature/2-gray-block-compression` → `0.2.0`). **`main`** currently follows the **`0.2.0`** line.
+
+When adding notable changes, update `CHANGELOG.md` under the correct **`0.x.0`** section (or **Unreleased**) consistent with this mapping.
