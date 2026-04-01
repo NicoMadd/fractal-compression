@@ -5,7 +5,7 @@ import java.util.List;
 
 import implementations.java.compression.src.utils.fractal.block.GrayBlock;
 import implementations.java.compression.src.utils.fractal.block.compressed.GrayCompressedBlock;
-import implementations.java.compression.src.utils.fractal.rangematch.GrayRangeMatch;
+import implementations.java.compression.src.utils.fractal.mapping.FractalMapping;
 import implementations.java.compression.src.utils.fractal.reducedpair.GrayReducedPair;
 import implementations.java.compression.src.utils.image.ImageMetadata;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
@@ -183,20 +183,22 @@ public class GrayBlockCompression {
         return reducedDomainBlocksPair;
     }
 
-    private List<GrayRangeMatch> buildRangeMatches(GrayReducedPair[][] reducedDomainBlocksPair) {
-        List<GrayRangeMatch> rangeMatches = new ArrayList<>();
+    private List<FractalMapping> buildFractalMappings(GrayReducedPair[][] reducedDomainBlocksPair) {
+        List<FractalMapping> mappings = new ArrayList<>();
 
         for (GrayBlock[] rangesRow : rangeBlocks) {
             for (GrayBlock range : rangesRow) {
                 GrayCompressedBlock bestDomain = findBestDomainMatch(range, reducedDomainBlocksPair);
-                rangeMatches.add(new GrayRangeMatch(range, bestDomain));
+                FractalMapping fm = new FractalMapping(range.x(), range.y(), bestDomain.domain().x(),
+                        bestDomain.domain().y(), bestDomain.s(), bestDomain.o());
+                mappings.add(fm);
             }
         }
 
-        return rangeMatches;
+        return mappings;
     }
 
-    public List<GrayRangeMatch> compress(ImageMetadata<GrayPixel> metadata) {
+    public List<FractalMapping> compress(ImageMetadata<GrayPixel> metadata) {
 
         this.imagePixels = metadata.getPixels();
         this.imageWidth = metadata.getWidth();
@@ -211,8 +213,7 @@ public class GrayBlockCompression {
         GrayReducedPair[][] reducedDomainBlocksPair = buildReducedDomainPairs(domainBlockNumber);
 
         System.out.println("Compression Finished!");
-        return buildRangeMatches(reducedDomainBlocksPair);
-
+        return buildFractalMappings(reducedDomainBlocksPair);
     }
 
 }

@@ -20,8 +20,9 @@ public abstract class Pipeline {
             System.out.println("File Input Stream closed.");
         }
 
-        Files.createDirectories(FileUtils.ITERATIONS_ROOT);
-        FileUtils.cleanAndCreateRunDir(params.runDir());
+        Files.createDirectories(FileUtils.PROCESSES_ROOT);
+        Files.createDirectories(params.runDir());
+        FileUtils.cleanAndCreateIterationsDir(params.runDir());
         FileUtils.copyOriginal(params.imagePath(), params.runDir());
 
     }

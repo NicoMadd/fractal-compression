@@ -5,12 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import implementations.java.compression.src.utils.files.readers.SequenceReader;
 import implementations.java.compression.src.utils.image.ImageMetadata;
 import implementations.java.compression.src.utils.image.pixel.BytePixel;
 import implementations.java.compression.src.utils.image.pixel.IntPixel;
 import implementations.java.compression.src.utils.image.pixel.MaxValType;
 import implementations.java.compression.src.utils.image.pixel.RGBPixel;
-import implementations.java.compression.src.utils.readers.SequenceReader;
 
 /*
  * Class to hold the metadata of a PPM image.

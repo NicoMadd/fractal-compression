@@ -1,4 +1,4 @@
-package implementations.java.compression.src.utils.readers;
+package implementations.java.compression.src.utils.files.readers;
 
 import java.io.BufferedInputStream;
 import java.io.EOFException;
@@ -56,13 +56,6 @@ public class SequenceReader {
         } while (true);
     }
 
-    public int readNextInt() throws IOException {
-        skipFollowingWhitespaces();
-        byte[] readBytes = readUntilWhitespace();
-        String rawNumber = new String(readBytes);
-        return Integer.parseInt(rawNumber);
-    }
-
     public char readWhitespace() throws IOException {
         int ic = this.bis.read();
 
@@ -113,6 +106,24 @@ public class SequenceReader {
     public int readNBytesAsInt(int n) throws IOException {
         byte[] bytes = this.readNBytes(n);
         return Integer.parseInt(new String(bytes));
+    }
 
+    public String readNBytesAsString(int n) throws IOException {
+        byte[] bytes = this.readNBytes(n);
+        return new String(bytes);
+    }
+
+    public int readNextInt() throws IOException {
+        skipFollowingWhitespaces();
+        byte[] readBytes = readUntilWhitespace();
+        String rawNumber = new String(readBytes);
+        return Integer.parseInt(rawNumber);
+    }
+
+    public float readNextFloat() throws IOException {
+        skipFollowingWhitespaces();
+        byte[] readBytes = readUntilWhitespace();
+        String rawNumber = new String(readBytes);
+        return Float.parseFloat(rawNumber);
     }
 }

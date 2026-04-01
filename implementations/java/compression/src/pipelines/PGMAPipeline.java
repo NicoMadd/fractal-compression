@@ -2,6 +2,7 @@ package implementations.java.compression.src.pipelines;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -12,8 +13,8 @@ import implementations.java.compression.src.benchmarks.SimpleCompressionBenchmar
 import implementations.java.compression.src.utils.errors.ErrorUtils;
 import implementations.java.compression.src.utils.files.FileUtils;
 import implementations.java.compression.src.utils.fractal.block.GrayBlock;
-import implementations.java.compression.src.utils.fractal.block.compressed.GrayCompressedBlock;
-import implementations.java.compression.src.utils.fractal.rangematch.GrayRangeMatch;
+import implementations.java.compression.src.utils.fractal.mapping.Codebook;
+import implementations.java.compression.src.utils.fractal.mapping.FractalMapping;
 import implementations.java.compression.src.utils.image.pgm.PGMAImageMetadata;
 import implementations.java.compression.src.utils.image.pgm.PGMAUtils;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
@@ -23,9 +24,11 @@ import implementations.java.compression.src.utils.matrix.MatrixUtils;
 public class PGMAPipeline extends Pipeline {
 
     private PGMAImageMetadata metadata;
+    private GrayBlockCompression gbc;
 
     public PGMAPipeline(PipelineParams params) throws IOException {
         super(params);
+        this.gbc = new GrayBlockCompression();
     }
 
     protected void init(FileInputStream fis) throws IOException {
@@ -33,16 +36,31 @@ public class PGMAPipeline extends Pipeline {
     }
 
     public void run(PipelineParams params)
-            throws IOException {
+            throws Exception {
         String originalImagePath = params.imagePath();
         int iterations = params.iterations();
         Path runDir = params.runDir();
+        Path iterationsDir = FileUtils.iterationsDir(runDir);
 
         long t0 = System.nanoTime();
 
-        GrayBlockCompression bc = new GrayBlockCompression();
+        Path codebookPath = runDir.resolve("codebook.fc");
 
-        List<GrayRangeMatch> rangeMatches = bc.compress(metadata);
+        System.out.println("Looking for file in " + codebookPath.toString());
+
+        Codebook cb = null;
+        List<FractalMapping> mappings;
+
+        if (Files.exists(codebookPath)) {
+            System.out.println("Codebook found!");
+            cb = new Codebook(codebookPath.toString());
+            mappings = cb.getMappings();
+        } else {
+            System.out.println("Codebook not found!");
+            mappings = this.gbc.compress(metadata);
+            cb = new Codebook(mappings);
+            cb.save(codebookPath.toString());
+        }
 
         long t1 = System.nanoTime();
 
@@ -56,7 +74,7 @@ public class PGMAPipeline extends Pipeline {
         MatrixUtils.fill(img, () -> GrayPixelUtils.getRandomPixel());
         MatrixUtils.fill(next, () -> GrayPixelUtils.getRandomPixel());
 
-        PGMAUtils.saveToImage(img, FileUtils.inRunDir(runDir, "initial").toString());
+        PGMAUtils.saveToImage(img, FileUtils.inRunDir(iterationsDir, "initial").toString());
 
         System.out.println("Iterating over " + iterations + " iterations");
 
@@ -70,11 +88,10 @@ public class PGMAPipeline extends Pipeline {
             System.out.println("Iteration " + iter);
 
             // loop compressed blocks
-            for (GrayRangeMatch rm : rangeMatches) {
-                GrayCompressedBlock cb = rm.compressed();
+            for (FractalMapping fm : mappings) {
 
-                int xDomain = cb.domain().x();
-                int yDomain = cb.domain().y();
+                int xDomain = fm.domainX();
+                int yDomain = fm.domainY();
 
                 GrayPixel[][] domainPixels = new GrayPixel[RGBBlockCompression.DBD][RGBBlockCompression.DBD];
 
@@ -99,8 +116,8 @@ public class PGMAPipeline extends Pipeline {
                         float gray = p.gray();
 
                         // for gray its just one pixel for s and o.
-                        float s = cb.s();
-                        float o = cb.o();
+                        float s = fm.s();
+                        float o = fm.o();
 
                         // new generated value with s/o
                         int newColorValue = Math.max(0, Math.min(255, (int) (s * gray + o)));
@@ -113,11 +130,11 @@ public class PGMAPipeline extends Pipeline {
 
                 // use range in rm to write the new pixels in next pixels
 
-                int xRangeOffset = rm.range().x();
-                int yRangeOffset = rm.range().y();
+                int xRangeOffset = fm.rangeX();
+                int yRangeOffset = fm.rangeY();
 
-                for (int i = 0; i < 4; i++) {
-                    for (int j = 0; j < 4; j++) {
+                for (int i = 0; i < GrayBlockCompression.RBD; i++) {
+                    for (int j = 0; j < GrayBlockCompression.RBD; j++) {
                         next[xRangeOffset + i][yRangeOffset + j] = newPixels[i][j];
                     }
                 }
@@ -125,7 +142,7 @@ public class PGMAPipeline extends Pipeline {
 
             long iterationEndTs = System.nanoTime();
 
-            Path iterBase = FileUtils.inRunDir(runDir, "iter_" + iter);
+            Path iterBase = FileUtils.inRunDir(iterationsDir, "iter_" + iter);
             String currentIterationPath = iterBase + ".pgm";
             PGMAUtils.saveToImage(next, iterBase.toString());
 
@@ -156,7 +173,20 @@ public class PGMAPipeline extends Pipeline {
         System.out.println("Compression took: " + compressionSeconds + "s");
         System.out.println("Decompression took: " + decompressionSeconds + "s");
 
-        scb.saveTo(runDir.toString());
+        scb.saveTo(iterationsDir.toString());
+
+        calculateCompressionRatio(originalImagePath, codebookPath.toString());
+    }
+
+    private void calculateCompressionRatio(String originalImagePath, String codebookPath) throws IOException {
+        long originalSize = FileUtils.getFileSize(originalImagePath);
+        long codebookSize = FileUtils.getFileSize(codebookPath);
+
+        double n = (double) originalSize / codebookSize;
+
+        String ratio = String.format("%.2f:1", n);
+
+        System.out.println("Compression ratio: " + ratio);
 
     }
 }

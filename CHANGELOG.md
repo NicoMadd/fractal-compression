@@ -10,6 +10,18 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 ### Added
 
 - `docs/fractal-codebook-fc.html` — **Fractal Codebook** ASCII format spec (PGMA-style; magic `FC`)
+- **Fractal Codebook** Java types: `FractalMapping`, `Codebook` (FC read/write); `SequenceWriter`; `SequenceReader` moved to `utils/files/readers/`
+- `FileUtils.getFileSize`; `PGMAPipeline` prints compression ratio **N:1** (original image file size vs `codebook.fc`)
+
+### Changed
+
+- Output root renamed to **`processes/`** (was `iterations/`): per image `processes/<stem>/` holds `codebook.fc` and `original.pgm`; **`processes/<stem>/iterations/`** holds PG iteration frames and `benchmark.csv`. Only the inner `iterations` folder is wiped on each run. Sample outputs under `processes/` migrated from `iterations/`.
+- `README.md`: documents the `processes/<stem>/` layout
+
+### Fixed
+
+- `Codebook` file load: `deserialize` assigns `mappings`; path constructor initializes an empty list before read; failed deserialize logs and throws (no silent empty codebook)
+- `PGMAPipeline`: load `codebook.fc` from `runDir` when present, else compress and save; `parseMappings` rebuilds `GrayRangeMatch` from `FractalMapping` (placeholder pixel grids; positions and `s`/`o` drive decode)
 
 ## [0.2.0] - 2026-03-29 — `feature/2-gray-block-compression` (`main`)
 

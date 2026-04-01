@@ -26,7 +26,7 @@ public record PipelineParams(String imagePath, int iterations, Path runDir) {
             return Optional.empty();
         }
 
-        Path runDir = FileUtils.ITERATIONS_ROOT.resolve(FileUtils.runFolderName(imagePath));
+        Path runDir = FileUtils.PROCESSES_ROOT.resolve(FileUtils.runFolderName(imagePath));
 
         return Optional.of(new PipelineParams(imagePath, iterations, runDir));
     }

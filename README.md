@@ -34,4 +34,4 @@ chmod +x run.sh   # once, if needed
 ./run.sh ../../data/images/lena.ppm
 ```
 
-Pass any PPM path as the first argument. Outputs are written under `implementations/java/compression/iterations/` (per-iteration PPM frames and `benchmark.csv` with timing / MSE / PSNR).
+Pass any PPM path as the first argument. Outputs are written under `processes/<image-stem>/` at repo level (`codebook.fc`, `original.pgm`), with per-run iteration PGMs and `benchmark.csv` under `processes/<image-stem>/iterations/` (when the Java module’s working directory matches `run.sh`).

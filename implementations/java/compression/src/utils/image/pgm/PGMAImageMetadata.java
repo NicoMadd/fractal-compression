@@ -5,9 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import implementations.java.compression.src.utils.files.readers.SequenceReader;
 import implementations.java.compression.src.utils.image.ImageMetadata;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
-import implementations.java.compression.src.utils.readers.SequenceReader;
 
 public class PGMAImageMetadata implements ImageMetadata<GrayPixel> {
 
