@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fractal Codebook (ASCII)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Georgia, "Times New Roman", serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.45; color: #1a1a1a; }
+    h1 { font-size: 1.75rem; border-bottom: 1px solid #ccc; padding-bottom: 0.35rem; }
+    pre, code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 0.9rem; }
+    pre { background: #f6f6f6; border: 1px solid #e0e0e0; padding: 1rem; overflow-x: auto; }
+    ul { padding-left: 1.25rem; }
+    .note { font-size: 0.95rem; color: #444; }
+    hr { border: none; border-top: 1px solid #ccc; margin: 1.5rem 0; }
+  </style>
+</head>
+<body>
+
+<h1>Fractal Codebook</h1>
+
+<p>
+  This document describes the <strong>Fractal Codebook</strong> ASCII file format: a list of
+  <em>range–domain affine mappings</em> (one per range block), as loaded by
+  <code>implementations.java.compression.src.utils.fractal.mapping.Codebook</code>.
+  On disk the format begins with the two-byte magic <code>FC</code> (Fractal Codebook).
+  The layout is intentionally similar in spirit to
+  <a href="https://people.sc.fsu.edu/~jburkardt/data/pgma/pgma.html">ASCII PGM (PGMA)</a>:
+  a short magic token, then decimal numbers separated by whitespace.
+</p>
+
+<hr>
+
+<h2>Definition</h2>
+
+<ul>
+  <li>
+    <strong>Magic number.</strong>
+    The first two bytes are the ASCII characters <code>F</code> and <code>C</code>,
+    the on-disk signature for a <strong>Fractal Codebook</strong> file.
+  </li>
+  <li>
+    <strong>Whitespace.</strong>
+    Exactly one whitespace character (space, tab, CR, or LF as accepted by
+    <code>java.lang.Character.isWhitespace</code>) must follow the magic number.
+    The reference reader uses <code>SequenceReader.readWhitespace()</code>, which requires this separator.
+  </li>
+  <li>
+    <strong>Row count.</strong>
+    An unsigned decimal integer: <code>N</code>, the number of mapping records that follow.
+    Leading whitespace before this integer is skipped by the reader.
+  </li>
+  <li>
+    <strong>Mapping records.</strong>
+    For each of the <code>N</code> rows, six tokens in order, each separated by whitespace:
+    <ol>
+      <li><code>rangeX</code> — decimal <code>int</code>, x-coordinate of the range block’s top-left pixel.</li>
+      <li><code>rangeY</code> — decimal <code>int</code>, y-coordinate of the range block’s top-left pixel.</li>
+      <li><code>domainX</code> — decimal <code>int</code>, x-coordinate of the domain block’s top-left pixel.</li>
+      <li><code>domainY</code> — decimal <code>int</code>, y-coordinate of the domain block’s top-left pixel.</li>
+      <li><code>s</code> — decimal <code>float</code>, contrast (scale) coefficient in the affine map
+        <code>value ≈ s × sample + o</code> (see compressor implementation for exact use).</li>
+      <li><code>o</code> — decimal <code>float</code>, offset (brightness) coefficient.</li>
+    </ol>
+    These fields match the Java record
+    <code>FractalMapping(int rangeX, int rangeY, int domainX, int domainY, float s, float o)</code>.
+  </li>
+  <li>
+    <strong>Encoding.</strong>
+    Integers use <code>Integer.parseInt</code> semantics; floats use <code>Float.parseFloat</code>
+    (locale-independent ASCII digits, optional sign and exponent).
+    Line breaks are optional; any run of whitespace separates tokens.
+  </li>
+</ul>
+
+<p class="note">
+  <strong>Decoder contract.</strong>
+  Block sizes (range / domain), image width and height, and iteration count are <em>not</em> stored in a
+  Fractal Codebook file in the current implementation; they must match whatever pipeline produced the codebook.
+  Future versions may add a header (dimensions, <code>RBD</code>/<code>DBD</code>, codec version).
+</p>
+
+<hr>
+
+<h2>Example Fractal Codebook file</h2>
+
+<p>Three mappings (illustrative numbers only):</p>
+
+<pre>FC 3
+0 0 16 16 0.92 4.5
+4 0 32 0 1.0 0.0
+0 4 0 32 0.88 -2.0</pre>
+
+<hr>
+
+<h2>Characteristics</h2>
+
+<ul>
+  <li>ASCII text (human-inspectable, not binary-packed)</li>
+  <li>One codebook per file</li>
+  <li>No built-in comments line (unlike PGM <code>#</code>); entire file is tokens after the magic</li>
+  <li>Typical extension: <code>.fc</code> or any path passed to <code>new Codebook(String path)</code></li>
+</ul>
+
+<hr>
+
+<h2>Implementation reference</h2>
+
+<ul>
+  <li><code>Codebook.deserialize</code> — read magic, separator, <code>N</code>, then <code>N</code> mappings.</li>
+  <li><code>Codebook.readMapping</code> — six tokens per <code>FractalMapping</code>.</li>
+  <li><code>SequenceReader.readNextInt</code> / <code>readNextFloat</code> — tokenization.</li>
+</ul>
+
+<p class="note">
+  Last revised to match the Java sources in repository
+  <code>fractal-compression/implementations/java/compression</code>.
+</p>
+
+</body>
+</html>
