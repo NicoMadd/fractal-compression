@@ -7,6 +7,10 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 
+### Added
+
+- `docs/fractal-codebook-fc.html` — **Fractal Codebook** ASCII format spec (PGMA-style; magic `FC`)
+
 ## [0.2.0] - 2026-03-29 — `feature/2-gray-block-compression` (`main`)
 
 ### Added
