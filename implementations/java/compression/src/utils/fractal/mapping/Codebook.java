@@ -1,11 +1,12 @@
 package implementations.java.compression.src.utils.fractal.mapping;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import implementations.java.compression.src.utils.files.readers.SequenceInput;
 import implementations.java.compression.src.utils.files.readers.SequenceReader;
+import implementations.java.compression.src.utils.files.writers.SequenceOutput;
 import implementations.java.compression.src.utils.files.writers.SequenceWriter;
 
 public class Codebook {
@@ -31,8 +32,7 @@ public class Codebook {
 
     public Codebook(String path) {
         this.mappings = List.of();
-        try (FileInputStream fis = new FileInputStream(path)) {
-            SequenceReader sr = new SequenceReader(fis);
+        try (SequenceInput sr = new SequenceReader(path)) {
             deserialize(sr);
         } catch (Exception e) {
             System.out.println("Error deserializing codebook: " + e.getMessage());
@@ -54,26 +54,20 @@ public class Codebook {
         return domainSize;
     }
 
-    private void deserialize(SequenceReader sr) throws IOException {
+    private void deserialize(SequenceInput sr) throws IOException {
 
         // Read first two bytes. Should be magic number
-        String magicNumber = sr.readNBytesAsString(2);
+        String magicNumber = sr.readString(2);
 
         if (!MAGIC_NUMBER.equals(magicNumber)) {
             throw new IllegalArgumentException(
                     "Magic number of image is not correct. Expected " + MAGIC_NUMBER + "but was: " + magicNumber);
         }
 
-        sr.skipFollowingWhitespaces();
-        String headerLine = readLine(sr);
-        String[] headerParts = headerLine.trim().split("\\s+");
-        if (headerParts.length != 3) {
-            throw new IllegalArgumentException(
-                    "Codebook header after FC must be three integers: <range size> <domain size> <mapping count>.");
-        }
-        this.rangeSize = Integer.parseInt(headerParts[0]);
-        this.domainSize = Integer.parseInt(headerParts[1]);
-        int totalRows = Integer.parseInt(headerParts[2]);
+        sr.space();
+        this.rangeSize = sr.readInt();
+        this.domainSize = sr.readInt();
+        int totalRows = sr.readInt();
 
         List<FractalMapping> mappings = new ArrayList<>();
 
@@ -85,15 +79,6 @@ public class Codebook {
         this.mappings = mappings;
     }
 
-    private static String readLine(SequenceReader sr) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        while (!sr.nextCharIs('\n')) {
-            sb.append((char) sr.read());
-        }
-        sr.read();
-        return sb.toString();
-    }
-
     /**
      * The fractal mapping is composed of 4 ints and 2 floats.
      * 
@@ -101,13 +86,13 @@ public class Codebook {
      * @return
      * @throws IOException
      */
-    private FractalMapping readMapping(SequenceReader sr) throws IOException {
-        int rangeX = sr.readNextInt();
-        int rangeY = sr.readNextInt();
-        int domainX = sr.readNextInt();
-        int domainY = sr.readNextInt();
-        float s = sr.readNextFloat();
-        float o = sr.readNextFloat();
+    private FractalMapping readMapping(SequenceInput sr) throws IOException {
+        int rangeX = sr.readInt();
+        int rangeY = sr.readInt();
+        int domainX = sr.readInt();
+        int domainY = sr.readInt();
+        float s = sr.readFloat();
+        float o = sr.readFloat();
 
         return new FractalMapping(rangeX, rangeY, domainX, domainY, s, o);
     }
@@ -120,7 +105,7 @@ public class Codebook {
      */
     public void save(String path) throws Exception {
 
-        try (SequenceWriter sw = new SequenceWriter(path)) {
+        try (SequenceOutput sw = new SequenceWriter(path)) {
             serialize(sw);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -128,7 +113,7 @@ public class Codebook {
 
     }
 
-    private void serialize(SequenceWriter sw) throws IOException {
+    private void serialize(SequenceOutput sw) throws IOException {
 
         serializeMetadata(sw);
 
@@ -143,15 +128,15 @@ public class Codebook {
             sw.space();
             sw.write(fm.domainY());
             sw.space();
-            sw.write(fm.s());
+            sw.write(fm.s(), 2);
             sw.space();
-            sw.write(fm.o());
+            sw.write(fm.o(), 2);
             sw.bl();
         }
 
     }
 
-    private void serializeMetadata(SequenceWriter sw) throws IOException {
+    private void serializeMetadata(SequenceOutput sw) throws IOException {
         // Write the MAGIC_NUMBER
         sw.write(MAGIC_NUMBER);
 

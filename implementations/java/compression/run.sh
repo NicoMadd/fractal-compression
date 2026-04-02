@@ -8,38 +8,91 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 IMAGES_ROOT="${REPO_ROOT}/data/images"
 
 usage() {
-  echo "Usage: $0 [<image type>] <image name> <iterations> [<range size> <domain size>]"
+  echo "Usage: $0 [[<image type>] <image name>] [-i iterations] [-r range] [-d domain] [-c] [-- <java-args>...]"
   echo "  image type: subdirectory under data/images (default: pgma)"
-  echo "  image name: stem or prefix; must match exactly one file in that folder"
-  echo "  range/domain: optional; default 8 16"
-  echo "Example: $0 baboon 25"
-  echo "Example: $0 pgma baboon 25 8 16"
+  echo "  image name: stem or prefix; must match exactly one file under the type folder"
+  echo "  Defaults: iterations=25, range=4, domain=8"
+  echo "  -i, -r, -d override defaults (any order before --). -c drops existing codebook before run."
+  echo "  After --, remaining args are passed to Main as well."
+  echo "Example: $0 baboon"
+  echo "Example: $0 baboon -i 40"
+  echo "Example: $0 baboon -c"
+  echo "Example: $0 pgma baboon -r 8 -d 16"
   exit 1
 }
 
+JAVA_OPTS=()
+PRE_JAVA=()
+seen_sep=0
+for arg in "$@"; do
+  if [[ "$seen_sep" -eq 1 ]]; then
+    JAVA_OPTS+=("$arg")
+    continue
+  fi
+  if [[ "$arg" == "--" ]]; then
+    seen_sep=1
+    continue
+  fi
+  PRE_JAVA+=("$arg")
+done
+
+ITERS=25
+RANGE=4
+DOMAIN=8
+CLEAN_CODEBOOK=0
 TYPE="pgma"
-RANGE="8"
-DOMAIN="16"
-if [ "$#" -eq 2 ]; then
-  NAME="$1"
-  ITERS="$2"
-elif [ "$#" -eq 3 ]; then
-  TYPE="$1"
-  NAME="$2"
-  ITERS="$3"
-elif [ "$#" -eq 4 ]; then
-  NAME="$1"
-  ITERS="$2"
-  RANGE="$3"
-  DOMAIN="$4"
-elif [ "$#" -eq 5 ]; then
-  TYPE="$1"
-  NAME="$2"
-  ITERS="$3"
-  RANGE="$4"
-  DOMAIN="$5"
+POSITIONAL=()
+
+i=0
+n=${#PRE_JAVA[@]}
+while [ "$i" -lt "$n" ]; do
+  a="${PRE_JAVA[$i]}"
+  case "$a" in
+    -i)
+      i=$((i + 1))
+      if [ "$i" -ge "$n" ]; then echo "$0: -i requires a value"; exit 1; fi
+      ITERS="${PRE_JAVA[$i]}"
+      ;;
+    -r)
+      i=$((i + 1))
+      if [ "$i" -ge "$n" ]; then echo "$0: -r requires a value"; exit 1; fi
+      RANGE="${PRE_JAVA[$i]}"
+      ;;
+    -d)
+      i=$((i + 1))
+      if [ "$i" -ge "$n" ]; then echo "$0: -d requires a value"; exit 1; fi
+      DOMAIN="${PRE_JAVA[$i]}"
+      ;;
+    -c)
+      CLEAN_CODEBOOK=1
+      ;;
+    *)
+      POSITIONAL+=("$a")
+      ;;
+  esac
+  i=$((i + 1))
+done
+
+if [ "${#POSITIONAL[@]}" -eq 1 ]; then
+  NAME="${POSITIONAL[0]}"
+elif [ "${#POSITIONAL[@]}" -eq 2 ]; then
+  TYPE="${POSITIONAL[0]}"
+  NAME="${POSITIONAL[1]}"
 else
   usage
+fi
+
+if ! [[ "$ITERS" =~ ^[0-9]+$ ]] || [ "$ITERS" -lt 0 ]; then
+  echo "$0: iterations must be a non-negative integer"
+  exit 1
+fi
+if ! [[ "$RANGE" =~ ^[0-9]+$ ]] || [ "$RANGE" -le 0 ]; then
+  echo "$0: range size must be a positive integer"
+  exit 1
+fi
+if ! [[ "$DOMAIN" =~ ^[0-9]+$ ]] || [ "$DOMAIN" -le 0 ]; then
+  echo "$0: domain size must be a positive integer"
+  exit 1
 fi
 
 SEARCH_DIR="${IMAGES_ROOT}/${TYPE}"
@@ -70,4 +123,11 @@ find src -name '*.java' | sort >"${tmp_list}"
 javac -d out @"${tmp_list}"
 rm -f "${tmp_list}"
 
-exec java -cp out implementations.java.compression.src.Main "${IMAGE_PATH}" "${ITERS}" "${RANGE}" "${DOMAIN}"
+MAIN_ARGS=("${IMAGE_PATH}" "${ITERS}" "${RANGE}" "${DOMAIN}")
+if [ "$CLEAN_CODEBOOK" -eq 1 ]; then
+  MAIN_ARGS+=(-c)
+fi
+if [ "${#JAVA_OPTS[@]}" -gt 0 ]; then
+  MAIN_ARGS+=("${JAVA_OPTS[@]}")
+fi
+exec java -cp out implementations.java.compression.src.Main "${MAIN_ARGS[@]}"

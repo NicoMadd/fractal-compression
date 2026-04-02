@@ -12,9 +12,15 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 - `docs/fractal-codebook-fc.html` — **Fractal Codebook** ASCII format spec (PGMA-style; magic `FC`)
 - **Fractal Codebook** Java types: `FractalMapping`, `Codebook` (FC read/write); `SequenceWriter`; `SequenceReader` moved to `utils/files/readers/`
 - `FileUtils.getFileSize`; `PGMAPipeline` prints compression ratio **N:1** (original image file size vs `codebook.fc`)
+- **`SequenceOutput` / `SequenceInput`** (shared write/read API); **`BytesWriter` / `BytesReader`** (big-endian binary); **`SequenceReader(String path)`**; `SequenceWriter` and `SequenceReader` implement the text backends for those interfaces.
 
 ### Changed
 
+- **`PipelineParams.parse`:** optional range/domain positionals; defaults when omitted (range **4**, domain **2×** range); flags **`-r`**, **`-d`**, **`-c`** (rebuild codebook). Works with `Main` after `run.sh` or direct `java`.
+- `implementations/java/compression/run.sh`: minimal **`run.sh <name>`** uses defaults **25** iterations, range **4**, domain **8**; **`-i`**, **`-r`**, **`-d`**, **`-c`**; **`--`** forwards extra args to `Main`.
+- **`PGMAPipeline`:** when **`cleanCodebook`** is set (**`-c`**), ignores an existing **`codebook.fc`** and recomputes + saves.
+- **`Codebook`:** I/O via **`SequenceInput`** / **`SequenceOutput`**; header and rows use structured reads/writes; **`s`** / **`o`** serialized with **`write(float, 2)`** (two fractional digits) for smaller ASCII rows.
+- **`SequenceWriter`:** **`write(float, int precision)`** (`Locale.US`).
 - **Fractal Codebook (`.fc`) header (breaking):** after magic `FC`, the first line must be three decimal integers — **range block size**, **domain block size**, and **mapping count** `N` — then `N` mapping rows. Older files with only `FC N` must be re-saved or hand-migrated. `Codebook` read/write and `rangeSize()` / `domainSize()` match this layout; see `docs/fractal-codebook-fc.html`.
 - Output root renamed to **`processes/`** (was `iterations/`): per image `processes/<stem>/` holds `codebook.fc` and `original.pgm`; **`processes/<stem>/iterations/`** holds PG iteration frames and `benchmark.csv`. Only the inner `iterations` folder is wiped on each run. Sample outputs under `processes/` migrated from `iterations/`.
 - `README.md`: documents the `processes/<stem>/` layout

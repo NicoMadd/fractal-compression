@@ -2,8 +2,9 @@ package implementations.java.compression.src.utils.files.writers;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Locale;
 
-public class SequenceWriter implements AutoCloseable {
+public class SequenceWriter implements SequenceOutput {
 
     private FileWriter fw;
 
@@ -20,12 +21,21 @@ public class SequenceWriter implements AutoCloseable {
         this.fw.write(chars);
     }
 
+    public void write(short number) throws IOException {
+        write(String.valueOf(number));
+    }
+
     public void write(int number) throws IOException {
         write(String.valueOf(number));
     }
 
     public void write(float number) throws IOException {
-        write(String.valueOf(number));
+        write(number, 2);
+    }
+
+    public void write(float number, int precision) throws IOException {
+        String formatted = String.format(Locale.US, "%." + precision + "f", number);
+        write(formatted);
     }
 
     public void space() throws IOException {

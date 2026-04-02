@@ -3,12 +3,18 @@ package implementations.java.compression.src.utils.files.readers;
 import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public class SequenceReader {
+public class SequenceReader implements SequenceInput {
 
     BufferedInputStream bis;
+
+    public SequenceReader(String path) throws FileNotFoundException {
+        this(new FileInputStream(path));
+    }
 
     public SequenceReader(FileInputStream bis) {
         this.bis = new BufferedInputStream(bis);
@@ -125,5 +131,66 @@ public class SequenceReader {
         byte[] readBytes = readUntilWhitespace();
         String rawNumber = new String(readBytes);
         return Float.parseFloat(rawNumber);
+    }
+
+    @Override
+    public char readChar() throws IOException {
+        int b = bis.read();
+        if (b < 0) {
+            throw new EOFException();
+        }
+        return (char) (b & 0xFF);
+    }
+
+    @Override
+    public String readString(int utf8ByteCount) throws IOException {
+        byte[] buf = bis.readNBytes(utf8ByteCount);
+        return new String(buf, StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public short readShort() throws IOException {
+        skipFollowingWhitespaces();
+        byte[] readBytes = readUntilWhitespace();
+        return Short.parseShort(new String(readBytes, StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public int readInt() throws IOException {
+        skipFollowingWhitespaces();
+        byte[] readBytes = readUntilWhitespace();
+        return Integer.parseInt(new String(readBytes, StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public float readFloat() throws IOException {
+        return readNextFloat();
+    }
+
+    @Override
+    public void space() throws IOException {
+        int c = bis.read();
+        if (c < 0) {
+            throw new EOFException();
+        }
+        if (c != ' ') {
+            throw new IOException("expected space (0x20), got 0x" + Integer.toHexString(c));
+        }
+    }
+
+    @Override
+    public void bl() throws IOException {
+        int c = bis.read();
+        if (c < 0) {
+            throw new EOFException();
+        }
+        if (c != '\n') {
+            throw new IOException("expected newline (0x0a), got 0x" + Integer.toHexString(c));
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        bis.close();
     }
 }

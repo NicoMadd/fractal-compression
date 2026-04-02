@@ -50,12 +50,20 @@ public class PGMAPipeline extends Pipeline {
         Codebook cb = null;
         List<FractalMapping> mappings;
 
-        if (Files.exists(codebookPath)) {
+        boolean codebookExists = Files.exists(codebookPath);
+
+        if (codebookExists) {
             System.out.println("Codebook found!");
+        } else {
+            System.out.println("Codebook not found!");
+        }
+
+        if (!params.cleanCodebook() && codebookExists) {
+            System.out.println("Reading codebook");
             cb = new Codebook(codebookPath.toString());
             mappings = cb.getMappings();
         } else {
-            System.out.println("Codebook not found!");
+            System.out.println("Processing codebook");
             mappings = this.gbc.compress(metadata);
             cb = new Codebook(params.rangeSize(), params.domainSize(), mappings);
             cb.save(codebookPath.toString());
