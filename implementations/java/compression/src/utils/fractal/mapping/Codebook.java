@@ -10,11 +10,15 @@ import implementations.java.compression.src.utils.files.writers.SequenceWriter;
 
 public class Codebook {
 
+    private int rangeSize;
+    private int domainSize;
     private List<FractalMapping> mappings;
 
     private String MAGIC_NUMBER = "FC";
 
-    public Codebook(List<FractalMapping> mappings) {
+    public Codebook(int rangeSize, int domainSize, List<FractalMapping> mappings) {
+        this.rangeSize = rangeSize;
+        this.domainSize = domainSize;
         this.mappings = mappings;
     }
 
@@ -40,9 +44,17 @@ public class Codebook {
         return this.mappings;
     }
 
-    private void deserialize(SequenceReader sr) throws IOException {
+    /** Range block edge length stored in the file header. */
+    public int rangeSize() {
+        return rangeSize;
+    }
 
-        List<FractalMapping> mappings = new ArrayList<>();
+    /** Domain block edge length stored in the file header. */
+    public int domainSize() {
+        return domainSize;
+    }
+
+    private void deserialize(SequenceReader sr) throws IOException {
 
         // Read first two bytes. Should be magic number
         String magicNumber = sr.readNBytesAsString(2);
@@ -52,11 +64,18 @@ public class Codebook {
                     "Magic number of image is not correct. Expected " + MAGIC_NUMBER + "but was: " + magicNumber);
         }
 
-        // Read a space
-        sr.readWhitespace();
+        sr.skipFollowingWhitespaces();
+        String headerLine = readLine(sr);
+        String[] headerParts = headerLine.trim().split("\\s+");
+        if (headerParts.length != 3) {
+            throw new IllegalArgumentException(
+                    "Codebook header after FC must be three integers: <range size> <domain size> <mapping count>.");
+        }
+        this.rangeSize = Integer.parseInt(headerParts[0]);
+        this.domainSize = Integer.parseInt(headerParts[1]);
+        int totalRows = Integer.parseInt(headerParts[2]);
 
-        // Read an int with a max rows to read for all fractal mappings
-        int totalRows = sr.readNextInt();
+        List<FractalMapping> mappings = new ArrayList<>();
 
         for (int i = 0; i < totalRows; i++) {
             FractalMapping fm = readMapping(sr);
@@ -64,6 +83,15 @@ public class Codebook {
         }
 
         this.mappings = mappings;
+    }
+
+    private static String readLine(SequenceReader sr) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        while (!sr.nextCharIs('\n')) {
+            sb.append((char) sr.read());
+        }
+        sr.read();
+        return sb.toString();
     }
 
     /**
@@ -102,17 +130,7 @@ public class Codebook {
 
     private void serialize(SequenceWriter sw) throws IOException {
 
-        // Write the MAGIC_NUMBER
-        sw.write(MAGIC_NUMBER);
-
-        // Write a space
-        sw.space();
-
-        // total rows
-        sw.write(this.mappings.size());
-
-        // Breakline
-        sw.bl();
+        serializeMetadata(sw);
 
         for (int i = 0; i < this.mappings.size(); i++) {
             FractalMapping fm = mappings.get(i);
@@ -131,6 +149,28 @@ public class Codebook {
             sw.bl();
         }
 
+    }
+
+    private void serializeMetadata(SequenceWriter sw) throws IOException {
+        // Write the MAGIC_NUMBER
+        sw.write(MAGIC_NUMBER);
+
+        // Write a space
+        sw.space();
+
+        sw.write(rangeSize);
+
+        sw.space();
+
+        sw.write(domainSize);
+
+        sw.space();
+
+        // total rows
+        sw.write(this.mappings.size());
+
+        // Breakline
+        sw.bl();
     }
 
 }

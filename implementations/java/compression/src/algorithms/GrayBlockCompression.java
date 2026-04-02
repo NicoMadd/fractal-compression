@@ -22,11 +22,27 @@ public class GrayBlockCompression {
 
     private float meanR;
 
-    // FIXME HARD VALUES
     // RANGE BLOCK DIMENSION
-    public static int RBD = 4;
+    private int RBD;
+
     // DOMAIN BLOCK DIMENSION
-    public static int DBD = 8;
+    private int DBD;
+
+    public GrayBlockCompression() {
+    }
+
+    public GrayBlockCompression(int rbd, int dbd) {
+        this.RBD = rbd;
+        this.DBD = dbd;
+    }
+
+    public int getRangeSize() {
+        return this.RBD;
+    }
+
+    public int getDomainSize() {
+        return this.DBD;
+    }
 
     /**
      * Calculate S is the summation of the differences between each Di minus the
@@ -212,8 +228,9 @@ public class GrayBlockCompression {
 
         GrayReducedPair[][] reducedDomainBlocksPair = buildReducedDomainPairs(domainBlockNumber);
 
+        List<FractalMapping> fractalMappings = buildFractalMappings(reducedDomainBlocksPair);
         System.out.println("Compression Finished!");
-        return buildFractalMappings(reducedDomainBlocksPair);
+        return fractalMappings;
     }
 
 }

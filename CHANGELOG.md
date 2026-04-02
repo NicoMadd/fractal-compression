@@ -15,6 +15,7 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Changed
 
+- **Fractal Codebook (`.fc`) header (breaking):** after magic `FC`, the first line must be three decimal integers — **range block size**, **domain block size**, and **mapping count** `N` — then `N` mapping rows. Older files with only `FC N` must be re-saved or hand-migrated. `Codebook` read/write and `rangeSize()` / `domainSize()` match this layout; see `docs/fractal-codebook-fc.html`.
 - Output root renamed to **`processes/`** (was `iterations/`): per image `processes/<stem>/` holds `codebook.fc` and `original.pgm`; **`processes/<stem>/iterations/`** holds PG iteration frames and `benchmark.csv`. Only the inner `iterations` folder is wiped on each run. Sample outputs under `processes/` migrated from `iterations/`.
 - `README.md`: documents the `processes/<stem>/` layout
 

@@ -39,15 +39,20 @@
     the on-disk signature for a <strong>Fractal Codebook</strong> file.
   </li>
   <li>
-    <strong>Whitespace.</strong>
-    Exactly one whitespace character (space, tab, CR, or LF as accepted by
-    <code>java.lang.Character.isWhitespace</code>) must follow the magic number.
-    The reference reader uses <code>SequenceReader.readWhitespace()</code>, which requires this separator.
-  </li>
-  <li>
-    <strong>Row count.</strong>
-    An unsigned decimal integer: <code>N</code>, the number of mapping records that follow.
-    Leading whitespace before this integer is skipped by the reader.
+    <strong>Header line.</strong>
+    After the magic, <strong>leading whitespace</strong> is skipped
+    (same idea as <code>SequenceReader.skipFollowingWhitespaces</code>).
+    The remainder of the <strong>same line</strong> up to and not including the first
+    line feed (<code>\n</code>) must contain <strong>exactly three</strong> integer tokens,
+    separated by whitespace:
+    <ol>
+      <li><code>rangeSize</code> — edge length in pixels of each <strong>range</strong> block (RBD).</li>
+      <li><code>domainSize</code> — edge length in pixels of each <strong>domain</strong> block (DBD).</li>
+      <li><code>N</code> — number of mapping records that follow.</li>
+    </ol>
+    The reference implementation reads this line as text, trims it, splits on runs of whitespace, and requires
+    exactly three fields. Values are parsed with <code>Integer.parseInt</code>.
+    The reader consumes bytes until the first <code>\n</code> (Unix <code>\n</code> or CRLF both work: the third token is trimmed).
   </li>
   <li>
     <strong>Mapping records.</strong>
@@ -68,24 +73,27 @@
     <strong>Encoding.</strong>
     Integers use <code>Integer.parseInt</code> semantics; floats use <code>Float.parseFloat</code>
     (locale-independent ASCII digits, optional sign and exponent).
-    Line breaks are optional; any run of whitespace separates tokens.
+    After the header line, line breaks are optional between tokens; any run of whitespace separates tokens.
   </li>
 </ul>
 
 <p class="note">
   <strong>Decoder contract.</strong>
-  Block sizes (range / domain), image width and height, and iteration count are <em>not</em> stored in a
-  Fractal Codebook file in the current implementation; they must match whatever pipeline produced the codebook.
-  Future versions may add a header (dimensions, <code>RBD</code>/<code>DBD</code>, codec version).
+  <code>rangeSize</code> and <code>domainSize</code> in the header must match the compressor settings used to build the file;
+  decoders should use them (or verify against CLI / pipeline parameters) so domain and range windows align with stored coordinates.
+  Image width, height, and iteration count are <em>not</em> stored in the codebook.
 </p>
 
 <hr>
 
 <h2>Example Fractal Codebook file</h2>
 
-<p>Three mappings (illustrative numbers only):</p>
+<p>
+  Three mappings with range blocks of side 4, domain blocks of side 8, and illustrative affine rows
+  (numbers only for documentation):
+</p>
 
-<pre>FC 3
+<pre>FC 4 8 3
 0 0 16 16 0.92 4.5
 4 0 32 0 1.0 0.0
 0 4 0 32 0.88 -2.0</pre>
@@ -106,9 +114,11 @@
 <h2>Implementation reference</h2>
 
 <ul>
-  <li><code>Codebook.deserialize</code> — read magic, separator, <code>N</code>, then <code>N</code> mappings.</li>
+  <li><code>Codebook.deserialize</code> — read magic; skip leading whitespace; read first line as <code>rangeSize domainSize N</code>; then <code>N</code> mappings via <code>readMapping</code>.</li>
+  <li><code>Codebook.serializeMetadata</code> — write <code>FC</code>, space, <code>rangeSize</code>, space, <code>domainSize</code>, space, <code>N</code>, line break.</li>
   <li><code>Codebook.readMapping</code> — six tokens per <code>FractalMapping</code>.</li>
-  <li><code>SequenceReader.readNextInt</code> / <code>readNextFloat</code> — tokenization.</li>
+  <li><code>Codebook.rangeSize()</code> / <code>domainSize()</code> — accessors for header geometry after load.</li>
+  <li><code>SequenceReader.readNextInt</code> / <code>readNextFloat</code> — tokenization for mapping rows.</li>
 </ul>
 
 <p class="note">

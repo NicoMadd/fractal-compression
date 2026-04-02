@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 import implementations.java.compression.src.algorithms.GrayBlockCompression;
-import implementations.java.compression.src.algorithms.RGBBlockCompression;
 import implementations.java.compression.src.benchmarks.Iteration;
 import implementations.java.compression.src.benchmarks.SimpleCompressionBenchmark;
 import implementations.java.compression.src.utils.errors.ErrorUtils;
@@ -28,7 +27,7 @@ public class PGMAPipeline extends Pipeline {
 
     public PGMAPipeline(PipelineParams params) throws IOException {
         super(params);
-        this.gbc = new GrayBlockCompression();
+        this.gbc = new GrayBlockCompression(params.rangeSize(), params.domainSize());
     }
 
     protected void init(FileInputStream fis) throws IOException {
@@ -58,8 +57,9 @@ public class PGMAPipeline extends Pipeline {
         } else {
             System.out.println("Codebook not found!");
             mappings = this.gbc.compress(metadata);
-            cb = new Codebook(mappings);
+            cb = new Codebook(params.rangeSize(), params.domainSize(), mappings);
             cb.save(codebookPath.toString());
+            System.out.println("Codebook saved to " + codebookPath.toString());
         }
 
         long t1 = System.nanoTime();
@@ -93,22 +93,22 @@ public class PGMAPipeline extends Pipeline {
                 int xDomain = fm.domainX();
                 int yDomain = fm.domainY();
 
-                GrayPixel[][] domainPixels = new GrayPixel[RGBBlockCompression.DBD][RGBBlockCompression.DBD];
+                GrayPixel[][] domainPixels = new GrayPixel[gbc.getDomainSize()][gbc.getDomainSize()];
 
-                for (int i = 0; i < RGBBlockCompression.DBD; i++) {
-                    for (int j = 0; j < RGBBlockCompression.DBD; j++) {
+                for (int i = 0; i < gbc.getDomainSize(); i++) {
+                    for (int j = 0; j < gbc.getDomainSize(); j++) {
                         domainPixels[i][j] = img[xDomain + i][yDomain + j];
                     }
                 }
 
                 GrayBlock domainBlock = new GrayBlock(xDomain, yDomain, domainPixels);
 
-                GrayBlock reducedBlock = domainBlock.reduce(RGBBlockCompression.RBD);
+                GrayBlock reducedBlock = domainBlock.reduce(gbc.getRangeSize());
 
-                GrayPixel[][] newPixels = new GrayPixel[RGBBlockCompression.RBD][RGBBlockCompression.RBD];
+                GrayPixel[][] newPixels = new GrayPixel[gbc.getRangeSize()][gbc.getRangeSize()];
 
-                for (int i = 0; i < RGBBlockCompression.RBD; i++) {
-                    for (int j = 0; j < RGBBlockCompression.RBD; j++) {
+                for (int i = 0; i < gbc.getRangeSize(); i++) {
+                    for (int j = 0; j < gbc.getRangeSize(); j++) {
                         GrayPixel p = reducedBlock.pixels()[i][j];
 
                         // gray has the same value for all colors
@@ -133,8 +133,8 @@ public class PGMAPipeline extends Pipeline {
                 int xRangeOffset = fm.rangeX();
                 int yRangeOffset = fm.rangeY();
 
-                for (int i = 0; i < GrayBlockCompression.RBD; i++) {
-                    for (int j = 0; j < GrayBlockCompression.RBD; j++) {
+                for (int i = 0; i < gbc.getRangeSize(); i++) {
+                    for (int j = 0; j < gbc.getRangeSize(); j++) {
                         next[xRangeOffset + i][yRangeOffset + j] = newPixels[i][j];
                     }
                 }
