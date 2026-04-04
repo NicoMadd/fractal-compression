@@ -49,7 +49,6 @@ public class GrayBlock extends Block<GrayPixel> {
         // calculo para saber el tamaño de bloque reducido => 8x8 a 4x4 => ratio de 2 =>
         // bloques de 2x2
         int reduceRatio = blockDim / reduceTo;
-        int totalReducedPixels = (int) Math.round(Math.pow(reduceRatio, 2));
 
         GrayPixel[][] reducedPixels = new GrayPixel[reduceTo][reduceTo];
 
@@ -59,16 +58,8 @@ public class GrayBlock extends Block<GrayPixel> {
                 int mainOffsetI = i * reduceRatio;
                 int mainOffsetJ = j * reduceRatio;
 
-                GrayPixel[] innerPixels = new GrayPixel[totalReducedPixels];
-                int idx = 0;
-
-                for (int ri = 0; ri < reduceRatio; ri++) {
-                    for (int rj = 0; rj < reduceRatio; rj++) {
-                        innerPixels[idx++] = this.pixels[mainOffsetI + ri][mainOffsetJ + rj];
-                    }
-                }
-
-                GrayPixel reducedPixel = GrayPixelUtils.reduce(innerPixels);
+                GrayPixel reducedPixel = GrayPixelUtils.bicubicReduction(this.pixels, mainOffsetI,
+                        mainOffsetJ, reduceRatio);
 
                 reducedPixels[i][j] = reducedPixel;
 

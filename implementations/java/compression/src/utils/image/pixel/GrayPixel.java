@@ -10,7 +10,7 @@ public class GrayPixel extends Pixel {
 
     public GrayPixel(int level) {
         if (level < 0 || level > 255) {
-            throw new IllegalArgumentException("Level value must be between 0 and 255.");
+            throw new IllegalArgumentException("Level value must be between 0 and 255. Found: " + level);
         }
         this.level = level;
     }
