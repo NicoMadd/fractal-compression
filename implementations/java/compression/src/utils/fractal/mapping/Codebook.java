@@ -8,6 +8,7 @@ import implementations.java.compression.src.utils.files.readers.SequenceInput;
 import implementations.java.compression.src.utils.files.readers.SequenceReader;
 import implementations.java.compression.src.utils.files.writers.SequenceOutput;
 import implementations.java.compression.src.utils.files.writers.SequenceWriter;
+import implementations.java.compression.src.utils.fractal.transformation.TransformationType;
 
 public class Codebook {
 
@@ -94,7 +95,14 @@ public class Codebook {
         float s = sr.readFloat();
         float o = sr.readFloat();
 
-        return new FractalMapping(rangeX, rangeY, domainX, domainY, s, o);
+        TransformationType t = parseTransformation(sr);
+
+        return new FractalMapping(rangeX, rangeY, domainX, domainY, s, o, t);
+    }
+
+    private TransformationType parseTransformation(SequenceInput sr) throws IOException {
+        int ordinal = sr.readInt();
+        return TransformationType.values()[ordinal];
     }
 
     /**
@@ -131,6 +139,9 @@ public class Codebook {
             sw.write(fm.s(), 2);
             sw.space();
             sw.write(fm.o(), 2);
+            sw.space();
+            sw.write(fm.t().ordinal());
+
             sw.bl();
         }
 

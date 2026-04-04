@@ -7,9 +7,10 @@ import implementations.java.compression.src.utils.fractal.block.GrayBlock;
 import implementations.java.compression.src.utils.fractal.block.compressed.GrayCompressedBlock;
 import implementations.java.compression.src.utils.fractal.mapping.FractalMapping;
 import implementations.java.compression.src.utils.fractal.reducedpair.GrayReducedPair;
+import implementations.java.compression.src.utils.fractal.transformation.Transformation;
+import implementations.java.compression.src.utils.fractal.transformation.definitions.Identity;
 import implementations.java.compression.src.utils.image.ImageMetadata;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
-import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
 public class GrayBlockCompression {
 
@@ -27,6 +28,8 @@ public class GrayBlockCompression {
 
     // DOMAIN BLOCK DIMENSION
     private int DBD;
+
+    private List<Transformation> ALLOWED_TRANSFORMATIONS = List.of(new Identity());
 
     public GrayBlockCompression() {
     }
@@ -58,7 +61,7 @@ public class GrayBlockCompression {
      * @return s value calculated for these blocks
      * 
      */
-    private float calculateS(List<GrayPixel> rangePixels, List<GrayPixel> rdPixels, float meanD) {
+    private float calculateS(GrayPixel[][] rangePixels, GrayPixel[][] rdPixels, float meanD) {
         // calculate s
         // numerator: summation of the diff between each
         // Di minus the avgD times
@@ -67,17 +70,17 @@ public class GrayBlockCompression {
         float numerator = 0;
         float denominator = 0;
 
-        int totalPixels = rangePixels.size();
+        for (int i = 0; i < RBD; i++) {
+            for (int j = 0; j < RBD; j++) {
+                int domainColorValue = rdPixels[i][j].gray();
+                int rangeColorValue = rangePixels[i][j].gray();
 
-        for (int t = 0; t < totalPixels; t++) {
-            int domainColorValue = rdPixels.get(t).gray();
-            int rangeColorValue = rangePixels.get(t).gray();
+                float domainDiff = domainColorValue - meanD;
+                float rangeDiff = rangeColorValue - this.meanR;
 
-            float domainDiff = domainColorValue - meanD;
-            float rangeDiff = rangeColorValue - this.meanR;
-
-            numerator += domainDiff * rangeDiff;
-            denominator += Math.pow(domainDiff, 2);
+                numerator += domainDiff * rangeDiff;
+                denominator += Math.pow(domainDiff, 2);
+            }
         }
 
         float s = 0;
@@ -106,38 +109,43 @@ public class GrayBlockCompression {
                 GrayBlock rd = rdp.reduced();
                 float meanD = rd.mean();
 
-                List<GrayPixel> rangePixels = MatrixUtils.flatMap(range.pixels());
-                List<GrayPixel> rdPixels = MatrixUtils.flatMap(rd.pixels());
+                GrayPixel[][] rangePixels = range.pixels();
+                GrayPixel[][] rdPixels = rd.pixels();
 
-                int totalPixels = rangePixels.size();
+                for (Transformation t : ALLOWED_TRANSFORMATIONS) {
 
-                // composed of all 3 channels
-                float blockError = 0;
+                    float blockError = 0;
 
-                float s = calculateS(rangePixels, rdPixels, meanD);
+                    GrayPixel[][] transformedRD = new GrayPixel[RBD][RBD];
+                    t.transform(rdPixels, transformedRD);
 
-                // calculate o
-                float o = calculateO(meanD, s);
+                    float s = calculateS(rangePixels, transformedRD, meanD);
 
-                // Calculate color error
-                float colorError = 0;
+                    // calculate o
+                    float o = calculateO(meanD, s);
 
-                for (int t = 0; t < totalPixels; t++) {
-                    float approxRange = s * rdPixels.get(t).gray() + o;
+                    // Calculate color error
+                    float colorError = 0;
 
-                    float rangeDiff = rangePixels.get(t).gray() - approxRange;
+                    for (int i = 0; i < RBD; i++) {
+                        for (int j = 0; j < RBD; j++) {
+                            float approxRange = s * transformedRD[i][j].gray() + o;
 
-                    colorError += Math.pow(rangeDiff, 2);
-                }
+                            float rangeDiff = rangePixels[i][j].gray() - approxRange;
 
-                // sum color error to block error
-                blockError += colorError;
+                            colorError += Math.pow(rangeDiff, 2);
+                        }
+                    }
 
-                // decide wether to keep this block or discard it.
-                // if block error is less than the actual best, then keep it.
-                if (blockError < bestError) {
-                    bestCompression = new GrayCompressedBlock(range, rdp.domain(), s, o);
-                    bestError = blockError;
+                    // sum color error to block error
+                    blockError += colorError;
+
+                    // decide wether to keep this block or discard it.
+                    // if block error is less than the actual best, then keep it.
+                    if (blockError < bestError) {
+                        bestCompression = new GrayCompressedBlock(range, rdp.domain(), s, o, t.type());
+                        bestError = blockError;
+                    }
                 }
             }
         }
@@ -206,7 +214,7 @@ public class GrayBlockCompression {
             for (GrayBlock range : rangesRow) {
                 GrayCompressedBlock bestDomain = findBestDomainMatch(range, reducedDomainBlocksPair);
                 FractalMapping fm = new FractalMapping(range.x(), range.y(), bestDomain.domain().x(),
-                        bestDomain.domain().y(), bestDomain.s(), bestDomain.o());
+                        bestDomain.domain().y(), bestDomain.s(), bestDomain.o(), bestDomain.t());
                 mappings.add(fm);
             }
         }
