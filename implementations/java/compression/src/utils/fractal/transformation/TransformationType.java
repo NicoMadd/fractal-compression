@@ -15,13 +15,13 @@ public enum TransformationType {
     ROTATION_CW_180,
     /** Rotate the block 90° counter-clockwise (270° clockwise). */
     ROTATION_CCW_90,
-    /** Reflect across the vertical midline (left–right flip). */
+    /** Horizontal reflection over the x-axis: reverses column index {@code j} (left ↔ right). */
     REFLECTION_HZ,
-    /** Reflect across the horizontal midline (top–bottom flip). */
+    /** Vertical reflection over the y-axis: reverses row index {@code i} (top ↔ bottom). */
     REFLECTION_VC,
-    /** Reflect across the main diagonal (top-left to bottom-right). */
+    /** First diagonal: mirror in the top-left–bottom-right diagonal (transpose, {@code (i,j) -> (j,i)}). */
     REFLECTION_FD,
-    /** Reflect across the anti-diagonal (top-right to bottom-left). */
+    /** Secondary diagonal: mirror in the top-right–bottom-left diagonal ({@code (i,j) -> (n-1-j, n-1-i)}). */
     REFLECTION_SD,
 
 }

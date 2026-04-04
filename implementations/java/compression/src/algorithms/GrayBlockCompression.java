@@ -1,6 +1,7 @@
 package implementations.java.compression.src.algorithms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import implementations.java.compression.src.utils.fractal.block.GrayBlock;
@@ -8,7 +9,8 @@ import implementations.java.compression.src.utils.fractal.block.compressed.GrayC
 import implementations.java.compression.src.utils.fractal.mapping.FractalMapping;
 import implementations.java.compression.src.utils.fractal.reducedpair.GrayReducedPair;
 import implementations.java.compression.src.utils.fractal.transformation.Transformation;
-import implementations.java.compression.src.utils.fractal.transformation.definitions.Identity;
+import implementations.java.compression.src.utils.fractal.transformation.TransformationFactory;
+import implementations.java.compression.src.utils.fractal.transformation.TransformationType;
 import implementations.java.compression.src.utils.image.ImageMetadata;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
 
@@ -29,7 +31,9 @@ public class GrayBlockCompression {
     // DOMAIN BLOCK DIMENSION
     private int DBD;
 
-    private List<Transformation> ALLOWED_TRANSFORMATIONS = List.of(new Identity());
+    private List<Transformation> ALLOWED_TRANSFORMATIONS = Arrays.stream(TransformationType.values())
+            .map(TransformationFactory::of)
+            .toList();
 
     public GrayBlockCompression() {
     }

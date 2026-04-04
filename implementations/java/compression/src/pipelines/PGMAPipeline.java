@@ -14,6 +14,7 @@ import implementations.java.compression.src.utils.files.FileUtils;
 import implementations.java.compression.src.utils.fractal.block.GrayBlock;
 import implementations.java.compression.src.utils.fractal.mapping.Codebook;
 import implementations.java.compression.src.utils.fractal.mapping.FractalMapping;
+import implementations.java.compression.src.utils.fractal.transformation.Transformation;
 import implementations.java.compression.src.utils.image.pgm.PGMAImageMetadata;
 import implementations.java.compression.src.utils.image.pgm.PGMAUtils;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
@@ -115,9 +116,14 @@ public class PGMAPipeline extends Pipeline {
 
                 GrayPixel[][] newPixels = new GrayPixel[gbc.getRangeSize()][gbc.getRangeSize()];
 
+                GrayPixel[][] transformedPixels = new GrayPixel[gbc.getRangeSize()][gbc.getRangeSize()];
+
+                Transformation t = fm.transformation();
+                t.transform(reducedBlock.pixels(), transformedPixels);
+
                 for (int i = 0; i < gbc.getRangeSize(); i++) {
                     for (int j = 0; j < gbc.getRangeSize(); j++) {
-                        GrayPixel p = reducedBlock.pixels()[i][j];
+                        GrayPixel p = transformedPixels[i][j];
 
                         // gray has the same value for all colors
                         // here we take red to simplify it, for now.

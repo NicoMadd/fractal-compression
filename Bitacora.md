@@ -87,3 +87,25 @@ Informal benchmark and run notes. Add dated entries as you go.
 | Compression time | 13.962638625 s |
 | Decompression time | 10.326542208 s |
 | Compression ratio | 2.76:1 |
+
+## 2026-04-04 — Lena ASCII (range 8 / domain 16, full `TransformationType` search)
+
+**Command (from terminal log):**
+
+```bash
+./implementations/java/compression/run.sh lena.ascii -i 10 -c -d 16 -r 8
+```
+
+**Parameters:** iterations `10`, clean codebook (`-c`), domain `16`, range `8`, image `lena.ascii`. Encoder tries every **`TransformationType`** (identity, rotations, reflections); decode applies the stored isometry before **`s` / `o`**.
+
+**Final metrics (after last iteration; values printed at end of run):**
+
+| Metric | Value |
+|--------|--------|
+| MSE | 52.21171188354492 |
+| PSNR | 30.953124280596267 |
+| Compression time | 20.755891292 s |
+| Decompression time | 10.79434675 s |
+| Compression ratio | 10.34:1 |
+
+*Same CLI as the 2026-04-02 r8/d16 row above; metrics differ because the compressor search space and decode path now include all eight block symmetries (longer compression time).*

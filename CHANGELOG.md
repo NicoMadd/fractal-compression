@@ -7,6 +7,16 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 
+### Added
+
+- **`TransformationFactory`:** `of(TransformationType)` for all symmetries; reflection implementations **HZ**, **VC**, **FD**, **SD**; rotation classes **CW90**, **CW180**, **CCW90**.
+- **`GrayBlockCompression`:** **`ALLOWED_TRANSFORMATIONS`** covers every **`TransformationType`** via **`Arrays.stream(...).map(TransformationFactory::of)`**.
+- **`FractalMapping.transformation()`** resolves a **`Transformation`** through **`TransformationFactory`**.
+
+### Fixed
+
+- **`PGMAPipeline`:** decode applies the codebook isometry to the reduced domain in a **scratch** `GrayPixel[][]`, then **`s` / `o`**, matching encode (no overwrite with untransformed samples).
+
 ## [0.3.0] - 2026-04-04 — `feature/3-bicubic-domain-reduce`
 
 ### Added
