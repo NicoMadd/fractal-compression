@@ -7,10 +7,12 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 
-## [0.3.0] - 2026-04-04 — `feature/3-bicubic-domain-reduce` (`main`)
+## [0.3.0] - 2026-04-04 — `feature/3-bicubic-domain-reduce`
 
 ### Added
 
+- **Fractal domain transforms:** `Transformation`, `TransformationType`, `Identity`; gray block search applies each allowed transform to the reduced domain before the affine `s`/`o` fit.
+- **`MatrixUtils.copy`**, **`MatrixUtils.shape`**, and **`MatrixShape`** for rectangular `T[][]` helpers.
 - `docs/fractal-codebook-fc.html` — **Fractal Codebook** ASCII format spec (PGMA-style; magic `FC`)
 - **Fractal Codebook** Java types: `FractalMapping`, `Codebook` (FC read/write); `SequenceWriter`; `SequenceReader` moved to `utils/files/readers/`
 - `FileUtils.getFileSize`; `PGMAPipeline` prints compression ratio **N:1** (original image file size vs `codebook.fc`)
@@ -19,7 +21,9 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Changed
 
-- **Summary:** **Bicubic** domain reduction; **Fractal Codebook** and **processes/** output layout updates (**breaking** for older `.fc` trees); **CLI** / **run.sh** / **PGMAPipeline** ergonomics for range/domain size and optional codebook rebuild.
+- **Summary:** **Bicubic** domain reduction; **Fractal Codebook** and **processes/** output layout updates (**breaking** for older `.fc` trees); **CLI** / **run.sh** / **PGMAPipeline** ergonomics; **2D** affine fit on **transformed** reduced-domain pixels and **transformation** ordinal persisted in codebook rows.
+- **`FractalMapping` / `GrayCompressedBlock`:** include **`TransformationType`** `t`; **`Codebook`** mapping rows append **`t`** as a decimal **ordinal** after **`s`** and **`o`** (older `.fc` files with only six affine tokens per row must be re-saved).
+- **`GrayBlockCompression`:** `s`/`o` and error use **2D** range and transformed-domain pixels (`calculateS` on matrices); best block stores the winning transform type.
 - **`PipelineParams.parse`:** optional range/domain positionals; defaults when omitted (range **4**, domain **2×** range); flags **`-r`**, **`-d`**, **`-c`** (rebuild codebook). Works with `Main` after `run.sh` or direct `java`.
 - `implementations/java/compression/run.sh`: minimal **`run.sh <name>`** uses defaults **25** iterations, range **4**, domain **8**; **`-i`**, **`-r`**, **`-d`**, **`-c`**; **`--`** forwards extra args to `Main`.
 - **`PGMAPipeline`:** when **`cleanCodebook`** is set (**`-c`**), ignores an existing **`codebook.fc`** and recomputes + saves.

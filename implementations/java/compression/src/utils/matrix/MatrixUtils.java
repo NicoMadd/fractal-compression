@@ -161,4 +161,21 @@ public class MatrixUtils {
         return mappedMatrix;
     }
 
+    public static <T> void copy(T[][] src, T[][] dst) {
+        MatrixShape shape = shape(src);
+
+        for (int i = 0; i < shape.rows(); i++) {
+            for (int j = 0; j < shape.cols(); j++) {
+                dst[i][j] = src[i][j];
+            }
+        }
+    }
+
+    public static <T> MatrixShape shape(T[][] matrix) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+
+        return new MatrixShape(rows, cols);
+    }
+
 }

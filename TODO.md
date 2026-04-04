@@ -7,5 +7,5 @@
     - memory usage
     [X] file compression ratio
 [X] serialize compression relations and cache it / force process it.
-- Downsampling bicubico.
+[X] Downsampling bicubico.
 - Try with a text file 
