@@ -12,6 +12,12 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 - **`TransformationFactory`:** `of(TransformationType)` for all symmetries; reflection implementations **HZ**, **VC**, **FD**, **SD**; rotation classes **CW90**, **CW180**, **CCW90**.
 - **`GrayBlockCompression`:** **`ALLOWED_TRANSFORMATIONS`** covers every **`TransformationType`** via **`Arrays.stream(...).map(TransformationFactory::of)`**.
 - **`FractalMapping.transformation()`** resolves a **`Transformation`** through **`TransformationFactory`**.
+- **Sample assets:** **`data/images/text-sample.png`** and **`data/images/pgma/text-sample.ascii.pgm`** (512×512 **P2** PGMA, grayscale on white) for high-contrast / text-like pipeline runs.
+
+### Changed
+
+- **`GrayBlockCompression`:** **progress logging** — geometry summary, phase labels (range blocks, domain blocks, bicubic domain shrink, search), and ~**25** updates while matching range blocks.
+- **`PGMAPipeline`:** when the codebook has **≥ 800** mappings, ~**25** **per-iteration** “applying mappings **k**/total” lines so long decode passes stay visible.
 
 ### Fixed
 

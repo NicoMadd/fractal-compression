@@ -96,8 +96,14 @@ public class PGMAPipeline extends Pipeline {
 
             System.out.println("Iteration " + iter);
 
+            int mapCount = mappings.size();
+            int mapStep = Math.max(1, mapCount / 25);
             // loop compressed blocks
-            for (FractalMapping fm : mappings) {
+            for (int mi = 0; mi < mapCount; mi++) {
+                FractalMapping fm = mappings.get(mi);
+                if (mapCount >= 800 && (mi == 0 || mi + 1 == mapCount || (mi + 1) % mapStep == 0)) {
+                    System.out.println("  applying mappings " + (mi + 1) + "/" + mapCount);
+                }
 
                 int xDomain = fm.domainX();
                 int yDomain = fm.domainY();

@@ -1,11 +1,19 @@
 # TODOs
 
-- Adaptative block size. Some images dont fit the 4x4 or 8x8. try different approaches.
-[X] Try with ranges of 8x8 and 16x16
-- Use geometric transformations.
-- add metrics on
+- Adaptive block size. Some images don’t fit fixed 4×4 or 8×8; try different approaches.
+
+- [x] Try with ranges of 8×8 and 16×16
+
+- [x] Use geometric transformations (`TransformationType`, factory, reflections + rotations, encode/decode aligned with `s`/`o`).
+
+- Add metrics on
+
     - memory usage
-    [X] file compression ratio
-[X] serialize compression relations and cache it / force process it.
-[X] Downsampling bicubico.
-- Try with a text file 
+
+    - [x] file compression ratio
+
+- [x] Serialize compression relations and cache it / force recompute (`codebook.fc`, `-c`).
+
+- [x] Bicubic downsampling for domain → range reduction.
+
+- [x] Sample text-style image for runs: `data/images/text-sample.png`, `data/images/pgma/text-sample.ascii.pgm` (512×512 PGMA).

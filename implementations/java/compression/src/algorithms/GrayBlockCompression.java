@@ -214,12 +214,21 @@ public class GrayBlockCompression {
     private List<FractalMapping> buildFractalMappings(GrayReducedPair[][] reducedDomainBlocksPair) {
         List<FractalMapping> mappings = new ArrayList<>();
 
+        int rb = rangeBlocks.length;
+        int totalRanges = rb * rb;
+        int step = Math.max(1, totalRanges / 25);
+        int done = 0;
+
         for (GrayBlock[] rangesRow : rangeBlocks) {
             for (GrayBlock range : rangesRow) {
                 GrayCompressedBlock bestDomain = findBestDomainMatch(range, reducedDomainBlocksPair);
                 FractalMapping fm = new FractalMapping(range.x(), range.y(), bestDomain.domain().x(),
                         bestDomain.domain().y(), bestDomain.s(), bestDomain.o(), bestDomain.t());
                 mappings.add(fm);
+                done++;
+                if (done == 1 || done == totalRanges || done % step == 0) {
+                    System.out.println("Compress: matched range blocks " + done + "/" + totalRanges);
+                }
             }
         }
 
@@ -235,10 +244,19 @@ public class GrayBlockCompression {
         int rangeBlocksNumber = this.imageWidth / RBD; // 256 / 4 = 64
         int domainBlockNumber = this.imageHeight / DBD; // 256 / (4 * 2) = 32
 
+        System.out.println("Compress: image " + imageWidth + "x" + imageHeight + ", range " + RBD + ", domain "
+                + DBD + " → " + rangeBlocksNumber + "x" + rangeBlocksNumber + " ranges, " + domainBlockNumber + "x"
+                + domainBlockNumber + " domains");
+
+        System.out.println("Compress: building range blocks…");
         this.rangeBlocks = buildRangeBlocks(rangeBlocksNumber);
+        System.out.println("Compress: building domain blocks…");
         this.domainBlocks = buildDomainBlocks(domainBlockNumber);
 
+        System.out.println("Compress: bicubic-reduce domain blocks (" + domainBlockNumber * domainBlockNumber
+                + " blocks)…");
         GrayReducedPair[][] reducedDomainBlocksPair = buildReducedDomainPairs(domainBlockNumber);
+        System.out.println("Compress: searching best domain + transform per range block…");
 
         List<FractalMapping> fractalMappings = buildFractalMappings(reducedDomainBlocksPair);
         System.out.println("Compression Finished!");
