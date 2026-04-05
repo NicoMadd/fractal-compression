@@ -1,0 +1,61 @@
+# PGMA benchmark matrix (square images under data/images/pgma only).
+# From repo root:
+#   ./implementations/java/benchmarks/run_matrix.sh ./implementations/java/benchmarks/matrix.all-pgma.example.txt
+#
+# Geometries: r4/d8, r8/d16, r16/d32 (domain = 2× range). Iteration counts: 10, 20, 30.
+# Use -c only when -r/-d change: the first line per image in each geometry block uses -c; other lines
+# keep the same -r/-d and omit -c (same codebook, different decode iteration count only).
+#
+# First token must match exactly one file under data/images/pgma (see run.sh).
+# 4 stems × 3 geometries × 3 iteration counts = 36 runs.
+
+# ========== range 4, domain 8 ==========
+# --- iterations 10 (-c: new range/domain for each stem) ---
+apollonian_gasket.ascii -i 10 -c -r 4 -d 8
+baboon.ascii -i 10 -c -r 4 -d 8
+lena.ascii -i 10 -c -r 4 -d 8
+text-sample.ascii -i 10 -c -r 4 -d 8
+# --- iterations 20 ---
+apollonian_gasket.ascii -i 20 -r 4 -d 8
+baboon.ascii -i 20 -r 4 -d 8
+lena.ascii -i 20 -r 4 -d 8
+text-sample.ascii -i 20 -r 4 -d 8
+# --- iterations 30 ---
+apollonian_gasket.ascii -i 30 -r 4 -d 8
+baboon.ascii -i 30 -r 4 -d 8
+lena.ascii -i 30 -r 4 -d 8
+text-sample.ascii -i 30 -r 4 -d 8
+
+# ========== range 8, domain 16 ==========
+# --- iterations 10 (-c: new range/domain) ---
+apollonian_gasket.ascii -i 10 -c -r 8 -d 16
+baboon.ascii -i 10 -c -r 8 -d 16
+lena.ascii -i 10 -c -r 8 -d 16
+text-sample.ascii -i 10 -c -r 8 -d 16
+# --- iterations 20 ---
+apollonian_gasket.ascii -i 20 -r 8 -d 16
+baboon.ascii -i 20 -r 8 -d 16
+lena.ascii -i 20 -r 8 -d 16
+text-sample.ascii -i 20 -r 8 -d 16
+# --- iterations 30 ---
+apollonian_gasket.ascii -i 30 -r 8 -d 16
+baboon.ascii -i 30 -r 8 -d 16
+lena.ascii -i 30 -r 8 -d 16
+text-sample.ascii -i 30 -r 8 -d 16
+
+# ========== range 16, domain 32 ==========
+# --- iterations 10 (-c: new range/domain) ---
+apollonian_gasket.ascii -i 10 -c -r 16 -d 32
+baboon.ascii -i 10 -c -r 16 -d 32
+lena.ascii -i 10 -c -r 16 -d 32
+text-sample.ascii -i 10 -c -r 16 -d 32
+# --- iterations 20 ---
+apollonian_gasket.ascii -i 20 -r 16 -d 32
+baboon.ascii -i 20 -r 16 -d 32
+lena.ascii -i 20 -r 16 -d 32
+text-sample.ascii -i 20 -r 16 -d 32
+# --- iterations 30 ---
+apollonian_gasket.ascii -i 30 -r 16 -d 32
+baboon.ascii -i 30 -r 16 -d 32
+lena.ascii -i 30 -r 16 -d 32
+text-sample.ascii -i 30 -r 16 -d 32

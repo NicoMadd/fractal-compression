@@ -2,10 +2,10 @@ package implementations.java.compression.src.benchmarks;
 
 import java.util.Locale;
 
-public record Iteration(int n, long timestamp, long duration, double mse, double psnr) {
+public record Iteration(int n, long timestamp, long duration, double mse, double mae, double psnr) {
 
     public static String columns() {
-        return "n,timestamp,durationNanos,durationSeconds,mse,psnr";
+        return "n,timestamp,durationNanos,durationSeconds,mse,mae,psnr";
     }
 
     public String toString() {
@@ -22,9 +22,9 @@ public record Iteration(int n, long timestamp, long duration, double mse, double
         sb.append(',');
         sb.append(String.format(Locale.US, "%.12f", mse));
         sb.append(',');
+        sb.append(String.format(Locale.US, "%.12f", mae));
+        sb.append(',');
         sb.append(String.format(Locale.US, "%.12f", psnr));
         return sb.toString();
-
     }
-
 }

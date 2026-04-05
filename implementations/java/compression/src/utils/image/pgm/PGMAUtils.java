@@ -4,7 +4,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import implementations.java.compression.src.utils.image.pixel.GrayPixel;;
+import implementations.java.compression.src.benchmarks.ImageErrorMetrics;
+import implementations.java.compression.src.utils.image.pixel.GrayPixel;
 
 public class PGMAUtils {
 
@@ -16,33 +17,41 @@ public class PGMAUtils {
         metadata.saveToFile(finalPath);
     }
 
-    public static double calculateMSE(String originalImgPath, String lastIterationPath) throws IOException {
+    public static ImageErrorMetrics calculateErrorMetrics(String originalImgPath, String lastIterationPath)
+            throws IOException {
 
-        FileInputStream ofis = new FileInputStream(originalImgPath);
-        FileInputStream ffis = new FileInputStream(lastIterationPath);
+        try (FileInputStream ofis = new FileInputStream(originalImgPath);
+                FileInputStream ffis = new FileInputStream(lastIterationPath)) {
 
-        PGMAImageMetadata originalImg = new PGMAImageMetadata(ofis);
-        PGMAImageMetadata finalImg = new PGMAImageMetadata(ffis);
+            PGMAImageMetadata originalImg = new PGMAImageMetadata(ofis);
+            PGMAImageMetadata finalImg = new PGMAImageMetadata(ffis);
 
-        int width = originalImg.getWidth();
-        int height = originalImg.getHeight();
+            int width = originalImg.getWidth();
+            int height = originalImg.getHeight();
 
-        GrayPixel[][] originalPixels = originalImg.getPixels();
-        GrayPixel[][] finaPixels = finalImg.getPixels();
+            GrayPixel[][] originalPixels = originalImg.getPixels();
+            GrayPixel[][] finaPixels = finalImg.getPixels();
 
-        double totalError = 0;
+            double totalSq = 0;
+            double totalAbs = 0;
 
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                GrayPixel originalPixel = originalPixels[i][j];
-                GrayPixel finalPixel = finaPixels[i][j];
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    GrayPixel originalPixel = originalPixels[i][j];
+                    GrayPixel finalPixel = finaPixels[i][j];
 
-                totalError += originalPixel.sqDiff(finalPixel);
+                    totalSq += originalPixel.sqDiff(finalPixel);
+                    totalAbs += Math.abs((double) originalPixel.gray() - (double) finalPixel.gray());
+                }
             }
+
+            double n = (double) width * (double) height;
+            return new ImageErrorMetrics(totalSq / n, totalAbs / n);
         }
+    }
 
-        return totalError / (width * height);
-
+    public static double calculateMSE(String originalImgPath, String lastIterationPath) throws IOException {
+        return calculateErrorMetrics(originalImgPath, lastIterationPath).mse();
     }
 
 }

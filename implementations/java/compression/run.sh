@@ -12,7 +12,7 @@ usage() {
   echo "  image type: subdirectory under data/images (default: pgma)"
   echo "  image name: stem or prefix; must match exactly one file under the type folder"
   echo "  Defaults: iterations=25, range=4, domain=8"
-  echo "  -i, -r, -d override defaults (any order before --). -c drops existing codebook before run."
+  echo "  -i, -r, -d override defaults (any order before --). -c forces codebook rebuild (see codebook_r{r}_d{d}.fc)."
   echo "  After --, remaining args are passed to Main as well."
   echo "Example: $0 baboon"
   echo "Example: $0 baboon -i 40"

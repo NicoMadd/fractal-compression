@@ -1,0 +1,33 @@
+---
+description: Fractal-compression repo — benchmarks contract, Java layout, processes/ behavior, env vars for cross-impl work
+alwaysApply: true
+---
+
+# Fractal compression — context for agents
+
+## Project
+
+- **Purpose:** Thesis-oriented **fractal image compression** research; comparative benchmarks. Reference implementation is **Java**; **C++** and **Python** are planned — keep shared artifacts **language-neutral** where possible.
+- **Layout:** `algorithms/` (docs), `data/images/` (inputs), `implementations/java/compression/` (main Java module), **`benchmarks/`** (cross-language run record spec + `registry.jsonl`). See root `README.md` table.
+
+## Versioning and changelog
+
+- Follow **[versioning-and-releases.mdc](versioning-and-releases.mdc)** (`0.x.0` ↔ `feature/x-...`; **main** = `0.2.0` line). Add notable work under the correct **`CHANGELOG.md`** section.
+
+## Benchmark run record (shared contract)
+
+- **Spec:** [`benchmarks/RUN_RECORD.md`](benchmarks/RUN_RECORD.md) — JSON lines in **`benchmarks/registry.jsonl`**; each line is one object with **`schema_version`**, **`runner`** (`language`, `id`, `version`), core metrics, optional **`host`**, optional **`extras`** for non-Java fields.
+- **Java** emits **`runner.language: "java"`**, default **`runner.id: "java-compression"`**; override with **`BENCHMARK_RUNNER_ID`** / **`BENCHMARK_RUNNER_VERSION`**. **`BENCHMARK_GIT_SHA`** is set by [`implementations/java/benchmarks/run_matrix.sh`](implementations/java/benchmarks/run_matrix.sh).
+- **Future C++/Python** should match the same **core** field names when appending to `registry.jsonl`.
+
+## Java module (`implementations/java/compression/`)
+
+- **Entry:** `run.sh` → `Main` → **`PGMAPipeline`**. Outputs live under **`processes/<stem>/`** (relative to module cwd: **`FileUtils.PROCESSES_ROOT`** resolves to repo `processes/`).
+- **Per stem:** `codebook_r{r}_d{d}.fc` (geometry-specific), `original.pgm`, `iterations/` (PGMs + `benchmark.csv`), `baselines/` (PNG + zip baselines), `run_manifest.json`. **Same stem re-runs overwrite** iteration outputs under that folder; **`registry.jsonl` still appends** one line per successful run.
+- **Benchmarks package:** `src/benchmarks/` — `RunManifest`, `RunnerInfo`, `HostEnvironmentMetrics`, `MemorySampler`, `BenchmarkRegistry`, etc. Baseline I/O: `src/utils/baselines/CompressionBaselines.java`.
+- **Matrix batch:** [`implementations/java/benchmarks/matrix.all-pgma.example.txt`](implementations/java/benchmarks/matrix.all-pgma.example.txt) and `run_matrix.sh`.
+
+## Code style reminders
+
+- **Do not remove existing comments** when editing unless the user asks.
+- **No automatic git commits** without explicit user approval after changes are done.

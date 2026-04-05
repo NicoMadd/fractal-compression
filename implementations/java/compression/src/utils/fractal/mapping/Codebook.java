@@ -1,6 +1,7 @@
 package implementations.java.compression.src.utils.fractal.mapping;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +54,13 @@ public class Codebook {
     /** Domain block edge length stored in the file header. */
     public int domainSize() {
         return domainSize;
+    }
+
+    /**
+     * Canonical on-disk path for this range/domain geometry under a stem’s {@code processes/} folder.
+     */
+    public static Path pathForGeometry(Path runDir, int rangeSize, int domainSize) {
+        return runDir.resolve(String.format("codebook_r%d_d%d.fc", rangeSize, domainSize));
     }
 
     private void deserialize(SequenceInput sr) throws IOException {

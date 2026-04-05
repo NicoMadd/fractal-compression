@@ -1,0 +1,5 @@
+# One invocation of run.sh per line (image name / flags). See run.sh usage.
+# Full set of data/images/pgma: matrix.all-pgma.example.txt
+#
+# text-sample -i 1 -c -r 8 -d 16
+# lena.ascii -i 5 -c -r 8 -d 16

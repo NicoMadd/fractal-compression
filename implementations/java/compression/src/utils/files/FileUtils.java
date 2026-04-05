@@ -40,9 +40,9 @@ public class FileUtils {
     }
 
     /**
-     * Deletes and recreates only {@code <imageProcessDir>/iterations/}, preserving
-     * {@code codebook.fc}, {@code original.pgm}, and other files in the image
-     * folder.
+     * Deletes the {@code iterations} subdirectory under {@code imageProcessDir} if it exists,
+     * then creates a fresh empty {@code iterations} directory. Everything else under
+     * {@code imageProcessDir} is left unchanged.
      */
     public static void cleanAndCreateIterationsDir(Path imageProcessDir) throws IOException {
         Path iterDir = iterationsDir(imageProcessDir);
@@ -66,7 +66,20 @@ public class FileUtils {
     }
 
     public static long getFileSize(String filepath) throws IOException {
-        return Files.size(Path.of(filepath));
+        return getFileSize(Path.of(filepath));
+    }
+
+    public static long getFileSize(Path path) throws IOException {
+        return Files.size(path);
+    }
+
+
+    public static Path repoRoot() {
+        return Paths.get("").toAbsolutePath().resolve("../../..").normalize();
+    }
+
+    public static Path benchmarkRegistryPath() {
+        return repoRoot().resolve("benchmarks").resolve("registry.jsonl");
     }
 
 }

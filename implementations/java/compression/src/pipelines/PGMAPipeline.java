@@ -7,8 +7,15 @@ import java.nio.file.Path;
 import java.util.List;
 
 import implementations.java.compression.src.algorithms.GrayBlockCompression;
+import implementations.java.compression.src.benchmarks.BenchmarkRegistry;
+import implementations.java.compression.src.benchmarks.HostEnvironmentMetrics;
+import implementations.java.compression.src.benchmarks.ImageErrorMetrics;
 import implementations.java.compression.src.benchmarks.Iteration;
+import implementations.java.compression.src.benchmarks.MemorySampler;
+import implementations.java.compression.src.benchmarks.RunManifest;
+import implementations.java.compression.src.benchmarks.RunnerInfo;
 import implementations.java.compression.src.benchmarks.SimpleCompressionBenchmark;
+import implementations.java.compression.src.utils.baselines.CompressionBaselines;
 import implementations.java.compression.src.utils.errors.ErrorUtils;
 import implementations.java.compression.src.utils.files.FileUtils;
 import implementations.java.compression.src.utils.fractal.block.GrayBlock;
@@ -35,43 +42,42 @@ public class PGMAPipeline extends Pipeline {
         this.metadata = new PGMAImageMetadata(fis);
     }
 
-    public void run(PipelineParams params)
-            throws Exception {
+    public void run(PipelineParams params) throws Exception {
         String originalImagePath = params.imagePath();
         int iterations = params.iterations();
         Path runDir = params.runDir();
         Path iterationsDir = FileUtils.iterationsDir(runDir);
+        MemorySampler memorySampler = new MemorySampler();
+        memorySampler.sample();
 
         long t0 = System.nanoTime();
 
-        Path codebookPath = runDir.resolve("codebook.fc");
+        Path codebookPath = Codebook.pathForGeometry(runDir, params.rangeSize(), params.domainSize());
 
-        System.out.println("Looking for file in " + codebookPath.toString());
+        System.out.println("Looking for codebook at " + codebookPath);
 
-        Codebook cb = null;
-        List<FractalMapping> mappings;
+        List<FractalMapping> mappings = null;
 
-        boolean codebookExists = Files.exists(codebookPath);
-
-        if (codebookExists) {
-            System.out.println("Codebook found!");
-        } else {
-            System.out.println("Codebook not found!");
+        if (!params.cleanCodebook() && Files.exists(codebookPath)) {
+            Codebook loaded = new Codebook(codebookPath.toString());
+            if (loaded.rangeSize() == params.rangeSize() && loaded.domainSize() == params.domainSize()) {
+                System.out.println("Reading codebook from " + codebookPath);
+                mappings = loaded.getMappings();
+            } else {
+                System.out.println("On-disk codebook range/domain does not match this run; rebuilding.");
+            }
         }
 
-        if (!params.cleanCodebook() && codebookExists) {
-            System.out.println("Reading codebook");
-            cb = new Codebook(codebookPath.toString());
-            mappings = cb.getMappings();
-        } else {
+        if (mappings == null) {
             System.out.println("Processing codebook");
             mappings = this.gbc.compress(metadata);
-            cb = new Codebook(params.rangeSize(), params.domainSize(), mappings);
+            Codebook cb = new Codebook(params.rangeSize(), params.domainSize(), mappings);
             cb.save(codebookPath.toString());
-            System.out.println("Codebook saved to " + codebookPath.toString());
+            System.out.println("Codebook saved to " + codebookPath);
         }
 
         long t1 = System.nanoTime();
+        memorySampler.sample();
 
         System.out.println("Starting Decompression");
 
@@ -88,6 +94,10 @@ public class PGMAPipeline extends Pipeline {
         System.out.println("Iterating over " + iterations + " iterations");
 
         SimpleCompressionBenchmark scb = new SimpleCompressionBenchmark();
+
+        double finalMse = 0;
+        double finalMae = 0;
+        double finalPsnr = 0;
 
         // N iterations
         for (int iter = 0; iter <= iterations; iter++) {
@@ -166,13 +176,22 @@ public class PGMAPipeline extends Pipeline {
             String currentIterationPath = iterBase + ".pgm";
             PGMAUtils.saveToImage(next, iterBase.toString());
 
-            double mse = PGMAUtils.calculateMSE(originalImagePath, currentIterationPath);
+            ImageErrorMetrics err = PGMAUtils.calculateErrorMetrics(originalImagePath, currentIterationPath);
+            double mse = err.mse();
+            double mae = err.mae();
             System.out.println("MSE: " + mse);
+            System.out.println("MAE: " + mae);
 
             double psnr = ErrorUtils.calculatePSNR(mse);
             System.out.println("PSNR: " + psnr);
-            Iteration iteration = new Iteration(iter, iterationEndTs, iterationEndTs - iterationStartTs, mse, psnr);
+            Iteration iteration = new Iteration(iter, iterationEndTs, iterationEndTs - iterationStartTs, mse, mae, psnr);
             scb.add(iteration);
+
+            finalMse = mse;
+            finalMae = mae;
+            finalPsnr = psnr;
+
+            memorySampler.sample();
 
             // Jacobi: keep two buffers; swap references so next pass reads the image
             // we just wrote and writes into the other buffer.
@@ -183,6 +202,7 @@ public class PGMAPipeline extends Pipeline {
         }
 
         long t2 = System.nanoTime();
+        memorySampler.sample();
 
         long compressionElapsedNanos = t1 - t0;
         double compressionSeconds = compressionElapsedNanos / 1_000_000_000.0;
@@ -196,6 +216,77 @@ public class PGMAPipeline extends Pipeline {
         scb.saveTo(iterationsDir.toString());
 
         calculateCompressionRatio(originalImagePath, codebookPath.toString());
+
+        writeBenchmarkOutputs(params, originalImagePath, runDir, iterationsDir, codebookPath, iterations,
+                compressionSeconds, decompressionSeconds, finalMse, finalMae, finalPsnr, memorySampler);
+    }
+
+    // Baseline PNG/zip, run_manifest.json, registry line
+    private void writeBenchmarkOutputs(
+            PipelineParams params,
+            String originalImagePath,
+            Path runDir,
+            Path iterationsDir,
+            Path codebookPath,
+            int iterations,
+            double compressionSeconds,
+            double decompressionSeconds,
+            double finalMse,
+            double finalMae,
+            double finalPsnr,
+            MemorySampler memorySampler) throws IOException {
+
+        Path originalCopyPath = runDir.resolve("original.pgm");
+        Path finalIterPath = iterationsDir.resolve("iter_" + iterations + ".pgm");
+        Path baselinesDir = runDir.resolve("baselines");
+
+        long bytesOriginalInput = FileUtils.getFileSize(originalImagePath);
+        long bytesOriginalCopy = FileUtils.getFileSize(originalCopyPath);
+        long bytesCodebook = FileUtils.getFileSize(codebookPath.toString());
+        long pngOrig = CompressionBaselines.writePngFromPgm(originalCopyPath, baselinesDir.resolve("original.png"));
+        long pngFinal = CompressionBaselines.writePngFromPgm(finalIterPath,
+                baselinesDir.resolve("reconstruction.png"));
+        long zipOrig = CompressionBaselines.writeZipDeflatedArchive(originalCopyPath,
+                baselinesDir.resolve("original_deflated.zip"), "original.pgm");
+        String zipEntryName = codebookPath.getFileName().toString();
+        long zipCb = CompressionBaselines.writeZipDeflatedArchive(codebookPath,
+                baselinesDir.resolve("codebook_deflated.zip"), zipEntryName);
+        double ratioOc = (double) bytesOriginalInput / (double) bytesCodebook;
+
+        RunManifest manifest = new RunManifest(
+                System.currentTimeMillis(),
+                RunManifest.gitShaFromEnv(),
+                originalImagePath,
+                runDir.toAbsolutePath().normalize().toString(),
+                iterations,
+                params.rangeSize(),
+                params.domainSize(),
+                params.cleanCodebook(),
+                compressionSeconds,
+                decompressionSeconds,
+                bytesOriginalInput,
+                bytesOriginalCopy,
+                bytesCodebook,
+                pngOrig,
+                pngFinal,
+                zipOrig,
+                zipCb,
+                ratioOc,
+                finalMse,
+                finalMae,
+                finalPsnr,
+                memorySampler.peakHeapUsedBytes(),
+                memorySampler.peakRuntimeUsedBytes(),
+                memorySampler.avgHeapUsedBytes(),
+                memorySampler.avgRuntimeUsedBytes(),
+                RunnerInfo.javaDefault(),
+                HostEnvironmentMetrics.capture());
+        manifest.write(runDir);
+        BenchmarkRegistry.appendLine(manifest.toJsonLine());
+
+        System.out.println("Wrote baseline PNG/zip under: " + baselinesDir.toAbsolutePath().normalize());
+        System.out.println("Wrote run manifest: " + runDir.resolve("run_manifest.json"));
+        System.out.println("Appended run to registry: " + FileUtils.benchmarkRegistryPath());
     }
 
     private void calculateCompressionRatio(String originalImagePath, String codebookPath) throws IOException {
