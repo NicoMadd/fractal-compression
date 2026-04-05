@@ -12,7 +12,7 @@ alwaysApply: true
 
 ## Versioning and changelog
 
-- Follow **[versioning-and-releases.mdc](versioning-and-releases.mdc)** (`0.x.0` ↔ `feature/x-...`; **main** = `0.2.0` line). Add notable work under the correct **`CHANGELOG.md`** section.
+- Follow **[versioning-and-releases.mdc](versioning-and-releases.mdc)** (`0.x.0` ↔ `feature/x-...`; **main** = **`0.4.0`** benchmark-registry checkpoint). Add notable work under the correct **`CHANGELOG.md`** section.
 
 ## Benchmark run record (shared contract)
 

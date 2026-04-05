@@ -5,6 +5,6 @@ alwaysApply: true
 
 # Versioning and changelog
 
-**Versioning (provisional):** each release line is **`0.x.0`**, where **`x`** is the branch prefix on **`feature/x-...`**. Those branches *mark* that line for now (e.g. `feature/1-raw-block-compression` → `0.1.0`, `feature/2-gray-block-compression` → `0.2.0`). **`main`** currently follows the **`0.2.0`** line.
+**Versioning (provisional):** each release line is **`0.x.0`**, where **`x`** is the branch prefix on **`feature/x-...`**. Those branches *mark* that line for now (e.g. `feature/1-raw-block-compression` → `0.1.0`, `feature/2-gray-block-compression` → `0.2.0`, `feature/4-benchmark-registry` → **`0.4.0`**). **`main`** currently carries the **`0.4.0`** checkpoint (**basic benchmark registry**); earlier **`0.3.0`** / **`0.2.0`** entries remain in [`CHANGELOG.md`](CHANGELOG.md).
 
 When adding notable changes, update `CHANGELOG.md` under the correct **`0.x.0`** section (or **Unreleased**) consistent with this mapping.

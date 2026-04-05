@@ -9,25 +9,34 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Added
 
-- **Benchmark harness:** `run_manifest.json` per run (sizes: input PGM, codebook, **PNG** gray baseline, **zip DEFLATE** archives for original vs codebook); same baselines also written under `processes/<stem>/baselines/` (`original.png`, `reconstruction.png`, `original_deflated.zip`, `codebook_deflated.zip`); **MAE** column in `benchmark.csv`; **MemorySampler** peak and **average** heap/runtime over samples; nested **`host`** object (logical CPU count, OS name/version/arch, physical RAM total/free when available, process/system CPU load, JVM heap/non-heap/commit/max, `java.*` / VM props, full JVM input args); **`schema_version`** + **`runner`** (`language`, `id`, `version`) on each JSON line for cross-language runners per [`benchmarks/RUN_RECORD.md`](benchmarks/RUN_RECORD.md); append-only [`benchmarks/registry.jsonl`](benchmarks/registry.jsonl); matrix driver [`implementations/java/benchmarks/run_matrix.sh`](implementations/java/benchmarks/run_matrix.sh); env: `BENCHMARK_GIT_SHA`, optional `BENCHMARK_RUNNER_ID`, `BENCHMARK_RUNNER_VERSION`.
-
 - **`TransformationFactory`:** `of(TransformationType)` for all symmetries; reflection implementations **HZ**, **VC**, **FD**, **SD**; rotation classes **CW90**, **CW180**, **CCW90**.
 - **`GrayBlockCompression`:** **`ALLOWED_TRANSFORMATIONS`** covers every **`TransformationType`** via **`Arrays.stream(...).map(TransformationFactory::of)`**.
 - **`FractalMapping.transformation()`** resolves a **`Transformation`** through **`TransformationFactory`**.
 - **Sample assets:** **`data/images/text-sample.png`** and **`data/images/pgma/text-sample.ascii.pgm`** (512×512 **P2** PGMA, grayscale on white) for high-contrast / text-like pipeline runs.
-- **Benchmarks:** [`benchmarks/registry-analysis.md`](benchmarks/registry-analysis.md) — tables + discussion aligned with append-only [`benchmarks/registry.jsonl`](benchmarks/registry.jsonl) (refresh when the registry snapshot changes).
 
 ### Changed
 
-- **`PGMAPipeline` / `Codebook`:** codebooks are stored per geometry as **`codebook_r{r}_d{d}.fc`**; **`Codebook.pathForGeometry`** is the single resolver (no **`codebook.fc`** fallback). **`-c`** forces rebuild of that file. Zip baseline entry name follows the file on disk.
-- **PG matrix sample:** [`implementations/java/benchmarks/matrix.all-pgma.example.txt`](implementations/java/benchmarks/matrix.all-pgma.example.txt) — **12** runs: square PGMAs only, **three** geometries, **`-i 30`** only, **no `-c`** so each `(image, r, d)` reuses its codebook file after the first build.
 - **`GrayBlockCompression`:** **progress logging** — geometry summary, phase labels (range blocks, domain blocks, bicubic domain shrink, search), and ~**25** updates while matching range blocks.
 - **`PGMAPipeline`:** when the codebook has **≥ 800** mappings, ~**25** **per-iteration** “applying mappings **k**/total” lines so long decode passes stay visible.
-- **`FileUtils`:** `getFileSize(Path)` overload; the `String` overload delegates to it (used for benchmark sizes and baselines).
 
 ### Fixed
 
 - **`PGMAPipeline`:** decode applies the codebook isometry to the reduced domain in a **scratch** `GrayPixel[][]`, then **`s` / `o`**, matching encode (no overwrite with untransformed samples).
+
+## [0.4.0] - 2026-04-05 — basic benchmark registry (`feature/4-benchmark-registry`)
+
+### Added
+
+- **Benchmark harness:** `run_manifest.json` per run (sizes: input PGM, codebook, **PNG** gray baseline, **zip DEFLATE** archives for original vs codebook); baselines under `processes/<stem>/baselines/`; **MAE** in `benchmark.csv`; **MemorySampler** peak and **average** heap/runtime; nested **`host`** (CPU, OS, RAM, JVM); **`schema_version`** + **`runner`** on each JSON line per [`benchmarks/RUN_RECORD.md`](benchmarks/RUN_RECORD.md); append-only [`benchmarks/registry.jsonl`](benchmarks/registry.jsonl); **`benchmarks/README.md`**; matrix driver [`implementations/java/benchmarks/run_matrix.sh`](implementations/java/benchmarks/run_matrix.sh); env: `BENCHMARK_GIT_SHA`, optional `BENCHMARK_RUNNER_ID`, `BENCHMARK_RUNNER_VERSION`.
+- Java **`src/benchmarks/`:** `BenchmarkRegistry`, `RunManifest`, `RunnerInfo`, `HostEnvironmentMetrics`, `MemorySampler`, `ImageErrorMetrics`; **`CompressionBaselines`** (PNG + zip).
+- **[`benchmarks/registry-analysis.md`](benchmarks/registry-analysis.md)** — per-image and cross-image tables over `registry.jsonl` (refresh when the snapshot changes).
+
+### Changed
+
+- **`PGMAPipeline`:** append registry line after successful runs; write manifest and baselines; **`Codebook.pathForGeometry`** → on-disk **`codebook_r{r}_d{d}.fc`** (no legacy **`codebook.fc`**). **`-c`** forces rebuild. Zip entry name matches the codebook file.
+- **PG matrix sample:** [`implementations/java/benchmarks/matrix.all-pgma.example.txt`](implementations/java/benchmarks/matrix.all-pgma.example.txt) — square PGMAs; **36** runs (4 × 3 geometries × 3 iteration counts); **−c** on **−i 10** when geometry is new per image; **−i 20** / **30** reuse codebooks.
+- **`FileUtils`:** `getFileSize(Path)`; generic **iterations-dir** javadoc (no codebook-specific names).
+- Root **`README.md`** and **`.cursor/rules/project-context.mdc`** — `benchmarks/` layout and runner env vars.
 
 ## [0.3.0] - 2026-04-04 — `feature/3-bicubic-domain-reduce`
 
