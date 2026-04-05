@@ -7,26 +7,14 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-05 — basic benchmark registry (`feature/4-benchmark-registry`)
+
 ### Added
 
 - **`TransformationFactory`:** `of(TransformationType)` for all symmetries; reflection implementations **HZ**, **VC**, **FD**, **SD**; rotation classes **CW90**, **CW180**, **CCW90**.
 - **`GrayBlockCompression`:** **`ALLOWED_TRANSFORMATIONS`** covers every **`TransformationType`** via **`Arrays.stream(...).map(TransformationFactory::of)`**.
 - **`FractalMapping.transformation()`** resolves a **`Transformation`** through **`TransformationFactory`**.
 - **Sample assets:** **`data/images/text-sample.png`** and **`data/images/pgma/text-sample.ascii.pgm`** (512×512 **P2** PGMA, grayscale on white) for high-contrast / text-like pipeline runs.
-
-### Changed
-
-- **`GrayBlockCompression`:** **progress logging** — geometry summary, phase labels (range blocks, domain blocks, bicubic domain shrink, search), and ~**25** updates while matching range blocks.
-- **`PGMAPipeline`:** when the codebook has **≥ 800** mappings, ~**25** **per-iteration** “applying mappings **k**/total” lines so long decode passes stay visible.
-
-### Fixed
-
-- **`PGMAPipeline`:** decode applies the codebook isometry to the reduced domain in a **scratch** `GrayPixel[][]`, then **`s` / `o`**, matching encode (no overwrite with untransformed samples).
-
-## [0.4.0] - 2026-04-05 — basic benchmark registry (`feature/4-benchmark-registry`)
-
-### Added
-
 - **Benchmark harness:** `run_manifest.json` per run (sizes: input PGM, codebook, **PNG** gray baseline, **zip DEFLATE** archives for original vs codebook); baselines under `processes/<stem>/baselines/`; **MAE** in `benchmark.csv`; **MemorySampler** peak and **average** heap/runtime; nested **`host`** (CPU, OS, RAM, JVM); **`schema_version`** + **`runner`** on each JSON line per [`benchmarks/RUN_RECORD.md`](benchmarks/RUN_RECORD.md); append-only [`benchmarks/registry.jsonl`](benchmarks/registry.jsonl); **`benchmarks/README.md`**; matrix driver [`implementations/java/benchmarks/run_matrix.sh`](implementations/java/benchmarks/run_matrix.sh); env: `BENCHMARK_GIT_SHA`, optional `BENCHMARK_RUNNER_ID`, `BENCHMARK_RUNNER_VERSION`.
 - Java **`src/benchmarks/`:** `BenchmarkRegistry`, `RunManifest`, `RunnerInfo`, `HostEnvironmentMetrics`, `MemorySampler`, `ImageErrorMetrics`; **`CompressionBaselines`** (PNG + zip).
 - **[`benchmarks/registry-analysis.md`](benchmarks/registry-analysis.md)** — per-image and cross-image tables over `registry.jsonl` (refresh when the snapshot changes).
@@ -34,9 +22,16 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 ### Changed
 
 - **`PGMAPipeline`:** append registry line after successful runs; write manifest and baselines; **`Codebook.pathForGeometry`** → on-disk **`codebook_r{r}_d{d}.fc`** (no legacy **`codebook.fc`**). **`-c`** forces rebuild. Zip entry name matches the codebook file.
+- **`PGMAPipeline`:** when the codebook has **≥ 800** mappings, ~**25** **per-iteration** “applying mappings **k**/total” lines so long decode passes stay visible.
+- **`GrayBlockCompression`:** **progress logging** — geometry summary, phase labels (range blocks, domain blocks, bicubic domain shrink, search), and ~**25** updates while matching range blocks.
 - **PG matrix sample:** [`implementations/java/benchmarks/matrix.all-pgma.example.txt`](implementations/java/benchmarks/matrix.all-pgma.example.txt) — square PGMAs; **36** runs (4 × 3 geometries × 3 iteration counts); **−c** on **−i 10** when geometry is new per image; **−i 20** / **30** reuse codebooks.
 - **`FileUtils`:** `getFileSize(Path)`; generic **iterations-dir** javadoc (no codebook-specific names).
 - Root **`README.md`** and **`.cursor/rules/project-context.mdc`** — `benchmarks/` layout and runner env vars.
+- **`implementations/java/compression/run.sh`:** usage text for **`-c`** references per-geometry **`codebook_r{r}_d{d}.fc`**.
+
+### Fixed
+
+- **`PGMAPipeline`:** decode applies the codebook isometry to the reduced domain in a **scratch** `GrayPixel[][]`, then **`s` / `o`**, matching encode (no overwrite with untransformed samples).
 
 ## [0.3.0] - 2026-04-04 — `feature/3-bicubic-domain-reduce`
 
