@@ -1,5 +1,6 @@
 package implementations.java.compression.src.utils.fractal.block;
 
+import implementations.java.compression.src.utils.fractal.block.reductions.ReductionStrategy;
 import implementations.java.compression.src.utils.image.pixel.Pixel;
 
 /* 
@@ -34,7 +35,7 @@ public abstract class Block<T extends Pixel> {
      * @return a new Block with the array reduced to a square matrix of reduceTo
      *         dim.
      */
-    public abstract Block<T> reduce(int reduceTo);
+    public abstract Block<T> reduce(int reduceTo, ReductionStrategy reductionStrategy);
 
     public String toString() {
         int rows = this.pixels().length;

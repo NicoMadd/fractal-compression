@@ -6,6 +6,7 @@ import java.util.List;
 
 import implementations.java.compression.src.utils.fractal.block.GrayBlock;
 import implementations.java.compression.src.utils.fractal.block.compressed.GrayCompressedBlock;
+import implementations.java.compression.src.utils.fractal.block.reductions.ReductionStrategy;
 import implementations.java.compression.src.utils.fractal.mapping.FractalMapping;
 import implementations.java.compression.src.utils.fractal.reducedpair.GrayReducedPair;
 import implementations.java.compression.src.utils.fractal.transformation.Transformation;
@@ -31,16 +32,16 @@ public class GrayBlockCompression {
     // DOMAIN BLOCK DIMENSION
     private int DBD;
 
+    private ReductionStrategy reductionStrategy;
+
     private List<Transformation> ALLOWED_TRANSFORMATIONS = Arrays.stream(TransformationType.values())
             .map(TransformationFactory::of)
             .toList();
 
-    public GrayBlockCompression() {
-    }
-
-    public GrayBlockCompression(int rbd, int dbd) {
+    public GrayBlockCompression(int rbd, int dbd, ReductionStrategy reductionStrategy) {
         this.RBD = rbd;
         this.DBD = dbd;
+        this.reductionStrategy = reductionStrategy;
     }
 
     public int getRangeSize() {
@@ -49,6 +50,10 @@ public class GrayBlockCompression {
 
     public int getDomainSize() {
         return this.DBD;
+    }
+
+    public ReductionStrategy getReductionStrategy() {
+        return this.reductionStrategy;
     }
 
     /**
@@ -203,7 +208,7 @@ public class GrayBlockCompression {
 
         for (int i = 0; i < domainBlockNumber; i++) {
             for (int j = 0; j < domainBlockNumber; j++) {
-                GrayBlock reducedBlock = domainBlocks[i][j].reduce(RBD);
+                GrayBlock reducedBlock = domainBlocks[i][j].reduce(RBD, this.reductionStrategy);
                 reducedDomainBlocksPair[i][j] = new GrayReducedPair(domainBlocks[i][j], reducedBlock);
             }
         }

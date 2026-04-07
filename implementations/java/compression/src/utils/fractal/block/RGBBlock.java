@@ -1,5 +1,6 @@
 package implementations.java.compression.src.utils.fractal.block;
 
+import implementations.java.compression.src.utils.fractal.block.reductions.ReductionStrategy;
 import implementations.java.compression.src.utils.image.pixel.RGBPixel;
 import implementations.java.compression.src.utils.image.pixel.utils.RGBPixelUtils;
 
@@ -40,7 +41,7 @@ public class RGBBlock extends Block<RGBPixel> {
      * @return a new Block with the array reduced to a square matrix of reduceTo
      *         dim.
      */
-    public RGBBlock reduce(int reduceTo) {
+    public RGBBlock reduce(int reduceTo, ReductionStrategy reductionStrategy) {
 
         int blockDim = this.pixels.length;
 

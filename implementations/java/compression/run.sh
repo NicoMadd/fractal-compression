@@ -8,11 +8,12 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 IMAGES_ROOT="${REPO_ROOT}/data/images"
 
 usage() {
-  echo "Usage: $0 [[<image type>] <image name>] [-i iterations] [-r range] [-d domain] [-c] [-- <java-args>...]"
+  echo "Usage: $0 [[<image type>] <image name>] [-i iterations] [-r range] [-d domain] [-c] [--mr|--br] [-- <java-args>...]"
   echo "  image type: subdirectory under data/images (default: pgma)"
   echo "  image name: stem or prefix; must match exactly one file under the type folder"
   echo "  Defaults: iterations=25, range=4, domain=8"
   echo "  -i, -r, -d override defaults (any order before --). -c forces codebook rebuild (see codebook_r{r}_d{d}.fc)."
+  echo "  --mr mean domain reduction (default); --br bicubic domain reduction. Not both."
   echo "  After --, remaining args are passed to Main as well."
   echo "Example: $0 baboon"
   echo "Example: $0 baboon -i 40"
@@ -40,6 +41,7 @@ ITERS=25
 RANGE=4
 DOMAIN=8
 CLEAN_CODEBOOK=0
+REDUCTION_FLAG=""
 TYPE="pgma"
 POSITIONAL=()
 
@@ -65,6 +67,14 @@ while [ "$i" -lt "$n" ]; do
       ;;
     -c)
       CLEAN_CODEBOOK=1
+      ;;
+    --mr)
+      if [ -n "$REDUCTION_FLAG" ] && [ "$REDUCTION_FLAG" != "--mr" ]; then echo "$0: use only one of --mr or --br"; exit 1; fi
+      REDUCTION_FLAG="--mr"
+      ;;
+    --br)
+      if [ -n "$REDUCTION_FLAG" ] && [ "$REDUCTION_FLAG" != "--br" ]; then echo "$0: use only one of --mr or --br"; exit 1; fi
+      REDUCTION_FLAG="--br"
       ;;
     *)
       POSITIONAL+=("$a")
@@ -126,6 +136,9 @@ rm -f "${tmp_list}"
 MAIN_ARGS=("${IMAGE_PATH}" "${ITERS}" "${RANGE}" "${DOMAIN}")
 if [ "$CLEAN_CODEBOOK" -eq 1 ]; then
   MAIN_ARGS+=(-c)
+fi
+if [ -n "$REDUCTION_FLAG" ]; then
+  MAIN_ARGS+=("$REDUCTION_FLAG")
 fi
 if [ "${#JAVA_OPTS[@]}" -gt 0 ]; then
   MAIN_ARGS+=("${JAVA_OPTS[@]}")

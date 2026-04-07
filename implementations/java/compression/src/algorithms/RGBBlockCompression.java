@@ -5,6 +5,7 @@ import java.util.List;
 
 import implementations.java.compression.src.utils.fractal.block.RGBBlock;
 import implementations.java.compression.src.utils.fractal.block.compressed.RGBCompressedBlock;
+import implementations.java.compression.src.utils.fractal.block.reductions.ReductionStrategy;
 import implementations.java.compression.src.utils.fractal.rangematch.RGBRangeMatch;
 import implementations.java.compression.src.utils.fractal.reducedpair.RGBReducedPair;
 import implementations.java.compression.src.utils.image.ImageMetadata;
@@ -28,6 +29,8 @@ public class RGBBlockCompression {
     public static int RBD = 4;
     // DOMAIN BLOCK DIMENSION
     public static int DBD = 8;
+
+    private ReductionStrategy reductionStrategy;
 
     /**
      * Calculate S is the summation of the differences between each Di minus the
@@ -192,7 +195,7 @@ public class RGBBlockCompression {
 
         for (int i = 0; i < domainBlockNumber; i++) {
             for (int j = 0; j < domainBlockNumber; j++) {
-                RGBBlock reducedBlock = domainBlocks[i][j].reduce(RBD);
+                RGBBlock reducedBlock = domainBlocks[i][j].reduce(RBD, this.reductionStrategy);
                 reducedDomainBlocksPair[i][j] = new RGBReducedPair(domainBlocks[i][j], reducedBlock);
             }
         }

@@ -35,7 +35,7 @@ public class PGMAPipeline extends Pipeline {
 
     public PGMAPipeline(PipelineParams params) throws IOException {
         super(params);
-        this.gbc = new GrayBlockCompression(params.rangeSize(), params.domainSize());
+        this.gbc = new GrayBlockCompression(params.rangeSize(), params.domainSize(), params.reductionStrategy());
     }
 
     protected void init(FileInputStream fis) throws IOException {
@@ -128,7 +128,7 @@ public class PGMAPipeline extends Pipeline {
 
                 GrayBlock domainBlock = new GrayBlock(xDomain, yDomain, domainPixels);
 
-                GrayBlock reducedBlock = domainBlock.reduce(gbc.getRangeSize());
+                GrayBlock reducedBlock = domainBlock.reduce(gbc.getRangeSize(), gbc.getReductionStrategy());
 
                 GrayPixel[][] newPixels = new GrayPixel[gbc.getRangeSize()][gbc.getRangeSize()];
 
@@ -184,7 +184,8 @@ public class PGMAPipeline extends Pipeline {
 
             double psnr = ErrorUtils.calculatePSNR(mse);
             System.out.println("PSNR: " + psnr);
-            Iteration iteration = new Iteration(iter, iterationEndTs, iterationEndTs - iterationStartTs, mse, mae, psnr);
+            Iteration iteration = new Iteration(iter, iterationEndTs, iterationEndTs - iterationStartTs, mse, mae,
+                    psnr);
             scb.add(iteration);
 
             finalMse = mse;

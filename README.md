@@ -27,12 +27,25 @@ Implementations may be made in Java, C++ and Python.
 
 ## Run (Java)
 
-From the Java module directory:
+From the Java module directory, `run.sh` compiles and runs the pipeline on a PPM under `data/images/` (default subfolder: `pgma`). The first argument is the **file stem** (prefix); it must match exactly one file like `stem*.ppm` in that folder.
 
 ```bash
 cd implementations/java/compression
 chmod +x run.sh   # once, if needed
-./run.sh ../../data/images/lena.ppm
+
+# default type pgma, default -i 25 -r 4 -d 8
+./run.sh lena
+
+# explicit image type folder under data/images
+./run.sh pgma baboon
+
+# overrides: iterations, range block size, domain block size
+./run.sh lena -i 40 -r 8 -d 16
+
+# force codebook rebuild (see codebook_r{r}_d{d}.fc)
+./run.sh lena -c
 ```
 
-Pass any PPM path as the first argument. Outputs are written under `processes/<image-stem>/` at repo level (`codebook_r{r}_d{d}.fc`, `original.pgm`), with per-run iteration PGMs and `benchmark.csv` under `processes/<image-stem>/iterations/` (when the Java module’s working directory matches `run.sh`).
+Anything after `--` is forwarded to `Main` (same argument model as `PipelineParams` in the Java sources).
+
+Outputs go under repo-root `processes/<stem>/`: `codebook_r{r}_d{d}.fc`, `original.pgm`, and under `iterations/` the iteration PGMs plus `benchmark.csv`.

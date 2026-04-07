@@ -6,14 +6,19 @@ import java.util.List;
 import java.util.Optional;
 
 import implementations.java.compression.src.utils.files.FileUtils;
+import implementations.java.compression.src.utils.fractal.block.reductions.BicubicReductionStrategy;
+import implementations.java.compression.src.utils.fractal.block.reductions.MeanReductionStrategy;
+import implementations.java.compression.src.utils.fractal.block.reductions.ReductionStrategy;
 
 public record PipelineParams(String imagePath, int iterations, Path runDir, int rangeSize, int domainSize,
-        boolean cleanCodebook) {
+        boolean cleanCodebook, ReductionStrategy reductionStrategy) {
 
     public static Optional<PipelineParams> parse(String[] args) {
         Integer rangeFlag = null;
         Integer domainFlag = null;
         boolean cleanCodebook = false;
+        boolean sawMr = false;
+        boolean sawBr = false;
 
         List<String> positionals = new ArrayList<>();
         for (int i = 0; i < args.length;) {
@@ -53,16 +58,30 @@ public record PipelineParams(String imagePath, int iterations, Path runDir, int 
             } else if ("-c".equals(a)) {
                 cleanCodebook = true;
                 i += 1;
+            } else if ("--mr".equals(a)) {
+                sawMr = true;
+                i += 1;
+            } else if ("--br".equals(a)) {
+                sawBr = true;
+                i += 1;
             } else {
                 positionals.add(a);
                 i += 1;
             }
         }
 
+        if (sawMr && sawBr) {
+            System.out.println("Cannot specify both --mr and --br.");
+            return Optional.empty();
+        }
+
+        ReductionStrategy reductionStrategy = sawBr ? new BicubicReductionStrategy() : new MeanReductionStrategy();
+
         if (positionals.size() < 2) {
             System.out.println(
-                    "Usage: <image path> <iterations> [<range size> [<domain size>]] [-r <range>] [-d <domain>] [-c]");
-            System.out.println("  Default range size is 4 if omitted. Domain defaults to 2× range if omitted.");
+                    "Usage: <image path> <iterations> [<range size> [<domain size>]] [-r <range>] [-d <domain>] [-c] [--mr | --br]");
+            System.out.println(
+                    "  Default range size is 4 if omitted. Domain defaults to 2× range if omitted. Domain reduction defaults to mean; --mr is mean, --br is bicubic.");
             return Optional.empty();
         }
 
@@ -117,7 +136,8 @@ public record PipelineParams(String imagePath, int iterations, Path runDir, int 
 
         Path runDir = FileUtils.PROCESSES_ROOT.resolve(FileUtils.runFolderName(imagePath));
 
-        return Optional.of(new PipelineParams(imagePath, iterations, runDir, rangeSize, domainSize, cleanCodebook));
+        return Optional
+                .of(new PipelineParams(imagePath, iterations, runDir, rangeSize, domainSize, cleanCodebook, reductionStrategy));
     }
 
 }

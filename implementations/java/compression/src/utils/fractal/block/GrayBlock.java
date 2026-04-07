@@ -1,7 +1,7 @@
 package implementations.java.compression.src.utils.fractal.block;
 
+import implementations.java.compression.src.utils.fractal.block.reductions.ReductionStrategy;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
-import implementations.java.compression.src.utils.image.pixel.utils.GrayPixelUtils;
 
 /* 
 x: is the x point of the left-top pixel of the pixels.
@@ -34,7 +34,7 @@ public class GrayBlock extends Block<GrayPixel> {
      * @return a new Block with the array reduced to a square matrix of reduceTo
      *         dim.
      */
-    public GrayBlock reduce(int reduceTo) {
+    public GrayBlock reduce(int reduceTo, ReductionStrategy reductionStrategy) {
 
         int blockDim = this.pixels.length;
 
@@ -58,7 +58,7 @@ public class GrayBlock extends Block<GrayPixel> {
                 int mainOffsetI = i * reduceRatio;
                 int mainOffsetJ = j * reduceRatio;
 
-                GrayPixel reducedPixel = GrayPixelUtils.bicubicReduction(this.pixels, mainOffsetI,
+                GrayPixel reducedPixel = reductionStrategy.reduce(this.pixels, mainOffsetI,
                         mainOffsetJ, reduceRatio);
 
                 reducedPixels[i][j] = reducedPixel;
