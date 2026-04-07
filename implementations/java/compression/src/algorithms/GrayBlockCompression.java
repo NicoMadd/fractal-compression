@@ -6,6 +6,8 @@ import java.util.List;
 
 import implementations.java.compression.src.utils.fractal.block.GrayBlock;
 import implementations.java.compression.src.utils.fractal.block.compressed.GrayCompressedBlock;
+import implementations.java.compression.src.utils.fractal.block.reductions.BicubicReductionStrategy;
+import implementations.java.compression.src.utils.fractal.block.reductions.MeanReductionStrategy;
 import implementations.java.compression.src.utils.fractal.block.reductions.ReductionStrategy;
 import implementations.java.compression.src.utils.fractal.mapping.FractalMapping;
 import implementations.java.compression.src.utils.fractal.reducedpair.GrayReducedPair;
@@ -54,6 +56,16 @@ public class GrayBlockCompression {
 
     public ReductionStrategy getReductionStrategy() {
         return this.reductionStrategy;
+    }
+
+    private String getReductionStrategyDescription() {
+        if (reductionStrategy instanceof BicubicReductionStrategy) {
+            return "bicubic-reducing";
+        }
+        if (reductionStrategy instanceof MeanReductionStrategy) {
+            return "mean-reducing";
+        }
+        return "reducing";
     }
 
     /**
@@ -257,9 +269,8 @@ public class GrayBlockCompression {
         this.rangeBlocks = buildRangeBlocks(rangeBlocksNumber);
         System.out.println("Compress: building domain blocks…");
         this.domainBlocks = buildDomainBlocks(domainBlockNumber);
-
-        System.out.println("Compress: bicubic-reduce domain blocks (" + domainBlockNumber * domainBlockNumber
-                + " blocks)…");
+        System.out.println("Compress: " + getReductionStrategyDescription() + " domain blocks ("
+                + domainBlockNumber * domainBlockNumber + " blocks)…");
         GrayReducedPair[][] reducedDomainBlocksPair = buildReducedDomainPairs(domainBlockNumber);
         System.out.println("Compress: searching best domain + transform per range block…");
 

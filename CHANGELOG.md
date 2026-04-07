@@ -9,7 +9,7 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Added
 
-- **`PipelineParams` / `run.sh`:** **`--mr`** (mean domain reduction, default) and **`--br`** (bicubic); mutually exclusive. **`BicubicReductionStrategy`** delegates to **`GrayPixelUtils.bicubicReduction`**.
+- **`PipelineParams` / `run.sh`:** **`--mr`** (mean domain reduction, default) and **`--br`** (bicubic); mutually exclusive. Mean / bicubic shrink logic lives in **`MeanReductionStrategy`** and **`BicubicReductionStrategy`**.
 
 ## [0.4.0] - 2026-04-05 — basic benchmark registry (`feature/4-benchmark-registry`)
 
