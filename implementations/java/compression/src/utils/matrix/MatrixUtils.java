@@ -64,7 +64,7 @@ public class MatrixUtils {
     public static float[][] avgKernel(int dim) {
         float[][] matrix = new float[dim][dim];
 
-        float avgKernelValue = (float) 1 / (dim * 2);
+        float avgKernelValue = (float) 1 / (dim * dim);
 
         fill(matrix, avgKernelValue);
 

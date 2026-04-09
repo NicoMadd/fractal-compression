@@ -46,26 +46,7 @@ public class GrayBlock extends Block<GrayPixel> {
             throw new IllegalArgumentException("reduceTo ratio should be an even number");
         }
 
-        // calculo para saber el tamaño de bloque reducido => 8x8 a 4x4 => ratio de 2 =>
-        // bloques de 2x2
-        int reduceRatio = blockDim / reduceTo;
-
-        GrayPixel[][] reducedPixels = new GrayPixel[reduceTo][reduceTo];
-
-        for (int i = 0; i < reduceTo; i++) {
-            for (int j = 0; j < reduceTo; j++) {
-
-                int mainOffsetI = i * reduceRatio;
-                int mainOffsetJ = j * reduceRatio;
-
-                GrayPixel reducedPixel = reductionStrategy.reduce(this.pixels, mainOffsetI,
-                        mainOffsetJ, reduceRatio);
-
-                reducedPixels[i][j] = reducedPixel;
-
-            }
-
-        }
+        GrayPixel[][] reducedPixels = reductionStrategy.reduce(this.pixels, reduceTo);
 
         GrayBlock reducedBlock = new GrayBlock(this.x(), this.y(), reducedPixels);
 

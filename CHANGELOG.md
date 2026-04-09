@@ -11,6 +11,10 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 - **`PipelineParams` / `run.sh`:** **`--mr`** (mean domain reduction, default) and **`--br`** (bicubic); mutually exclusive. Mean / bicubic shrink logic lives in **`MeanReductionStrategy`** and **`BicubicReductionStrategy`**.
 
+### Changed
+
+- **`BicubicReductionStrategy.reduce`:** for reduce ratio **2<sup>k</sup>**, repeatedly applies **2:1** separable Catmull–Rom on the **local R×R** tile until **2×2**, then the final sample (no recursive **`GrayBlock.reduce`**); non-power-of-two ratios throw with a clear message (use **mean** or change geometry).
+
 ## [0.4.0] - 2026-04-05 — basic benchmark registry (`feature/4-benchmark-registry`)
 
 ### Added
