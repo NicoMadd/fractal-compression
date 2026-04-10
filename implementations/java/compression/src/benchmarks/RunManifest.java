@@ -15,8 +15,15 @@ public record RunManifest(
         int rangeSize,
         int domainSize,
         boolean cleanCodebook,
+        boolean skipIterationSaves,
         double compressionSeconds,
         double decompressionSeconds,
+        double decompressionDecodeSeconds,
+        double decompressionSaveSeconds,
+        double decompressionSnapshotMetricsSeconds,
+        double decodeIterationAvgSeconds,
+        double decodeIterationMinSeconds,
+        double decodeIterationMaxSeconds,
         long bytesOriginalInput,
         long bytesOriginalPgmCopy,
         long bytesCodebook,
@@ -70,8 +77,15 @@ public record RunManifest(
                 + "\"range_size\":" + rangeSize + ","
                 + "\"domain_size\":" + domainSize + ","
                 + "\"clean_codebook\":" + cleanCodebook + ","
+                + "\"skip_iteration_saves\":" + skipIterationSaves + ","
                 + "\"compression_seconds\":" + jDbl(compressionSeconds) + ","
                 + "\"decompression_seconds\":" + jDbl(decompressionSeconds) + ","
+                + "\"decompression_decode_seconds\":" + jDbl(decompressionDecodeSeconds) + ","
+                + "\"decompression_save_seconds\":" + jDbl(decompressionSaveSeconds) + ","
+                + "\"decompression_snapshot_metrics_seconds\":" + jDbl(decompressionSnapshotMetricsSeconds) + ","
+                + "\"decode_iteration_avg_seconds\":" + jDbl(decodeIterationAvgSeconds) + ","
+                + "\"decode_iteration_min_seconds\":" + jDbl(decodeIterationMinSeconds) + ","
+                + "\"decode_iteration_max_seconds\":" + jDbl(decodeIterationMaxSeconds) + ","
                 + "\"bytes_original_input\":" + bytesOriginalInput + ","
                 + "\"bytes_original_pgm_copy\":" + bytesOriginalPgmCopy + ","
                 + "\"bytes_codebook\":" + bytesCodebook + ","

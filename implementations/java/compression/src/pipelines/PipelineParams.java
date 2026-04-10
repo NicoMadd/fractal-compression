@@ -11,12 +11,14 @@ import implementations.java.compression.src.utils.fractal.block.reductions.MeanR
 import implementations.java.compression.src.utils.fractal.block.reductions.ReductionStrategy;
 
 public record PipelineParams(String imagePath, int iterations, Path runDir, int rangeSize, int domainSize,
-        boolean cleanCodebook, ReductionStrategy reductionStrategy) {
+        boolean cleanCodebook, ReductionStrategy reductionStrategy, int parallelism, boolean skipIterationSaves) {
 
     public static Optional<PipelineParams> parse(String[] args) {
         Integer rangeFlag = null;
         Integer domainFlag = null;
+        Integer parallelismFlag = null;
         boolean cleanCodebook = false;
+        boolean omitIterationPgms = false;
         boolean sawMr = false;
         boolean sawBr = false;
 
@@ -58,6 +60,25 @@ public record PipelineParams(String imagePath, int iterations, Path runDir, int 
             } else if ("-c".equals(a)) {
                 cleanCodebook = true;
                 i += 1;
+            } else if ("--no-iter-save".equals(a)) {
+                omitIterationPgms = true;
+                i += 1;
+            } else if ("-p".equals(a)) {
+                if (i + 1 >= args.length) {
+                    System.out.println("Usage: -p requires a thread count (positive integer).");
+                    return Optional.empty();
+                }
+                try {
+                    parallelismFlag = Integer.parseInt(args[i + 1]);
+                    if (parallelismFlag <= 0) {
+                        System.out.println("Parallelism must be a positive integer.");
+                        return Optional.empty();
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Parallelism must be an integer.");
+                    return Optional.empty();
+                }
+                i += 2;
             } else if ("--mr".equals(a)) {
                 sawMr = true;
                 i += 1;
@@ -79,9 +100,11 @@ public record PipelineParams(String imagePath, int iterations, Path runDir, int 
 
         if (positionals.size() < 2) {
             System.out.println(
-                    "Usage: <image path> <iterations> [<range size> [<domain size>]] [-r <range>] [-d <domain>] [-c] [--mr | --br]");
+                    "Usage: <image path> <iterations> [<range size> [<domain size>]] [-r <range>] [-d <domain>] [-p <threads>] [-c] [--no-iter-save] [--mr | --br]");
             System.out.println(
-                    "  Default range size is 4 if omitted. Domain defaults to 2× range if omitted. Domain reduction defaults to mean; --mr is mean, --br is bicubic.");
+                    "  Default range size is 4 if omitted. Domain defaults to 2x range if omitted. Parallelism defaults to availableProcessors if -p omitted. Domain reduction defaults to mean; --mr is mean, --br is bicubic.");
+            System.out.println(
+                    "  --no-iter-save skips per-iteration PGM frames; errors are computed once from the final iter PGM.");
             return Optional.empty();
         }
 
@@ -134,10 +157,15 @@ public record PipelineParams(String imagePath, int iterations, Path runDir, int 
             domainSize = rangeSize * 2;
         }
 
+        int parallelism = parallelismFlag != null ? parallelismFlag : Runtime.getRuntime().availableProcessors();
+        if (parallelism < 1) {
+            parallelism = 1;
+        }
+
         Path runDir = FileUtils.PROCESSES_ROOT.resolve(FileUtils.runFolderName(imagePath));
 
-        return Optional
-                .of(new PipelineParams(imagePath, iterations, runDir, rangeSize, domainSize, cleanCodebook, reductionStrategy));
+        return Optional.of(new PipelineParams(imagePath, iterations, runDir, rangeSize, domainSize, cleanCodebook,
+                reductionStrategy, parallelism, omitIterationPgms));
     }
 
 }

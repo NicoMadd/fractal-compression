@@ -19,6 +19,15 @@ public class SimpleCompressionBenchmark {
         this.iterations.add(iteration);
     }
 
+    public void replaceLastIterationError(double mse, double mae, double psnr) {
+        if (this.iterations.isEmpty()) {
+            return;
+        }
+        int last = this.iterations.size() - 1;
+        Iteration prev = this.iterations.get(last);
+        this.iterations.set(last, new Iteration(prev.n(), prev.timestamp(), prev.duration(), mse, mae, psnr));
+    }
+
     public void saveTo(String directory) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append(Iteration.columns());

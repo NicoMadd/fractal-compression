@@ -8,11 +8,12 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 IMAGES_ROOT="${REPO_ROOT}/data/images"
 
 usage() {
-  echo "Usage: $0 [[<image type>] <image name>] [-i iterations] [-r range] [-d domain] [-c] [--mr|--br] [-- <java-args>...]"
+  echo "Usage: $0 [[<image type>] <image name>] [-i iterations] [-r range] [-d domain] [-p threads] [-c] [--no-iter-save] [--mr|--br] [-- <java-args>...]"
   echo "  image type: subdirectory under data/images (default: pgma)"
   echo "  image name: stem or prefix; must match exactly one file under the type folder"
-  echo "  Defaults: iterations=25, range=4, domain=8"
-  echo "  -i, -r, -d override defaults (any order before --). -c forces codebook rebuild (see codebook_r{r}_d{d}.fc)."
+  echo "  Defaults: iterations=25, range=4, domain=8; thread pool size defaults to JVM availableProcessors if -p omitted"
+  echo "  -i, -r, -d, -p override defaults (any order before --). -c forces codebook rebuild (see codebook_r{r}_d{d}.fc)."
+  echo "  --no-iter-save skips per-iteration PGM writes; errors printed once from final frame (faster)."
   echo "  --mr mean domain reduction (default); --br bicubic domain reduction. Not both."
   echo "  After --, remaining args are passed to Main as well."
   echo "Example: $0 baboon"
@@ -40,7 +41,9 @@ done
 ITERS=25
 RANGE=4
 DOMAIN=8
+PARALLELISM=""
 CLEAN_CODEBOOK=0
+NO_ITER_SAVE=0
 REDUCTION_FLAG=""
 TYPE="pgma"
 POSITIONAL=()
@@ -65,8 +68,16 @@ while [ "$i" -lt "$n" ]; do
       if [ "$i" -ge "$n" ]; then echo "$0: -d requires a value"; exit 1; fi
       DOMAIN="${PRE_JAVA[$i]}"
       ;;
+    -p)
+      i=$((i + 1))
+      if [ "$i" -ge "$n" ]; then echo "$0: -p requires a value"; exit 1; fi
+      PARALLELISM="${PRE_JAVA[$i]}"
+      ;;
     -c)
       CLEAN_CODEBOOK=1
+      ;;
+    --no-iter-save)
+      NO_ITER_SAVE=1
       ;;
     --mr)
       if [ -n "$REDUCTION_FLAG" ] && [ "$REDUCTION_FLAG" != "--mr" ]; then echo "$0: use only one of --mr or --br"; exit 1; fi
@@ -104,6 +115,12 @@ if ! [[ "$DOMAIN" =~ ^[0-9]+$ ]] || [ "$DOMAIN" -le 0 ]; then
   echo "$0: domain size must be a positive integer"
   exit 1
 fi
+if [ -n "$PARALLELISM" ]; then
+  if ! [[ "$PARALLELISM" =~ ^[0-9]+$ ]] || [ "$PARALLELISM" -le 0 ]; then
+    echo "$0: -p must be a positive integer"
+    exit 1
+  fi
+fi
 
 SEARCH_DIR="${IMAGES_ROOT}/${TYPE}"
 if [ ! -d "$SEARCH_DIR" ]; then
@@ -137,8 +154,14 @@ MAIN_ARGS=("${IMAGE_PATH}" "${ITERS}" "${RANGE}" "${DOMAIN}")
 if [ "$CLEAN_CODEBOOK" -eq 1 ]; then
   MAIN_ARGS+=(-c)
 fi
+if [ "$NO_ITER_SAVE" -eq 1 ]; then
+  MAIN_ARGS+=(--no-iter-save)
+fi
 if [ -n "$REDUCTION_FLAG" ]; then
   MAIN_ARGS+=("$REDUCTION_FLAG")
+fi
+if [ -n "$PARALLELISM" ]; then
+  MAIN_ARGS+=(-p "$PARALLELISM")
 fi
 if [ "${#JAVA_OPTS[@]}" -gt 0 ]; then
   MAIN_ARGS+=("${JAVA_OPTS[@]}")

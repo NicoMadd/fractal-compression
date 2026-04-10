@@ -54,4 +54,27 @@ public class PGMAUtils {
         return calculateErrorMetrics(originalImgPath, lastIterationPath).mse();
     }
 
+    /**
+     * Same index pairing as {@link #calculateErrorMetrics(String, String)} on loaded rasters:
+     * {@code referencePixels[i][j]} vs {@code reconstructedPixels[i][j]} for {@code i} in {@code [0,width)},
+     * {@code j} in {@code [0,height)} (matches pipeline {@code GrayPixel[width][height]} buffers).
+     */
+    public static ImageErrorMetrics calculateErrorMetricsSameLayout(GrayPixel[][] referencePixels,
+            GrayPixel[][] reconstructedPixels,
+            int width,
+            int height) {
+        double totalSq = 0;
+        double totalAbs = 0;
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                GrayPixel originalPixel = referencePixels[i][j];
+                GrayPixel finalPixel = reconstructedPixels[i][j];
+                totalSq += originalPixel.sqDiff(finalPixel);
+                totalAbs += Math.abs((double) originalPixel.gray() - (double) finalPixel.gray());
+            }
+        }
+        double n = (double) width * (double) height;
+        return new ImageErrorMetrics(totalSq / n, totalAbs / n);
+    }
+
 }

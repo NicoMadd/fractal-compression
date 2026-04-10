@@ -9,7 +9,10 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Added
 
+- **`PipelineParams` / `run.sh`:** **`--no-iter-save`** skips writing **`iter_*`** PGMs each iteration; **`iter_<n>`** is written once at the end and **MSE/MAE/PSNR** are computed from that file (no per-iteration prints; **`benchmark.csv`** keeps per-iter decode times, last row gets final errors). Manifest includes **`skip_iteration_saves`**.
+- **Benchmark manifest / registry:** optional **`decompression_decode_seconds`**, **`decompression_save_seconds`**, **`decompression_snapshot_metrics_seconds`**, and per-pass **`decode_iteration_{avg,min,max}_seconds`** (see [`benchmarks/RUN_RECORD.md`](benchmarks/RUN_RECORD.md)); Java runner logs decode vs save vs metrics+sample and per-pass decode avg/min/max.
 - **`PipelineParams` / `run.sh`:** **`--mr`** (mean domain reduction, default) and **`--br`** (bicubic); mutually exclusive. Mean / bicubic shrink logic lives in **`MeanReductionStrategy`** and **`BicubicReductionStrategy`**.
+- **`PipelineParams` / `run.sh`:** **`-p <n>`** compression thread-pool size (positive integer); if omitted, **`Runtime.getRuntime().availableProcessors()`**.
 
 ### Changed
 

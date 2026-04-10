@@ -1,19 +1,23 @@
 package implementations.java.compression.src.algorithms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import implementations.java.compression.src.algorithms.concurrent.BlockBuilder;
+import implementations.java.compression.src.algorithms.concurrent.DomainFinder;
+import implementations.java.compression.src.algorithms.concurrent.ReducedDomainPairBuilder;
 import implementations.java.compression.src.utils.fractal.block.GrayBlock;
-import implementations.java.compression.src.utils.fractal.block.compressed.GrayCompressedBlock;
 import implementations.java.compression.src.utils.fractal.block.reductions.BicubicReductionStrategy;
 import implementations.java.compression.src.utils.fractal.block.reductions.MeanReductionStrategy;
 import implementations.java.compression.src.utils.fractal.block.reductions.ReductionStrategy;
 import implementations.java.compression.src.utils.fractal.mapping.FractalMapping;
 import implementations.java.compression.src.utils.fractal.reducedpair.GrayReducedPair;
-import implementations.java.compression.src.utils.fractal.transformation.Transformation;
-import implementations.java.compression.src.utils.fractal.transformation.TransformationFactory;
-import implementations.java.compression.src.utils.fractal.transformation.TransformationType;
 import implementations.java.compression.src.utils.image.ImageMetadata;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
 
@@ -26,24 +30,23 @@ public class GrayBlockCompression {
     private GrayBlock[][] rangeBlocks;
     private GrayBlock[][] domainBlocks;
 
-    private float meanR;
-
     // RANGE BLOCK DIMENSION
     private int RBD;
 
     // DOMAIN BLOCK DIMENSION
     private int DBD;
 
+    // Reduction strategy to reduce blocks
     private ReductionStrategy reductionStrategy;
 
-    private List<Transformation> ALLOWED_TRANSFORMATIONS = Arrays.stream(TransformationType.values())
-            .map(TransformationFactory::of)
-            .toList();
+    // number of threads to use for compression.
+    private int parallelism;
 
-    public GrayBlockCompression(int rbd, int dbd, ReductionStrategy reductionStrategy) {
+    public GrayBlockCompression(int rbd, int dbd, ReductionStrategy reductionStrategy, int parallelism) {
         this.RBD = rbd;
         this.DBD = dbd;
         this.reductionStrategy = reductionStrategy;
+        this.parallelism = parallelism;
     }
 
     public int getRangeSize() {
@@ -68,161 +71,87 @@ public class GrayBlockCompression {
         return "reducing";
     }
 
-    /**
-     * Calculate S is the summation of the differences between each Di minus the
-     * meansD times
-     * the difference between Ri minuts the meansR.
-     * 
-     * sums of [ (Di - meansD) * (Ri - meansR) ]
-     * 
-     * @param rangePixels n pixels unordered composing the range block
-     * @param rdPixels    n pixels unordered composing the reduced domain block
-     * @param meansD
-     * @param meansR
-     * @return s value calculated for these blocks
-     * 
-     */
-    private float calculateS(GrayPixel[][] rangePixels, GrayPixel[][] rdPixels, float meanD) {
-        // calculate s
-        // numerator: summation of the diff between each
-        // Di minus the avgD times
-        // the diff between Ri minus the avgR.
+    private GrayBlock[][] buildRangeBlocks(int rangeBlocksNumber) throws InterruptedException, ExecutionException {
 
-        float numerator = 0;
-        float denominator = 0;
+        ExecutorService es = Executors.newFixedThreadPool(this.parallelism);
 
-        for (int i = 0; i < RBD; i++) {
-            for (int j = 0; j < RBD; j++) {
-                int domainColorValue = rdPixels[i][j].gray();
-                int rangeColorValue = rangePixels[i][j].gray();
-
-                float domainDiff = domainColorValue - meanD;
-                float rangeDiff = rangeColorValue - this.meanR;
-
-                numerator += domainDiff * rangeDiff;
-                denominator += Math.pow(domainDiff, 2);
-            }
-        }
-
-        float s = 0;
-
-        if (denominator != 0) {
-            s = numerator / denominator;
-        }
-
-        return s;
-    }
-
-    private float calculateO(float meanD, float s) {
-        return this.meanR - s * meanD;
-    }
-
-    private GrayCompressedBlock findBestDomainMatch(GrayBlock range,
-            GrayReducedPair[][] reducedDomainsPairs) {
-
-        this.meanR = range.mean();
-
-        GrayCompressedBlock bestCompression = null;
-        float bestError = Float.MAX_VALUE;
-
-        for (GrayReducedPair[] row : reducedDomainsPairs) {
-            for (GrayReducedPair rdp : row) {
-                GrayBlock rd = rdp.reduced();
-                float meanD = rd.mean();
-
-                GrayPixel[][] rangePixels = range.pixels();
-                GrayPixel[][] rdPixels = rd.pixels();
-
-                for (Transformation t : ALLOWED_TRANSFORMATIONS) {
-
-                    float blockError = 0;
-
-                    GrayPixel[][] transformedRD = new GrayPixel[RBD][RBD];
-                    t.transform(rdPixels, transformedRD);
-
-                    float s = calculateS(rangePixels, transformedRD, meanD);
-
-                    // calculate o
-                    float o = calculateO(meanD, s);
-
-                    // Calculate color error
-                    float colorError = 0;
-
-                    for (int i = 0; i < RBD; i++) {
-                        for (int j = 0; j < RBD; j++) {
-                            float approxRange = s * transformedRD[i][j].gray() + o;
-
-                            float rangeDiff = rangePixels[i][j].gray() - approxRange;
-
-                            colorError += Math.pow(rangeDiff, 2);
-                        }
-                    }
-
-                    // sum color error to block error
-                    blockError += colorError;
-
-                    // decide wether to keep this block or discard it.
-                    // if block error is less than the actual best, then keep it.
-                    if (blockError < bestError) {
-                        bestCompression = new GrayCompressedBlock(range, rdp.domain(), s, o, t.type());
-                        bestError = blockError;
-                    }
-                }
-            }
-        }
-
-        return bestCompression;
-
-    }
-
-    private GrayBlock[][] buildRangeBlocks(int rangeBlocksNumber) {
-        GrayBlock[][] blocks = new GrayBlock[rangeBlocksNumber][rangeBlocksNumber];
+        List<Callable<GrayBlock>> callables = new ArrayList<>();
 
         for (int i = 0; i < rangeBlocksNumber; i++) {
             for (int j = 0; j < rangeBlocksNumber; j++) {
-                GrayPixel[][] blockPixels = new GrayPixel[RBD][RBD];
-
-                for (int k = 0; k < RBD; k++) {
-                    for (int l = 0; l < RBD; l++) {
-                        blockPixels[k][l] = this.imagePixels[RBD * i + k][RBD * j + l];
-                    }
-                }
-
-                blocks[i][j] = new GrayBlock(RBD * i, RBD * j, blockPixels);
+                BlockBuilder bb = new BlockBuilder(imagePixels, RBD * i, RBD * j, RBD);
+                callables.add(bb);
             }
+        }
+
+        GrayBlock[][] blocks = new GrayBlock[rangeBlocksNumber][rangeBlocksNumber];
+
+        try {
+            for (Future<GrayBlock> f : es.invokeAll(callables)) {
+                GrayBlock gb = f.get();
+                blocks[gb.x() / RBD][gb.y() / RBD] = gb;
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        } finally {
+            es.close();
         }
 
         return blocks;
     }
 
     private GrayBlock[][] buildDomainBlocks(int domainBlockNumber) {
-        GrayBlock[][] blocks = new GrayBlock[domainBlockNumber][domainBlockNumber];
+
+        ExecutorService es = Executors.newFixedThreadPool(this.parallelism);
+
+        List<Callable<GrayBlock>> callables = new ArrayList<>();
 
         for (int i = 0; i < domainBlockNumber; i++) {
             for (int j = 0; j < domainBlockNumber; j++) {
-                GrayPixel[][] blockPixels = new GrayPixel[DBD][DBD];
-
-                for (int k = 0; k < DBD; k++) {
-                    for (int l = 0; l < DBD; l++) {
-                        blockPixels[k][l] = this.imagePixels[DBD * i + k][DBD * j + l];
-                    }
-                }
-
-                blocks[i][j] = new GrayBlock(DBD * i, DBD * j, blockPixels);
+                BlockBuilder bb = new BlockBuilder(imagePixels, DBD * i, DBD * j, DBD);
+                callables.add(bb);
             }
         }
 
+        GrayBlock[][] blocks = new GrayBlock[domainBlockNumber][domainBlockNumber];
+
+        try {
+            for (Future<GrayBlock> f : es.invokeAll(callables)) {
+                GrayBlock gb = f.get();
+                blocks[gb.x() / DBD][gb.y() / DBD] = gb;
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        } finally {
+            es.close();
+        }
         return blocks;
     }
 
     private GrayReducedPair[][] buildReducedDomainPairs(int domainBlockNumber) {
-        GrayReducedPair[][] reducedDomainBlocksPair = new GrayReducedPair[domainBlockNumber][domainBlockNumber];
+
+        ExecutorService es = Executors.newFixedThreadPool(this.parallelism);
+
+        List<Callable<GrayReducedPair>> callables = new ArrayList<>();
 
         for (int i = 0; i < domainBlockNumber; i++) {
             for (int j = 0; j < domainBlockNumber; j++) {
-                GrayBlock reducedBlock = domainBlocks[i][j].reduce(RBD, this.reductionStrategy);
-                reducedDomainBlocksPair[i][j] = new GrayReducedPair(domainBlocks[i][j], reducedBlock);
+                callables.add(new ReducedDomainPairBuilder(domainBlocks[i][j], RBD, reductionStrategy));
             }
+        }
+
+        GrayReducedPair[][] reducedDomainBlocksPair = new GrayReducedPair[domainBlockNumber][domainBlockNumber];
+
+        try {
+            for (Future<GrayReducedPair> f : es.invokeAll(callables)) {
+                GrayReducedPair pair = f.get();
+                GrayBlock d = pair.domain();
+                reducedDomainBlocksPair[d.x() / DBD][d.y() / DBD] = pair;
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        } finally {
+            es.close();
         }
 
         return reducedDomainBlocksPair;
@@ -233,26 +162,34 @@ public class GrayBlockCompression {
 
         int rb = rangeBlocks.length;
         int totalRanges = rb * rb;
-        int step = Math.max(1, totalRanges / 25);
-        int done = 0;
+        AtomicInteger counter = new AtomicInteger(0);
+
+        ExecutorService es = Executors.newFixedThreadPool(this.parallelism);
+
+        List<DomainFinder> callables = new ArrayList<>();
 
         for (GrayBlock[] rangesRow : rangeBlocks) {
             for (GrayBlock range : rangesRow) {
-                GrayCompressedBlock bestDomain = findBestDomainMatch(range, reducedDomainBlocksPair);
-                FractalMapping fm = new FractalMapping(range.x(), range.y(), bestDomain.domain().x(),
-                        bestDomain.domain().y(), bestDomain.s(), bestDomain.o(), bestDomain.t());
-                mappings.add(fm);
-                done++;
-                if (done == 1 || done == totalRanges || done % step == 0) {
-                    System.out.println("Compress: matched range blocks " + done + "/" + totalRanges);
-                }
+                DomainFinder df = new DomainFinder(reducedDomainBlocksPair, range, counter, totalRanges);
+                callables.add(df);
             }
         }
 
+        try {
+            for (Future<FractalMapping> f : es.invokeAll(callables)) {
+                FractalMapping fm = f.get();
+                mappings.add(fm);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        } finally {
+            es.close();
+        }
         return mappings;
     }
 
-    public List<FractalMapping> compress(ImageMetadata<GrayPixel> metadata) {
+    public List<FractalMapping> compress(ImageMetadata<GrayPixel> metadata)
+            throws InterruptedException, ExecutionException {
 
         this.imagePixels = metadata.getPixels();
         this.imageWidth = metadata.getWidth();

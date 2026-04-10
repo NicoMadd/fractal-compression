@@ -31,6 +31,7 @@ public final class TransformationFactory {
             case REFLECTION_VC -> new ReflectionVc();
             case REFLECTION_FD -> new ReflectionFd();
             case REFLECTION_SD -> new ReflectionSd();
+            default -> throw new IllegalArgumentException("Invalid transformation type: " + type);
         };
     }
 }

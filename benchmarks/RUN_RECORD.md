@@ -26,8 +26,15 @@ Consumers **SHOULD** ignore unknown top-level keys. Producers **MAY** add **`ext
 | `range_size` | int | Range block edge length (this project). |
 | `domain_size` | int | Domain block edge length (this project). |
 | `clean_codebook` | bool | Whether the codebook was rebuilt. |
+| `skip_iteration_saves` | bool | *(Optional.)* When true, per-iteration PGM frames were not written (metrics from memory); final iteration PGM may still exist for baselines. |
 | `compression_seconds` | number | Encode / codebook build time. |
 | `decompression_seconds` | number | Decode phase time. |
+| `decompression_decode_seconds` | number | *(Optional.)* Cumulative wall time for parallel fractal decode only (`latch.await` work per iteration). |
+| `decompression_save_seconds` | number | *(Optional.)* Cumulative wall time for **`PGMAUtils.saveToImage`** (initial random frame plus each iteration snapshot). |
+| `decompression_snapshot_metrics_seconds` | number | *(Optional.)* Cumulative wall time after each snapshot: error metrics (e.g. loading PGMs / comparison) plus **`MemorySampler.sample()`**. |
+| `decode_iteration_avg_seconds` | number | *(Optional.)* Mean wall time per decompression pass (one **`latch.await`** span). |
+| `decode_iteration_min_seconds` | number | *(Optional.)* Shortest single-pass decode time. |
+| `decode_iteration_max_seconds` | number | *(Optional.)* Longest single-pass decode time. |
 | `bytes_original_input` | int | Primary input file size (bytes). |
 | `bytes_original_pgm_copy` | int | Copy kept next to artifacts, if applicable. |
 | `bytes_codebook` | int | Fractal artifact size (bytes). |
