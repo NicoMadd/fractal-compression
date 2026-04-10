@@ -14,7 +14,6 @@ import implementations.java.compression.src.benchmarks.BenchmarkRegistry;
 import implementations.java.compression.src.benchmarks.HostEnvironmentMetrics;
 import implementations.java.compression.src.benchmarks.ImageErrorMetrics;
 import implementations.java.compression.src.benchmarks.Iteration;
-import implementations.java.compression.src.benchmarks.MemorySampler;
 import implementations.java.compression.src.benchmarks.RunManifest;
 import implementations.java.compression.src.benchmarks.RunnerInfo;
 import implementations.java.compression.src.benchmarks.SimpleCompressionBenchmark;
@@ -50,8 +49,7 @@ public class PGMAPipeline extends Pipeline {
         int iterations = params.iterations();
         Path runDir = params.runDir();
         Path iterationsDir = FileUtils.iterationsDir(runDir);
-        MemorySampler memorySampler = new MemorySampler();
-        memorySampler.sample();
+        beginRunMemorySampling();
 
         if (params.skipCompression() && params.skipDecompression()) {
             throw new IllegalStateException("Cannot skip both compression and decompression.");
@@ -269,8 +267,8 @@ public class PGMAPipeline extends Pipeline {
         writeBenchmarkOutputs(params, originalImagePath, runDir, iterationsDir, codebookPath, iterations,
                 compressionSeconds, decompressionSeconds, decompressionDecodeSeconds, decompressionSaveSeconds,
                 decompressionSnapshotMetricsSeconds, decodeIterationAvgSeconds, decodeIterationMinSeconds,
-                decodeIterationMaxSeconds, iterationOutMetrics.getMse(), iterationOutMetrics.getMae(),
-                iterationOutMetrics.getPsnr(), memorySampler);
+                decodeIterationMaxSeconds,                 iterationOutMetrics.getMse(), iterationOutMetrics.getMae(),
+                iterationOutMetrics.getPsnr());
 
         if (es != null) {
             es.shutdown();
@@ -336,8 +334,7 @@ public class PGMAPipeline extends Pipeline {
             double decodeIterationMaxSeconds,
             double finalMse,
             double finalMae,
-            double finalPsnr,
-            MemorySampler memorySampler) throws IOException {
+            double finalPsnr) throws IOException {
 
         Path originalCopyPath = runDir.resolve("original.pgm");
         Path finalIterPath = iterationsDir.resolve("iter_" + iterations + ".pgm");
