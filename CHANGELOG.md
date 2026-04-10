@@ -7,6 +7,8 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-09 — concurrent pipeline & benchmark matrices (`feature/5-concurrent-pipeline`)
+
 ### Added
 
 - **Benchmark registry / manifest** ([`benchmarks/RUN_RECORD.md`](benchmarks/RUN_RECORD.md)): **`compression_parallelism`**, **`decompression_parallelism`**; **`skip_compression`**, **`skip_decompression`**; optional decode breakdown (**`decompression_{decode,save,snapshot_metrics}_seconds`**, **`decode_iteration_{avg,min,max}_seconds`**).
