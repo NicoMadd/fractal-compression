@@ -13,7 +13,7 @@ import implementations.java.compression.src.utils.fractal.block.reductions.Reduc
 public record PipelineParams(String imagePath, int iterations, Path runDir, int rangeSize, int domainSize,
         boolean cleanCodebook, ReductionStrategy reductionStrategy, int compressionParallelism,
         int decompressionParallelism, boolean skipIterationSaves, boolean skipCompression,
-        boolean skipDecompression) {
+        boolean skipDecompression, boolean debug) {
 
     public static Optional<PipelineParams> parse(String[] args) {
         Integer rangeFlag = null;
@@ -24,6 +24,7 @@ public record PipelineParams(String imagePath, int iterations, Path runDir, int 
         boolean omitIterationPgms = false;
         boolean skipCompression = false;
         boolean skipDecompression = false;
+        boolean debug = false;
         boolean sawMr = false;
         boolean sawBr = false;
 
@@ -73,6 +74,9 @@ public record PipelineParams(String imagePath, int iterations, Path runDir, int 
                 i += 1;
             } else if ("--skip-decompression".equals(a) || "-sd".equals(a)) {
                 skipDecompression = true;
+                i += 1;
+            } else if ("--debug".equals(a)) {
+                debug = true;
                 i += 1;
             } else if ("-p".equals(a)) {
                 if (i + 1 >= args.length) {
@@ -136,13 +140,15 @@ public record PipelineParams(String imagePath, int iterations, Path runDir, int 
 
         if (positionals.size() < 2) {
             System.out.println(
-                    "Usage: <image path> <iterations> [<range size> [<domain size>]] [-r <range>] [-d <domain>] [-p <threads>] [-P <threads>] [-c] [--no-iter-save] [--skip-compression | -sc] [--skip-decompression | -sd] [--mr | --br]");
+                    "Usage: <image path> <iterations> [<range size> [<domain size>]] [-r <range>] [-d <domain>] [-p <threads>] [-P <threads>] [-c] [--no-iter-save] [--skip-compression | -sc] [--skip-decompression | -sd] [--mr | --br] [--debug]");
             System.out.println(
                     "  Default range size is 4 if omitted. Domain defaults to 2x range if omitted. Compression thread count defaults to availableProcessors if -p omitted; decompression defaults to the compression count if -P omitted. Domain reduction defaults to mean; --mr is mean, --br is bicubic.");
             System.out.println(
                     "  --no-iter-save skips per-iteration PGM frames; errors are computed once from the final iter PGM.");
             System.out.println(
-                    "  --skip-compression / -sc loads codebook_r{r}_d{d}.fc only (must exist; implies no -c). --skip-decompression / -sd runs encode only; MSE/MAE/PSNR and reconstruction PNG are omitted in the manifest.");
+                    "  --debug prints phase and progress logs; without it only a final summary is printed.");
+            System.out.println(
+                    "  --skip-compression / -sc loads codebooks/codebook_r{r}_d{d}.fc only (must exist; implies no -c). --skip-decompression / -sd runs encode only; MSE/MAE/PSNR and reconstruction PNG are omitted in the manifest.");
             return Optional.empty();
         }
 
@@ -210,7 +216,7 @@ public record PipelineParams(String imagePath, int iterations, Path runDir, int 
 
         return Optional.of(new PipelineParams(imagePath, iterations, runDir, rangeSize, domainSize, cleanCodebook,
                 reductionStrategy, compressionParallelism, decompressionParallelism, omitIterationPgms, skipCompression,
-                skipDecompression));
+                skipDecompression, debug));
     }
 
 }

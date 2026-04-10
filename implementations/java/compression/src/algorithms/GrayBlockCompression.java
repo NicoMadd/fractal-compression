@@ -1,4 +1,4 @@
-package implementations.java.compression.src.algorithms.squared;
+package implementations.java.compression.src.algorithms;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import implementations.java.compression.src.algorithms.concurrent.BlockBuilder;
 import implementations.java.compression.src.algorithms.concurrent.DomainFinder;
 import implementations.java.compression.src.algorithms.concurrent.ReducedDomainPairBuilder;
+import implementations.java.compression.src.pipelines.RunLogging;
 import implementations.java.compression.src.utils.fractal.block.GrayBlock;
 import implementations.java.compression.src.utils.fractal.block.reductions.BicubicReductionStrategy;
 import implementations.java.compression.src.utils.fractal.block.reductions.MeanReductionStrategy;
@@ -21,7 +22,7 @@ import implementations.java.compression.src.utils.fractal.reducedpair.GrayReduce
 import implementations.java.compression.src.utils.image.ImageMetadata;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
 
-public class GraySquaredBlockCompression {
+public class GrayBlockCompression {
 
     private GrayPixel[][] imagePixels;
     private int imageWidth;
@@ -42,7 +43,7 @@ public class GraySquaredBlockCompression {
     // number of threads to use for compression.
     private int parallelism;
 
-    public GraySquaredBlockCompression(int rbd, int dbd, ReductionStrategy reductionStrategy, int parallelism) {
+    public GrayBlockCompression(int rbd, int dbd, ReductionStrategy reductionStrategy, int parallelism) {
         this.RBD = rbd;
         this.DBD = dbd;
         this.reductionStrategy = reductionStrategy;
@@ -198,21 +199,21 @@ public class GraySquaredBlockCompression {
         int rangeBlocksNumber = this.imageWidth / RBD; // 256 / 4 = 64
         int domainBlockNumber = this.imageHeight / DBD; // 256 / (4 * 2) = 32
 
-        System.out.println("Compress: image " + imageWidth + "x" + imageHeight + ", range " + RBD + ", domain "
+        RunLogging.debug("Compress: image " + imageWidth + "x" + imageHeight + ", range " + RBD + ", domain "
                 + DBD + " → " + rangeBlocksNumber + "x" + rangeBlocksNumber + " ranges, " + domainBlockNumber + "x"
                 + domainBlockNumber + " domains");
 
-        System.out.println("Compress: building range blocks…");
+        RunLogging.debug("Compress: building range blocks…");
         this.rangeBlocks = buildRangeBlocks(rangeBlocksNumber);
-        System.out.println("Compress: building domain blocks…");
+        RunLogging.debug("Compress: building domain blocks…");
         this.domainBlocks = buildDomainBlocks(domainBlockNumber);
-        System.out.println("Compress: " + getReductionStrategyDescription() + " domain blocks ("
+        RunLogging.debug("Compress: " + getReductionStrategyDescription() + " domain blocks ("
                 + domainBlockNumber * domainBlockNumber + " blocks)…");
         GrayReducedPair[][] reducedDomainBlocksPair = buildReducedDomainPairs(domainBlockNumber);
-        System.out.println("Compress: searching best domain + transform per range block…");
+        RunLogging.debug("Compress: searching best domain + transform per range block…");
 
         List<FractalMapping> fractalMappings = buildFractalMappings(reducedDomainBlocksPair);
-        System.out.println("Compression Finished!");
+        RunLogging.debug("Compression Finished!");
         return fractalMappings;
     }
 

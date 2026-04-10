@@ -15,12 +15,12 @@ public abstract class Pipeline {
     public Pipeline(PipelineParams params) throws IOException {
 
         try (FileInputStream fis = new FileInputStream(params.imagePath())) {
-            System.out.println("File Input Stream opened.");
+            RunLogging.debug("File Input Stream opened.");
             init(fis);
         } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         } finally {
-            System.out.println("File Input Stream closed.");
+            RunLogging.debug("File Input Stream closed.");
         }
 
         Files.createDirectories(FileUtils.PROCESSES_ROOT);

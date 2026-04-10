@@ -1,5 +1,6 @@
 package implementations.java.compression.src.utils.fractal.block.reductions;
 
+import implementations.java.compression.src.pipelines.RunLogging;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
 import implementations.java.compression.src.utils.matrix.MatrixShape;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
@@ -28,7 +29,7 @@ public class BicubicReductionStrategy implements ReductionStrategy {
 
         GrayPixel[][] reduced = new GrayPixel[reduceTo][reduceTo];
 
-        System.out.println(shape);
+        RunLogging.debug(String.valueOf(shape));
 
         for (int ri = 0; ri < reduceTo; ri++) {
             for (int rj = 0; rj < reduceTo; rj++) {
@@ -63,7 +64,7 @@ public class BicubicReductionStrategy implements ReductionStrategy {
     private GrayPixel reducePixel(GrayPixel[][] pixels) {
         float[][] grayValues = MatrixUtils.floatMap(pixels, p -> (float) p.gray());
 
-        System.out.println(MatrixUtils.shape(pixels));
+        RunLogging.debug(String.valueOf(MatrixUtils.shape(pixels)));
 
         float value = MatrixUtils.dotProduct(grayValues, BICUBIC_DOWNSAMPLING_KERNEL_05);
 

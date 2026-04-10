@@ -7,6 +7,14 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 
+### Added
+
+- **`--debug`:** verbose stdout (phase/progress logs). Default is **summary-only** (`--- Summary ---` with timings, ratio, metrics, output paths).
+
+### Changed
+
+- **Codebook path:** per-geometry **`codebook_r{r}_d{d}.fc`** now lives under **`processes/<stem>/codebooks/`** (see **`Codebook.CODEBOOKS_SUBDIR`** / **`Codebook.pathForGeometry`**).
+
 ## [0.5.0] - 2026-04-09 — concurrent pipeline & benchmark matrices (`feature/5-concurrent-pipeline`)
 
 ### Added

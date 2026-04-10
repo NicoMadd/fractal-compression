@@ -1,6 +1,7 @@
 package implementations.java.compression.src.utils.fractal.mapping;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,9 @@ import implementations.java.compression.src.utils.files.writers.SequenceWriter;
 import implementations.java.compression.src.utils.fractal.transformation.TransformationType;
 
 public class Codebook {
+
+    /** Subfolder under each stem’s {@code processes/<stem>/} where {@code codebook_r{r}_d{d}.fc} files live. */
+    public static final String CODEBOOKS_SUBDIR = "codebooks";
 
     private int rangeSize;
     private int domainSize;
@@ -57,10 +61,11 @@ public class Codebook {
     }
 
     /**
-     * Canonical on-disk path for this range/domain geometry under a stem’s {@code processes/} folder.
+     * Canonical on-disk path for this range/domain geometry under a stem’s {@code processes/<stem>/} folder
+     * ({@link #CODEBOOKS_SUBDIR} subdirectory).
      */
     public static Path pathForGeometry(Path runDir, int rangeSize, int domainSize) {
-        return runDir.resolve(String.format("codebook_r%d_d%d.fc", rangeSize, domainSize));
+        return runDir.resolve(CODEBOOKS_SUBDIR).resolve(String.format("codebook_r%d_d%d.fc", rangeSize, domainSize));
     }
 
     private void deserialize(SequenceInput sr) throws IOException {
@@ -120,6 +125,11 @@ public class Codebook {
      * @throws Exception
      */
     public void save(String path) throws Exception {
+        Path p = Path.of(path);
+        Path parent = p.getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
 
         try (SequenceOutput sw = new SequenceWriter(path)) {
             serialize(sw);

@@ -8,14 +8,15 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 IMAGES_ROOT="${REPO_ROOT}/data/images"
 
 usage() {
-  echo "Usage: $0 [[<image type>] <image name>] [-i iterations] [-r range] [-d domain] [-p threads] [-P decode-threads] [-c] [--no-iter-save] [--skip-compression|-sc] [--skip-decompression|-sd] [--mr|--br] [-- <java-args>...]"
+  echo "Usage: $0 [[<image type>] <image name>] [-i iterations] [-r range] [-d domain] [-p threads] [-P decode-threads] [-c] [--no-iter-save] [--skip-compression|-sc] [--skip-decompression|-sd] [--mr|--br] [--debug] [-- <java-args>...]"
   echo "  image type: subdirectory under data/images (default: pgma)"
   echo "  image name: stem or prefix; must match exactly one file under the type folder"
   echo "  Defaults: iterations=25, range=4, domain=8; compression -p defaults to availableProcessors; -P (decode) defaults to same as -p"
-  echo "  -i, -r, -d, -p, -P override defaults (any order before --). -c forces codebook rebuild (see codebook_r{r}_d{d}.fc)."
+  echo "  -i, -r, -d, -p, -P override defaults (any order before --). -c forces codebook rebuild (see codebooks/codebook_r{r}_d{d}.fc)."
   echo "  --no-iter-save skips per-iteration PGM writes; errors printed once from final frame (faster)."
   echo "  --skip-compression (-sc) loads codebook only (must exist; do not use with -c). --skip-decompression (-sd) encodes only; no decode / reconstruction metrics."
   echo "  --mr mean domain reduction (default); --br bicubic domain reduction. Not both."
+  echo "  --debug verbose phase/progress logs; default is summary-only on stdout."
   echo "  After --, remaining args are passed to Main as well."
   echo "Example: $0 baboon"
   echo "Example: $0 baboon -i 40"
@@ -48,6 +49,7 @@ CLEAN_CODEBOOK=0
 NO_ITER_SAVE=0
 SKIP_COMPRESSION=0
 SKIP_DECOMPRESSION=0
+DEBUG=0
 REDUCTION_FLAG=""
 TYPE="pgma"
 POSITIONAL=()
@@ -101,6 +103,9 @@ while [ "$i" -lt "$n" ]; do
     --br)
       if [ -n "$REDUCTION_FLAG" ] && [ "$REDUCTION_FLAG" != "--br" ]; then echo "$0: use only one of --mr or --br"; exit 1; fi
       REDUCTION_FLAG="--br"
+      ;;
+    --debug)
+      DEBUG=1
       ;;
     *)
       POSITIONAL+=("$a")
@@ -201,6 +206,9 @@ if [ -n "$PARALLELISM" ]; then
 fi
 if [ -n "$PARALLELISM_DECODE" ]; then
   MAIN_ARGS+=(-P "$PARALLELISM_DECODE")
+fi
+if [ "$DEBUG" -eq 1 ]; then
+  MAIN_ARGS+=(--debug)
 fi
 if [ "${#JAVA_OPTS[@]}" -gt 0 ]; then
   MAIN_ARGS+=("${JAVA_OPTS[@]}")

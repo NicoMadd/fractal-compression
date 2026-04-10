@@ -42,10 +42,10 @@ chmod +x run.sh   # once, if needed
 # overrides: iterations, range block size, domain block size
 ./run.sh lena -i 40 -r 8 -d 16
 
-# force codebook rebuild (see codebook_r{r}_d{d}.fc)
+# force codebook rebuild (see codebooks/codebook_r{r}_d{d}.fc)
 ./run.sh lena -c
 ```
 
 Anything after `--` is forwarded to `Main` (same argument model as `PipelineParams` in the Java sources).
 
-Outputs go under repo-root `processes/<stem>/`: `codebook_r{r}_d{d}.fc`, `original.pgm`, and under `iterations/` the iteration PGMs plus `benchmark.csv`.
+Outputs go under repo-root `processes/<stem>/`: `codebooks/codebook_r{r}_d{d}.fc`, `original.pgm`, and under `iterations/` the iteration PGMs plus `benchmark.csv`.

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import implementations.java.compression.src.pipelines.RunLogging;
 import implementations.java.compression.src.utils.fractal.block.GrayBlock;
 import implementations.java.compression.src.utils.fractal.block.compressed.GrayCompressedBlock;
 import implementations.java.compression.src.utils.fractal.mapping.FractalMapping;
@@ -50,7 +51,7 @@ public class DomainFinder implements Callable<FractalMapping> {
         int done = counter.incrementAndGet();
 
         if (done == 1 || done == totalRanges || done % step == 0) {
-            System.out.println("Compress: matched range blocks " + done + "/" + totalRanges);
+            RunLogging.debug("Compress: matched range blocks " + done + "/" + totalRanges);
         }
 
         return fm;
