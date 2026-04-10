@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +31,25 @@ import implementations.java.compression.src.utils.image.pixel.utils.GrayPixelUti
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
 public class PGMAPipeline extends Pipeline {
+
+    /** Human-readable duration for stdout (avoids long fractional second strings). */
+    private static String fmtMs(double seconds) {
+        return String.format(Locale.US, "%.2f ms", seconds * 1000.0);
+    }
+
+    private static String fmt3(double value) {
+        return String.format(Locale.US, "%.3f", value);
+    }
+
+    private static String formatCompressionRatio(long numeratorBytes, long denominatorBytes) {
+        if (denominatorBytes <= 0) {
+            return "n/a";
+        }
+        return String.format(Locale.US, "%.2f:1", (double) numeratorBytes / (double) denominatorBytes);
+    }
+
+    private record CompressionRatioLabels(String rawCodebook, String zipCodebook) {
+    }
 
     private PGMAImageMetadata metadata;
     private GrayBlockCompression gbc;
@@ -140,8 +160,8 @@ public class PGMAPipeline extends Pipeline {
             }
 
             // declare decode images
-            GrayPixel[][] img = new GrayPixel[metadata.getWidth()][metadata.getHeight()];
-            GrayPixel[][] next = new GrayPixel[metadata.getWidth()][metadata.getHeight()];
+            GrayPixel[][] img = new GrayPixel[metadata.getHeight()][metadata.getWidth()];
+            GrayPixel[][] next = new GrayPixel[metadata.getHeight()][metadata.getWidth()];
 
             // fill random values
             MatrixUtils.fill(img, () -> GrayPixelUtils.getRandomPixel());
@@ -249,12 +269,13 @@ public class PGMAPipeline extends Pipeline {
 
             if (RunLogging.isDebug()) {
                 System.out.println(
-                        "Decompression took: " + decompressionSeconds + "s (decode " + decompressionDecodeSeconds
-                                + "s, save " + decompressionSaveSeconds + "s, metrics+sample "
-                                + decompressionSnapshotMetricsSeconds + "s)");
+                        "Decompression took: " + fmtMs(decompressionSeconds) + " (decode " + fmtMs(decompressionDecodeSeconds)
+                                + ", save " + fmtMs(decompressionSaveSeconds) + ", metrics+sample "
+                                + fmtMs(decompressionSnapshotMetricsSeconds) + ")");
                 System.out.println(
-                        "Per-pass decode: avg " + decodeIterationAvgSeconds + "s, min " + decodeIterationMinSeconds
-                                + "s, max " + decodeIterationMaxSeconds + "s (" + decodePassCount + " passes)");
+                        "Per-pass decode: avg " + fmtMs(decodeIterationAvgSeconds) + ", min "
+                                + fmtMs(decodeIterationMinSeconds)
+                                + ", max " + fmtMs(decodeIterationMaxSeconds) + " (" + decodePassCount + " passes)");
             }
 
             scb.saveTo(iterationsDir.toString());
@@ -262,7 +283,7 @@ public class PGMAPipeline extends Pipeline {
         }
 
         if (RunLogging.isDebug()) {
-            System.out.println("Compression took: " + compressionSeconds + "s"
+            System.out.println("Compression took: " + fmtMs(compressionSeconds)
                     + (params.skipCompression() ? " (--skip-compression; phase not timed)" : ""));
             if (params.skipDecompression()) {
                 System.out.println(
@@ -270,19 +291,20 @@ public class PGMAPipeline extends Pipeline {
             }
         }
 
-        String ratioStr = compressionRatioString(originalImagePath, codebookPath.toString());
-        RunLogging.debug("Compression ratio: " + ratioStr);
-
-        writeBenchmarkOutputs(params, originalImagePath, runDir, iterationsDir, codebookPath, iterations,
+        CompressionRatioLabels ratioLabels = writeBenchmarkOutputs(params, originalImagePath, runDir, iterationsDir,
+                codebookPath, iterations,
                 compressionSeconds, decompressionSeconds, decompressionDecodeSeconds, decompressionSaveSeconds,
                 decompressionSnapshotMetricsSeconds, decodeIterationAvgSeconds, decodeIterationMinSeconds,
                 decodeIterationMaxSeconds, iterationOutMetrics.getMse(), iterationOutMetrics.getMae(),
                 iterationOutMetrics.getPsnr());
+        RunLogging.debug("Compression ratio (PGM vs raw codebook): " + ratioLabels.rawCodebook());
+        RunLogging.debug("Compression ratio (PGM vs zip codebook): " + ratioLabels.zipCodebook());
 
         if (!params.debug()) {
             printQuietSummary(params, compressionSeconds, decompressionSeconds, decompressionDecodeSeconds,
                     decompressionSaveSeconds, decompressionSnapshotMetricsSeconds, decodeIterationAvgSeconds,
-                    decodeIterationMinSeconds, decodeIterationMaxSeconds, decodePassCount, ratioStr, iterationOutMetrics,
+                    decodeIterationMinSeconds, decodeIterationMaxSeconds, decodePassCount, ratioLabels,
+                    iterationOutMetrics,
                     runDir);
         }
 
@@ -301,11 +323,11 @@ public class PGMAPipeline extends Pipeline {
         ImageErrorMetrics err = PGMAUtils.calculateErrorMetrics(originalImagePath, currentIterationPath);
         double mse = err.mse();
         double mae = err.mae();
-        RunLogging.debug("MSE: " + mse);
-        RunLogging.debug("MAE: " + mae);
+        RunLogging.debug("MSE: " + fmt3(mse));
+        RunLogging.debug("MAE: " + fmt3(mae));
 
         double psnr = ErrorUtils.calculatePSNR(mse);
-        RunLogging.debug("PSNR: " + psnr);
+        RunLogging.debug("PSNR: " + fmt3(psnr));
         scb.add(new Iteration(iter, iterationEndTs, iterationEndTs - iterationStartTs, mse, mae, psnr));
 
         outMetrics.setMse(mse);
@@ -320,11 +342,11 @@ public class PGMAPipeline extends Pipeline {
         ImageErrorMetrics err = PGMAUtils.calculateErrorMetrics(originalImagePath, finalIterationPath);
         double mse = err.mse();
         double mae = err.mae();
-        RunLogging.debug("MSE: " + mse);
-        RunLogging.debug("MAE: " + mae);
+        RunLogging.debug("MSE: " + fmt3(mse));
+        RunLogging.debug("MAE: " + fmt3(mae));
 
         double psnr = ErrorUtils.calculatePSNR(mse);
-        RunLogging.debug("PSNR: " + psnr);
+        RunLogging.debug("PSNR: " + fmt3(psnr));
 
         outMetrics.setMse(mse);
         outMetrics.setMae(mae);
@@ -333,7 +355,7 @@ public class PGMAPipeline extends Pipeline {
     }
 
     // Baseline PNG/zip, run_manifest.json, registry line
-    private void writeBenchmarkOutputs(
+    private CompressionRatioLabels writeBenchmarkOutputs(
             PipelineParams params,
             String originalImagePath,
             Path runDir,
@@ -373,6 +395,10 @@ public class PGMAPipeline extends Pipeline {
         long zipCb = CompressionBaselines.writeZipDeflatedArchive(codebookPath,
                 baselinesDir.resolve("codebook_deflated.zip"), zipEntryName);
         double ratioOc = (double) bytesOriginalInput / (double) bytesCodebook;
+        double ratioOcZip = zipCb > 0 ? (double) bytesOriginalInput / (double) zipCb : Double.NaN;
+        CompressionRatioLabels ratioLabels = new CompressionRatioLabels(
+                formatCompressionRatio(bytesOriginalInput, bytesCodebook),
+                formatCompressionRatio(bytesOriginalInput, zipCb));
 
         RunManifest manifest = new RunManifest(
                 System.currentTimeMillis(),
@@ -404,6 +430,7 @@ public class PGMAPipeline extends Pipeline {
                 zipOrig,
                 zipCb,
                 ratioOc,
+                ratioOcZip,
                 finalMse,
                 finalMae,
                 finalPsnr,
@@ -421,13 +448,8 @@ public class PGMAPipeline extends Pipeline {
             System.out.println("Wrote run manifest: " + runDir.resolve("run_manifest.json"));
             System.out.println("Appended run to registry: " + FileUtils.benchmarkRegistryPath());
         }
-    }
 
-    private static String compressionRatioString(String originalImagePath, String codebookPath) throws IOException {
-        long originalSize = FileUtils.getFileSize(originalImagePath);
-        long codebookSize = FileUtils.getFileSize(codebookPath);
-        double n = (double) originalSize / codebookSize;
-        return String.format("%.2f:1", n);
+        return ratioLabels;
     }
 
     private void printQuietSummary(
@@ -441,29 +463,33 @@ public class PGMAPipeline extends Pipeline {
             double decodeIterationMinSeconds,
             double decodeIterationMaxSeconds,
             int decodePassCount,
-            String ratioStr,
+            CompressionRatioLabels ratioLabels,
             IterationOutMetrics iterationOutMetrics,
             Path runDir) {
 
         System.out.println("--- Summary ---");
-        System.out.println("Compression: " + compressionSeconds + "s"
+        System.out.println("Compression: " + fmtMs(compressionSeconds)
                 + (params.skipCompression() ? " (skip-compression)" : ""));
         if (params.skipDecompression()) {
             System.out.println("Decompression: skipped");
         } else {
-            System.out.println("Decompression: " + decompressionSeconds + "s total (decode " + decompressionDecodeSeconds
-                    + "s, save " + decompressionSaveSeconds + "s, metrics+sample " + decompressionSnapshotMetricsSeconds
-                    + "s)");
-            System.out.println("Per-pass decode: avg " + decodeIterationAvgSeconds + "s, min " + decodeIterationMinSeconds
-                    + "s, max " + decodeIterationMaxSeconds + "s (" + decodePassCount + " passes)");
+            System.out.println("Decompression: " + fmtMs(decompressionSeconds) + " total (decode "
+                    + fmtMs(decompressionDecodeSeconds)
+                    + ", save " + fmtMs(decompressionSaveSeconds) + ", metrics+sample "
+                    + fmtMs(decompressionSnapshotMetricsSeconds) + ")");
+            System.out
+                    .println("Per-pass decode: avg " + fmtMs(decodeIterationAvgSeconds) + ", min "
+                            + fmtMs(decodeIterationMinSeconds)
+                            + ", max " + fmtMs(decodeIterationMaxSeconds) + " (" + decodePassCount + " passes)");
         }
-        System.out.println("Compression ratio: " + ratioStr);
+        System.out.println("Compression ratio: " + ratioLabels.rawCodebook() + " (PGM vs raw codebook), "
+                + ratioLabels.zipCodebook() + " (PGM vs zip codebook)");
         double mse = iterationOutMetrics.getMse();
         if (params.skipDecompression() || Double.isNaN(mse)) {
             System.out.println("MSE / MAE / PSNR: (n/a)");
         } else {
-            System.out.println("MSE: " + mse + "  MAE: " + iterationOutMetrics.getMae() + "  PSNR: "
-                    + iterationOutMetrics.getPsnr());
+            System.out.println("MSE: " + fmt3(mse) + "  MAE: " + fmt3(iterationOutMetrics.getMae()) + "  PSNR: "
+                    + fmt3(iterationOutMetrics.getPsnr()));
         }
         Path baselinesDir = runDir.resolve("baselines");
         System.out.println("Baselines: " + baselinesDir.toAbsolutePath().normalize());

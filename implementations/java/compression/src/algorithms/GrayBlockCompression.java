@@ -72,20 +72,23 @@ public class GrayBlockCompression {
         return "reducing";
     }
 
-    private GrayBlock[][] buildRangeBlocks(int rangeBlocksNumber) throws InterruptedException, ExecutionException {
+    private GrayBlock[][] buildRangeBlocks(int width, int height) throws InterruptedException, ExecutionException {
+
+        int rows = height / RBD;
+        int cols = width / RBD;
 
         ExecutorService es = Executors.newFixedThreadPool(this.parallelism);
 
         List<Callable<GrayBlock>> callables = new ArrayList<>();
 
-        for (int i = 0; i < rangeBlocksNumber; i++) {
-            for (int j = 0; j < rangeBlocksNumber; j++) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
                 BlockBuilder bb = new BlockBuilder(imagePixels, RBD * i, RBD * j, RBD);
                 callables.add(bb);
             }
         }
 
-        GrayBlock[][] blocks = new GrayBlock[rangeBlocksNumber][rangeBlocksNumber];
+        GrayBlock[][] blocks = new GrayBlock[rows][cols];
 
         try {
             for (Future<GrayBlock> f : es.invokeAll(callables)) {
@@ -101,20 +104,23 @@ public class GrayBlockCompression {
         return blocks;
     }
 
-    private GrayBlock[][] buildDomainBlocks(int domainBlockNumber) {
+    private GrayBlock[][] buildDomainBlocks(int width, int height) {
+
+        int rows = height / DBD;
+        int cols = width / DBD;
 
         ExecutorService es = Executors.newFixedThreadPool(this.parallelism);
 
         List<Callable<GrayBlock>> callables = new ArrayList<>();
 
-        for (int i = 0; i < domainBlockNumber; i++) {
-            for (int j = 0; j < domainBlockNumber; j++) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
                 BlockBuilder bb = new BlockBuilder(imagePixels, DBD * i, DBD * j, DBD);
                 callables.add(bb);
             }
         }
 
-        GrayBlock[][] blocks = new GrayBlock[domainBlockNumber][domainBlockNumber];
+        GrayBlock[][] blocks = new GrayBlock[rows][cols];
 
         try {
             for (Future<GrayBlock> f : es.invokeAll(callables)) {
@@ -204,9 +210,9 @@ public class GrayBlockCompression {
                 + domainBlockNumber + " domains");
 
         RunLogging.debug("Compress: building range blocks…");
-        this.rangeBlocks = buildRangeBlocks(rangeBlocksNumber);
+        this.rangeBlocks = buildRangeBlocks(imageWidth, imageHeight);
         RunLogging.debug("Compress: building domain blocks…");
-        this.domainBlocks = buildDomainBlocks(domainBlockNumber);
+        this.domainBlocks = buildDomainBlocks(imageWidth, imageHeight);
         RunLogging.debug("Compress: " + getReductionStrategyDescription() + " domain blocks ("
                 + domainBlockNumber * domainBlockNumber + " blocks)…");
         GrayReducedPair[][] reducedDomainBlocksPair = buildReducedDomainPairs(domainBlockNumber);

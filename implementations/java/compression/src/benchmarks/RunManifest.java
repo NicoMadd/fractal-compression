@@ -36,6 +36,7 @@ public record RunManifest(
         long zipBytesOriginalPgm,
         long zipBytesCodebook,
         double ratioOriginalOverCodebook,
+        double ratioOriginalOverZipCodebook,
         double mseFinal,
         double maeFinal,
         double psnrFinal,
@@ -102,6 +103,7 @@ public record RunManifest(
                 + "\"zip_bytes_original_pgm\":" + zipBytesOriginalPgm + ","
                 + "\"zip_bytes_codebook\":" + zipBytesCodebook + ","
                 + "\"ratio_original_over_codebook\":" + jDbl(ratioOriginalOverCodebook) + ","
+                + "\"ratio_original_over_zip_codebook\":" + jDbl(ratioOriginalOverZipCodebook) + ","
                 + "\"mse_final\":" + jDbl(mseFinal) + ","
                 + "\"mae_final\":" + jDbl(maeFinal) + ","
                 + "\"psnr_final\":" + jDbl(psnrFinal) + ","

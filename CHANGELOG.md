@@ -10,6 +10,7 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 ### Added
 
 - **`--debug`:** verbose stdout (phase/progress logs). Default is **summary-only** (`--- Summary ---` with timings, ratio, metrics, output paths).
+- **Benchmark manifest / summary:** **`ratio_original_over_zip_codebook`** (`bytes_original_input / zip_bytes_codebook`) and a second **compression ratio** line vs zipped codebook on stdout.
 
 ### Changed
 

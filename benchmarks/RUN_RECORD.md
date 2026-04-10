@@ -47,6 +47,7 @@ Consumers **SHOULD** ignore unknown top-level keys. Producers **MAY** add **`ext
 | `zip_bytes_original_pgm` | int | Single-entry DEFLATE zip of original bytes. |
 | `zip_bytes_codebook` | int | Single-entry DEFLATE zip of codebook bytes. |
 | `ratio_original_over_codebook` | number | `bytes_original_input / bytes_codebook`. |
+| `ratio_original_over_zip_codebook` | number | *(Optional.)* `bytes_original_input / zip_bytes_codebook` (same DEFLATE baseline as `zip_bytes_codebook`). |
 | `mse_final` | number | Final MSE vs reference. |
 | `mae_final` | number | Final MAE vs reference. |
 | `psnr_final` | number | Final PSNR (dB); `null` if undefined. |

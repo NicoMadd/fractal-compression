@@ -12,7 +12,7 @@ public class PGMAUtils {
     public static void saveToImage(GrayPixel[][] pixels, String path) throws FileNotFoundException, IOException {
         int rows = pixels.length;
         int cols = pixels[0].length;
-        PGMAImageMetadata metadata = new PGMAImageMetadata(rows, cols, 255, pixels);
+        PGMAImageMetadata metadata = new PGMAImageMetadata(cols, rows, 255, pixels);
         String finalPath = path + ".pgm";
         metadata.saveToFile(finalPath);
     }
@@ -35,8 +35,8 @@ public class PGMAUtils {
             double totalSq = 0;
             double totalAbs = 0;
 
-            for (int i = 0; i < width; i++) {
-                for (int j = 0; j < height; j++) {
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
                     GrayPixel originalPixel = originalPixels[i][j];
                     GrayPixel finalPixel = finaPixels[i][j];
 
@@ -55,9 +55,12 @@ public class PGMAUtils {
     }
 
     /**
-     * Same index pairing as {@link #calculateErrorMetrics(String, String)} on loaded rasters:
-     * {@code referencePixels[i][j]} vs {@code reconstructedPixels[i][j]} for {@code i} in {@code [0,width)},
-     * {@code j} in {@code [0,height)} (matches pipeline {@code GrayPixel[width][height]} buffers).
+     * Same index pairing as {@link #calculateErrorMetrics(String, String)} on
+     * loaded rasters:
+     * {@code referencePixels[i][j]} vs {@code reconstructedPixels[i][j]} for
+     * {@code i} in {@code [0,width)},
+     * {@code j} in {@code [0,height)} (matches pipeline
+     * {@code GrayPixel[width][height]} buffers).
      */
     public static ImageErrorMetrics calculateErrorMetricsSameLayout(GrayPixel[][] referencePixels,
             GrayPixel[][] reconstructedPixels,
