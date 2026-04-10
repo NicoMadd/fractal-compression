@@ -9,7 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import implementations.java.compression.src.algorithms.GrayBlockCompression;
+import implementations.java.compression.src.algorithms.squared.GraySquaredBlockCompression;
 import implementations.java.compression.src.benchmarks.BenchmarkRegistry;
 import implementations.java.compression.src.benchmarks.HostEnvironmentMetrics;
 import implementations.java.compression.src.benchmarks.ImageErrorMetrics;
@@ -33,11 +33,11 @@ import implementations.java.compression.src.utils.matrix.MatrixUtils;
 public class PGMAPipeline extends Pipeline {
 
     private PGMAImageMetadata metadata;
-    private GrayBlockCompression gbc;
+    private GraySquaredBlockCompression gbc;
 
     public PGMAPipeline(PipelineParams params) throws IOException {
         super(params);
-        this.gbc = new GrayBlockCompression(params.rangeSize(), params.domainSize(), params.reductionStrategy(),
+        this.gbc = new GraySquaredBlockCompression(params.rangeSize(), params.domainSize(), params.reductionStrategy(),
                 params.compressionParallelism());
     }
 
@@ -67,7 +67,8 @@ public class PGMAPipeline extends Pipeline {
             System.out.println("Skipping compression (--skip-compression); loading codebook from disk.");
             if (!Files.exists(codebookPath)) {
                 throw new IllegalStateException(
-                        "Missing codebook for --skip-compression: " + codebookPath + " (run without the flag to build).");
+                        "Missing codebook for --skip-compression: " + codebookPath
+                                + " (run without the flag to build).");
             }
             Codebook loaded = new Codebook(codebookPath.toString());
             if (loaded.rangeSize() != params.rangeSize() || loaded.domainSize() != params.domainSize()) {
@@ -131,127 +132,129 @@ public class PGMAPipeline extends Pipeline {
             t2 = System.nanoTime();
         } else {
 
-        System.out.println("Starting Decompression");
-        if (params.skipIterationSaves()) {
-            System.out.println(
-                    "Per-iteration PGM saves disabled (--no-iter-save); MSE/MAE/PSNR computed once from final frame.");
-        }
-
-        // declare decode images
-        GrayPixel[][] img = new GrayPixel[metadata.getWidth()][metadata.getHeight()];
-        GrayPixel[][] next = new GrayPixel[metadata.getWidth()][metadata.getHeight()];
-
-        // fill random values
-        MatrixUtils.fill(img, () -> GrayPixelUtils.getRandomPixel());
-        MatrixUtils.fill(next, () -> GrayPixelUtils.getRandomPixel());
-
-        long totalDecodeNanos = 0;
-        long minDecodeNanos = Long.MAX_VALUE;
-        long maxDecodeNanos = Long.MIN_VALUE;
-        int decodePassCount = 0;
-        long totalSaveNanos = 0;
-        long totalSnapshotMetricsNanos = 0;
-
-        long saveStart = System.nanoTime();
-        PGMAUtils.saveToImage(img, FileUtils.inRunDir(iterationsDir, "initial").toString());
-        totalSaveNanos += System.nanoTime() - saveStart;
-
-        System.out.println("Iterating over " + iterations + " iterations");
-
-        es = Executors.newFixedThreadPool(params.decompressionParallelism());
-
-        // N iterations
-        for (int iter = 0; iter <= iterations; iter++) {
-
-            long iterationStartTs = System.nanoTime();
-
-            CountDownLatch latch = new CountDownLatch(mappings.size());
-
-            System.out.println("Iteration " + iter);
-
-            int mapCount = mappings.size();
-            // loop compressed blocks
-
-            for (int mi = 0; mi < mapCount; mi++) {
-                FractalMapping fm = mappings.get(mi);
-
-                Decompressor decompressor = new Decompressor(fm, gbc.getDomainSize(), gbc.getRangeSize(),
-                        gbc.getReductionStrategy(), img, next, latch);
-
-                es.submit(decompressor);
+            System.out.println("Starting Decompression");
+            if (params.skipIterationSaves()) {
+                System.out.println(
+                        "Per-iteration PGM saves disabled (--no-iter-save); MSE/MAE/PSNR computed once from final frame.");
             }
 
-            latch.await();
+            // declare decode images
+            GrayPixel[][] img = new GrayPixel[metadata.getWidth()][metadata.getHeight()];
+            GrayPixel[][] next = new GrayPixel[metadata.getWidth()][metadata.getHeight()];
 
-            long iterationEndTs = System.nanoTime();
+            // fill random values
+            MatrixUtils.fill(img, () -> GrayPixelUtils.getRandomPixel());
+            MatrixUtils.fill(next, () -> GrayPixelUtils.getRandomPixel());
 
-            long decodeSliceNanos = iterationEndTs - iterationStartTs;
-            totalDecodeNanos += decodeSliceNanos;
-            minDecodeNanos = Math.min(minDecodeNanos, decodeSliceNanos);
-            maxDecodeNanos = Math.max(maxDecodeNanos, decodeSliceNanos);
-            decodePassCount++;
+            long totalDecodeNanos = 0;
+            long minDecodeNanos = Long.MAX_VALUE;
+            long maxDecodeNanos = Long.MIN_VALUE;
+            int decodePassCount = 0;
+            long totalSaveNanos = 0;
+            long totalSnapshotMetricsNanos = 0;
 
-            Path iterBase = FileUtils.inRunDir(iterationsDir, "iter_" + iter);
-            String currentIterationPath = iterBase + ".pgm";
-
-            boolean saveIterationFrames = !params.skipIterationSaves();
-            if (saveIterationFrames) {
-                saveStart = System.nanoTime();
-                PGMAUtils.saveToImage(next, iterBase.toString());
-                totalSaveNanos += System.nanoTime() - saveStart;
-            }
-
-            long metricsStart = System.nanoTime();
-            if (saveIterationFrames) {
-                recordIterationErrorMetrics(originalImagePath, currentIterationPath, iter, iterationStartTs,
-                        iterationEndTs, scb, iterationOutMetrics);
-            } else {
-                scb.add(new Iteration(iter, iterationEndTs, iterationEndTs - iterationStartTs, Double.NaN, Double.NaN,
-                        Double.NaN));
-            }
-            memorySampler.sample();
-            totalSnapshotMetricsNanos += System.nanoTime() - metricsStart;
-
-            // Jacobi: keep two buffers; swap references so next pass reads the image
-            // we just wrote and writes into the other buffer.
-            GrayPixel[][] tmp = img;
-            img = next;
-            next = tmp;
-
-        }
-
-        if (params.skipIterationSaves()) {
-            saveStart = System.nanoTime();
-            PGMAUtils.saveToImage(img, FileUtils.inRunDir(iterationsDir, "iter_" + iterations).toString());
+            long saveStart = System.nanoTime();
+            PGMAUtils.saveToImage(img, FileUtils.inRunDir(iterationsDir, "initial").toString());
             totalSaveNanos += System.nanoTime() - saveStart;
 
-            long metricsFinalStart = System.nanoTime();
-            Path finalIterPgm = iterationsDir.resolve("iter_" + iterations + ".pgm");
-            recordFinalIterationErrorMetrics(originalImagePath, finalIterPgm.toString(), scb, iterationOutMetrics);
-            totalSnapshotMetricsNanos += System.nanoTime() - metricsFinalStart;
-        }
+            System.out.println("Iterating over " + iterations + " iterations");
 
-        t2 = System.nanoTime();
-        memorySampler.sample();
+            es = Executors.newFixedThreadPool(params.decompressionParallelism());
 
-        long decompressionElapsedNanos = t2 - t1;
-        decompressionSeconds = decompressionElapsedNanos / 1_000_000_000.0;
-        decompressionDecodeSeconds = totalDecodeNanos / 1_000_000_000.0;
-        decompressionSaveSeconds = totalSaveNanos / 1_000_000_000.0;
-        decompressionSnapshotMetricsSeconds = totalSnapshotMetricsNanos / 1_000_000_000.0;
-        decodeIterationAvgSeconds = decodePassCount > 0
-                ? (totalDecodeNanos / (double) decodePassCount) / 1_000_000_000.0
-                : 0.0;
-        decodeIterationMinSeconds = decodePassCount > 0 ? minDecodeNanos / 1_000_000_000.0 : 0.0;
-        decodeIterationMaxSeconds = decodePassCount > 0 ? maxDecodeNanos / 1_000_000_000.0 : 0.0;
+            // N iterations
+            for (int iter = 0; iter <= iterations; iter++) {
 
-        System.out.println("Decompression took: " + decompressionSeconds + "s (decode " + decompressionDecodeSeconds
-                + "s, save " + decompressionSaveSeconds + "s, metrics+sample " + decompressionSnapshotMetricsSeconds
-                + "s)");
-        System.out.println("Per-pass decode: avg " + decodeIterationAvgSeconds + "s, min " + decodeIterationMinSeconds
-                + "s, max " + decodeIterationMaxSeconds + "s (" + decodePassCount + " passes)");
+                long iterationStartTs = System.nanoTime();
 
-        scb.saveTo(iterationsDir.toString());
+                CountDownLatch latch = new CountDownLatch(mappings.size());
+
+                System.out.println("Iteration " + iter);
+
+                int mapCount = mappings.size();
+                // loop compressed blocks
+
+                for (int mi = 0; mi < mapCount; mi++) {
+                    FractalMapping fm = mappings.get(mi);
+
+                    Decompressor decompressor = new Decompressor(fm, gbc.getDomainSize(), gbc.getRangeSize(),
+                            gbc.getReductionStrategy(), img, next, latch);
+
+                    es.submit(decompressor);
+                }
+
+                latch.await();
+
+                long iterationEndTs = System.nanoTime();
+
+                long decodeSliceNanos = iterationEndTs - iterationStartTs;
+                totalDecodeNanos += decodeSliceNanos;
+                minDecodeNanos = Math.min(minDecodeNanos, decodeSliceNanos);
+                maxDecodeNanos = Math.max(maxDecodeNanos, decodeSliceNanos);
+                decodePassCount++;
+
+                Path iterBase = FileUtils.inRunDir(iterationsDir, "iter_" + iter);
+                String currentIterationPath = iterBase + ".pgm";
+
+                boolean saveIterationFrames = !params.skipIterationSaves();
+                if (saveIterationFrames) {
+                    saveStart = System.nanoTime();
+                    PGMAUtils.saveToImage(next, iterBase.toString());
+                    totalSaveNanos += System.nanoTime() - saveStart;
+                }
+
+                long metricsStart = System.nanoTime();
+                if (saveIterationFrames) {
+                    recordIterationErrorMetrics(originalImagePath, currentIterationPath, iter, iterationStartTs,
+                            iterationEndTs, scb, iterationOutMetrics);
+                } else {
+                    scb.add(new Iteration(iter, iterationEndTs, iterationEndTs - iterationStartTs, Double.NaN,
+                            Double.NaN,
+                            Double.NaN));
+                }
+                memorySampler.sample();
+                totalSnapshotMetricsNanos += System.nanoTime() - metricsStart;
+
+                // Jacobi: keep two buffers; swap references so next pass reads the image
+                // we just wrote and writes into the other buffer.
+                GrayPixel[][] tmp = img;
+                img = next;
+                next = tmp;
+
+            }
+
+            if (params.skipIterationSaves()) {
+                saveStart = System.nanoTime();
+                PGMAUtils.saveToImage(img, FileUtils.inRunDir(iterationsDir, "iter_" + iterations).toString());
+                totalSaveNanos += System.nanoTime() - saveStart;
+
+                long metricsFinalStart = System.nanoTime();
+                Path finalIterPgm = iterationsDir.resolve("iter_" + iterations + ".pgm");
+                recordFinalIterationErrorMetrics(originalImagePath, finalIterPgm.toString(), scb, iterationOutMetrics);
+                totalSnapshotMetricsNanos += System.nanoTime() - metricsFinalStart;
+            }
+
+            t2 = System.nanoTime();
+            memorySampler.sample();
+
+            long decompressionElapsedNanos = t2 - t1;
+            decompressionSeconds = decompressionElapsedNanos / 1_000_000_000.0;
+            decompressionDecodeSeconds = totalDecodeNanos / 1_000_000_000.0;
+            decompressionSaveSeconds = totalSaveNanos / 1_000_000_000.0;
+            decompressionSnapshotMetricsSeconds = totalSnapshotMetricsNanos / 1_000_000_000.0;
+            decodeIterationAvgSeconds = decodePassCount > 0
+                    ? (totalDecodeNanos / (double) decodePassCount) / 1_000_000_000.0
+                    : 0.0;
+            decodeIterationMinSeconds = decodePassCount > 0 ? minDecodeNanos / 1_000_000_000.0 : 0.0;
+            decodeIterationMaxSeconds = decodePassCount > 0 ? maxDecodeNanos / 1_000_000_000.0 : 0.0;
+
+            System.out.println("Decompression took: " + decompressionSeconds + "s (decode " + decompressionDecodeSeconds
+                    + "s, save " + decompressionSaveSeconds + "s, metrics+sample " + decompressionSnapshotMetricsSeconds
+                    + "s)");
+            System.out
+                    .println("Per-pass decode: avg " + decodeIterationAvgSeconds + "s, min " + decodeIterationMinSeconds
+                            + "s, max " + decodeIterationMaxSeconds + "s (" + decodePassCount + " passes)");
+
+            scb.saveTo(iterationsDir.toString());
 
         }
 

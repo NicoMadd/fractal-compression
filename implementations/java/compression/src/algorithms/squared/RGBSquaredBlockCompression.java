@@ -1,4 +1,4 @@
-package implementations.java.compression.src.algorithms;
+package implementations.java.compression.src.algorithms.squared;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import implementations.java.compression.src.utils.image.pixel.RGB;
 import implementations.java.compression.src.utils.image.pixel.RGBPixel;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
-public class RGBBlockCompression {
+public class RGBSquaredBlockCompression {
 
     private RGBPixel[][] imagePixels;
     private int imageWidth;

@@ -1,4 +1,4 @@
-package implementations.java.compression.src.algorithms;
+package implementations.java.compression.src.algorithms.squared;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import implementations.java.compression.src.utils.fractal.reducedpair.GrayReduce
 import implementations.java.compression.src.utils.image.ImageMetadata;
 import implementations.java.compression.src.utils.image.pixel.GrayPixel;
 
-public class GrayBlockCompression {
+public class GraySquaredBlockCompression {
 
     private GrayPixel[][] imagePixels;
     private int imageWidth;
@@ -42,7 +42,7 @@ public class GrayBlockCompression {
     // number of threads to use for compression.
     private int parallelism;
 
-    public GrayBlockCompression(int rbd, int dbd, ReductionStrategy reductionStrategy, int parallelism) {
+    public GraySquaredBlockCompression(int rbd, int dbd, ReductionStrategy reductionStrategy, int parallelism) {
         this.RBD = rbd;
         this.DBD = dbd;
         this.reductionStrategy = reductionStrategy;
