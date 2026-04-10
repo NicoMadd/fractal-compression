@@ -22,10 +22,10 @@ alwaysApply: true
 
 ## Java module (`implementations/java/compression/`)
 
-- **Entry:** `run.sh` → `Main` → **`PGMAPipeline`**. Outputs live under **`processes/<stem>/`** (relative to module cwd: **`FileUtils.PROCESSES_ROOT`** resolves to repo `processes/`).
+- **Entry:** `run.sh` → `Main` → **`PGMAPipeline`**. Optional **`--skip-compression`** (**`-sc`**) / **`--skip-decompression`** (**`-sd`**) for phase-isolated runs (manifest flags **`skip_compression`** / **`skip_decompression`**). Outputs live under **`processes/<stem>/`** (relative to module cwd: **`FileUtils.PROCESSES_ROOT`** resolves to repo `processes/`).
 - **Per stem:** `codebook_r{r}_d{d}.fc` (geometry-specific), `original.pgm`, `iterations/` (PGMs + `benchmark.csv`), `baselines/` (PNG + zip baselines), `run_manifest.json`. **Same stem re-runs overwrite** iteration outputs under that folder; **`registry.jsonl` still appends** one line per successful run.
 - **Benchmarks package:** `src/benchmarks/` — `RunManifest`, `RunnerInfo`, `HostEnvironmentMetrics`, `MemorySampler`, `BenchmarkRegistry`, etc. Baseline I/O: `src/utils/baselines/CompressionBaselines.java`.
-- **Matrix batch:** [`implementations/java/benchmarks/matrix.all-pgma.example.txt`](implementations/java/benchmarks/matrix.all-pgma.example.txt) and `run_matrix.sh`.
+- **Matrix batch:** [`matrix.compression-pgma.txt`](implementations/java/benchmarks/matrix.compression-pgma.txt) (**lena** only; explicit **(range, domain)** pairs; **`-p`/`-P`** 1…16; regenerate via [`generate_compression_pgma_matrix.py`](implementations/java/benchmarks/generate_compression_pgma_matrix.py)) and [`matrix.decompression-pgma.txt`](implementations/java/benchmarks/matrix.decompression-pgma.txt) (decode / **`-p` 8**, **`-P`**, **`-i`**); index [`matrix.all-pgma.txt`](implementations/java/benchmarks/matrix.all-pgma.txt), [`run_matrix.sh`](implementations/java/benchmarks/run_matrix.sh), [`run_pgma_matrices.sh`](implementations/java/benchmarks/run_pgma_matrices.sh).
 
 ## Code style reminders
 

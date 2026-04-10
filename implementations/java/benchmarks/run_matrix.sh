@@ -23,3 +23,13 @@ while IFS= read -r line || [[ -n "$line" ]]; do
   echo "---- run.sh $line ----" >&2
   (cd "$COMP_DIR" && ./run.sh $line)
 done < "$MATRIX"
+
+REGISTRY="$REPO_ROOT/benchmarks/registry.jsonl"
+if [[ -f "$REGISTRY" ]]; then
+  SNAP_DIR="$REPO_ROOT/benchmarks/snapshots"
+  mkdir -p "$SNAP_DIR"
+  stamp="$(date +%Y-%m-%dT%H%M%S)"
+  dest="$SNAP_DIR/registry-${stamp}.jsonl"
+  cp "$REGISTRY" "$dest"
+  echo "Benchmark registry snapshot: $dest" >&2
+fi

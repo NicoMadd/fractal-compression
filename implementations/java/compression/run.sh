@@ -8,12 +8,13 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 IMAGES_ROOT="${REPO_ROOT}/data/images"
 
 usage() {
-  echo "Usage: $0 [[<image type>] <image name>] [-i iterations] [-r range] [-d domain] [-p threads] [-c] [--no-iter-save] [--mr|--br] [-- <java-args>...]"
+  echo "Usage: $0 [[<image type>] <image name>] [-i iterations] [-r range] [-d domain] [-p threads] [-P decode-threads] [-c] [--no-iter-save] [--skip-compression|-sc] [--skip-decompression|-sd] [--mr|--br] [-- <java-args>...]"
   echo "  image type: subdirectory under data/images (default: pgma)"
   echo "  image name: stem or prefix; must match exactly one file under the type folder"
-  echo "  Defaults: iterations=25, range=4, domain=8; thread pool size defaults to JVM availableProcessors if -p omitted"
-  echo "  -i, -r, -d, -p override defaults (any order before --). -c forces codebook rebuild (see codebook_r{r}_d{d}.fc)."
+  echo "  Defaults: iterations=25, range=4, domain=8; compression -p defaults to availableProcessors; -P (decode) defaults to same as -p"
+  echo "  -i, -r, -d, -p, -P override defaults (any order before --). -c forces codebook rebuild (see codebook_r{r}_d{d}.fc)."
   echo "  --no-iter-save skips per-iteration PGM writes; errors printed once from final frame (faster)."
+  echo "  --skip-compression (-sc) loads codebook only (must exist; do not use with -c). --skip-decompression (-sd) encodes only; no decode / reconstruction metrics."
   echo "  --mr mean domain reduction (default); --br bicubic domain reduction. Not both."
   echo "  After --, remaining args are passed to Main as well."
   echo "Example: $0 baboon"
@@ -42,8 +43,11 @@ ITERS=25
 RANGE=4
 DOMAIN=8
 PARALLELISM=""
+PARALLELISM_DECODE=""
 CLEAN_CODEBOOK=0
 NO_ITER_SAVE=0
+SKIP_COMPRESSION=0
+SKIP_DECOMPRESSION=0
 REDUCTION_FLAG=""
 TYPE="pgma"
 POSITIONAL=()
@@ -73,11 +77,22 @@ while [ "$i" -lt "$n" ]; do
       if [ "$i" -ge "$n" ]; then echo "$0: -p requires a value"; exit 1; fi
       PARALLELISM="${PRE_JAVA[$i]}"
       ;;
+    -P)
+      i=$((i + 1))
+      if [ "$i" -ge "$n" ]; then echo "$0: -P requires a value"; exit 1; fi
+      PARALLELISM_DECODE="${PRE_JAVA[$i]}"
+      ;;
     -c)
       CLEAN_CODEBOOK=1
       ;;
     --no-iter-save)
       NO_ITER_SAVE=1
+      ;;
+    --skip-compression|-sc)
+      SKIP_COMPRESSION=1
+      ;;
+    --skip-decompression|-sd)
+      SKIP_DECOMPRESSION=1
       ;;
     --mr)
       if [ -n "$REDUCTION_FLAG" ] && [ "$REDUCTION_FLAG" != "--mr" ]; then echo "$0: use only one of --mr or --br"; exit 1; fi
@@ -103,6 +118,15 @@ else
   usage
 fi
 
+if [ "$SKIP_COMPRESSION" -eq 1 ] && [ "$SKIP_DECOMPRESSION" -eq 1 ]; then
+  echo "$0: cannot use both --skip-compression and --skip-decompression"
+  exit 1
+fi
+if [ "$SKIP_COMPRESSION" -eq 1 ] && [ "$CLEAN_CODEBOOK" -eq 1 ]; then
+  echo "$0: cannot use -c with --skip-compression"
+  exit 1
+fi
+
 if ! [[ "$ITERS" =~ ^[0-9]+$ ]] || [ "$ITERS" -lt 0 ]; then
   echo "$0: iterations must be a non-negative integer"
   exit 1
@@ -118,6 +142,12 @@ fi
 if [ -n "$PARALLELISM" ]; then
   if ! [[ "$PARALLELISM" =~ ^[0-9]+$ ]] || [ "$PARALLELISM" -le 0 ]; then
     echo "$0: -p must be a positive integer"
+    exit 1
+  fi
+fi
+if [ -n "$PARALLELISM_DECODE" ]; then
+  if ! [[ "$PARALLELISM_DECODE" =~ ^[0-9]+$ ]] || [ "$PARALLELISM_DECODE" -le 0 ]; then
+    echo "$0: -P must be a positive integer"
     exit 1
   fi
 fi
@@ -157,11 +187,20 @@ fi
 if [ "$NO_ITER_SAVE" -eq 1 ]; then
   MAIN_ARGS+=(--no-iter-save)
 fi
+if [ "$SKIP_COMPRESSION" -eq 1 ]; then
+  MAIN_ARGS+=(--skip-compression)
+fi
+if [ "$SKIP_DECOMPRESSION" -eq 1 ]; then
+  MAIN_ARGS+=(--skip-decompression)
+fi
 if [ -n "$REDUCTION_FLAG" ]; then
   MAIN_ARGS+=("$REDUCTION_FLAG")
 fi
 if [ -n "$PARALLELISM" ]; then
   MAIN_ARGS+=(-p "$PARALLELISM")
+fi
+if [ -n "$PARALLELISM_DECODE" ]; then
+  MAIN_ARGS+=(-P "$PARALLELISM_DECODE")
 fi
 if [ "${#JAVA_OPTS[@]}" -gt 0 ]; then
   MAIN_ARGS+=("${JAVA_OPTS[@]}")

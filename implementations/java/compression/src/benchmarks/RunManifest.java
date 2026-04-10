@@ -16,6 +16,10 @@ public record RunManifest(
         int domainSize,
         boolean cleanCodebook,
         boolean skipIterationSaves,
+        boolean skipCompression,
+        boolean skipDecompression,
+        int compressionParallelism,
+        int decompressionParallelism,
         double compressionSeconds,
         double decompressionSeconds,
         double decompressionDecodeSeconds,
@@ -78,6 +82,10 @@ public record RunManifest(
                 + "\"domain_size\":" + domainSize + ","
                 + "\"clean_codebook\":" + cleanCodebook + ","
                 + "\"skip_iteration_saves\":" + skipIterationSaves + ","
+                + "\"skip_compression\":" + skipCompression + ","
+                + "\"skip_decompression\":" + skipDecompression + ","
+                + "\"compression_parallelism\":" + compressionParallelism + ","
+                + "\"decompression_parallelism\":" + decompressionParallelism + ","
                 + "\"compression_seconds\":" + jDbl(compressionSeconds) + ","
                 + "\"decompression_seconds\":" + jDbl(decompressionSeconds) + ","
                 + "\"decompression_decode_seconds\":" + jDbl(decompressionDecodeSeconds) + ","

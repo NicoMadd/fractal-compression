@@ -1,0 +1,1466 @@
+# PGMA matrix — decompression (decode parallelism / iterations)
+# From repo root:
+#   ./implementations/java/benchmarks/run_matrix.sh ./implementations/java/benchmarks/matrix.decompression-pgma.txt
+#
+# Compression -p fixed at 8; sweeps decode -P paired with same values as full matrix.
+# First line per (stem, geometry[, --br]) uses -c to build codebook; remaining lines reuse (decode-focused).
+# Runs: 1296.
+# Iterations: 10, 50, 100. --no-iter-save on all lines.
+# Geometries: R in {4,8,16}; D = k·R, k in {2, 3, 4, 5}; --br only for k even.
+# ========== range 4, domain 8 (domain = 2× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 4 -d 8 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 4 -d 8 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 4 -d 8 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 4 -d 8 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 32 --no-iter-save
+
+# ========== range 4, domain 8 (domain = 2× range), bicubic (--br) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 10 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 10 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 10 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 10 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 10 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 10 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 10 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 10 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 10 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 10 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 8 -p 8 -P 32 --br --no-iter-save
+
+# ========== range 4, domain 12 (domain = 3× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 4 -d 12 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 12 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 12 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 4 -d 12 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 12 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 12 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 4 -d 12 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 4 -d 12 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 4 -d 12 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 4 -d 12 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 12 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 12 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 12 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 12 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 12 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 12 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 12 -p 8 -P 32 --no-iter-save
+
+# ========== range 4, domain 16 (domain = 4× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 4 -d 16 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 4 -d 16 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 4 -d 16 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 4 -d 16 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 32 --no-iter-save
+
+# ========== range 4, domain 16 (domain = 4× range), bicubic (--br) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 10 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 10 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 10 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 10 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 10 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 50 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 100 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 10 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 10 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 10 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 10 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 10 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 50 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 100 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 16 -p 8 -P 32 --br --no-iter-save
+
+# ========== range 4, domain 20 (domain = 5× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 4 -d 20 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 20 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 20 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 4 -d 20 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 20 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 20 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 4 -d 20 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 4 -d 20 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 4 -d 20 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 4 -d 20 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 20 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 20 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 20 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 20 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 20 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 20 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 4 -d 20 -p 8 -P 32 --no-iter-save
+
+# ========== range 8, domain 16 (domain = 2× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 8 -d 16 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 8 -d 16 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 8 -d 16 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 8 -d 16 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 32 --no-iter-save
+
+# ========== range 8, domain 16 (domain = 2× range), bicubic (--br) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 10 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 10 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 10 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 10 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 10 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 10 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 10 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 10 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 10 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 10 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 16 -p 8 -P 32 --br --no-iter-save
+
+# ========== range 8, domain 24 (domain = 3× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 8 -d 24 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 24 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 24 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 8 -d 24 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 24 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 24 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 8 -d 24 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 8 -d 24 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 8 -d 24 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 8 -d 24 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 24 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 24 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 24 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 24 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 24 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 24 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 24 -p 8 -P 32 --no-iter-save
+
+# ========== range 8, domain 32 (domain = 4× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 8 -d 32 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 8 -d 32 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 8 -d 32 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 8 -d 32 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 32 --no-iter-save
+
+# ========== range 8, domain 32 (domain = 4× range), bicubic (--br) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 10 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 10 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 10 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 10 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 10 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 50 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 100 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 10 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 10 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 10 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 10 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 10 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 50 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 100 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 32 -p 8 -P 32 --br --no-iter-save
+
+# ========== range 8, domain 40 (domain = 5× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 8 -d 40 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 40 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 40 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 8 -d 40 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 40 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 40 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 8 -d 40 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 8 -d 40 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 8 -d 40 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 8 -d 40 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 40 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 40 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 40 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 40 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 40 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 40 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 8 -d 40 -p 8 -P 32 --no-iter-save
+
+# ========== range 16, domain 32 (domain = 2× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 16 -d 32 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 16 -d 32 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 16 -d 32 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 16 -d 32 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 32 --no-iter-save
+
+# ========== range 16, domain 32 (domain = 2× range), bicubic (--br) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 10 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 10 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 10 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 10 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 10 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 10 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 10 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 10 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 10 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 10 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 32 -p 8 -P 32 --br --no-iter-save
+
+# ========== range 16, domain 48 (domain = 3× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 16 -d 48 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 48 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 48 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 16 -d 48 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 48 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 48 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 16 -d 48 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 16 -d 48 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 16 -d 48 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 16 -d 48 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 48 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 48 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 48 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 48 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 48 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 48 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 48 -p 8 -P 32 --no-iter-save
+
+# ========== range 16, domain 64 (domain = 4× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 16 -d 64 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 16 -d 64 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 16 -d 64 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 16 -d 64 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 32 --no-iter-save
+
+# ========== range 16, domain 64 (domain = 4× range), bicubic (--br) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 10 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 10 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 10 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 10 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 10 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 50 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+baboon.ascii -i 100 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 10 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 10 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 10 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 10 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 10 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 50 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+lena.ascii -i 100 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 1 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 2 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 4 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 8 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 16 --br --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 64 -p 8 -P 32 --br --no-iter-save
+
+# ========== range 16, domain 80 (domain = 5× range) ==========
+# --- apollonian_gasket.ascii ---
+apollonian_gasket.ascii -i 10 -c -r 16 -d 80 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 10 -r 16 -d 80 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 80 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 50 -r 16 -d 80 -p 8 -P 32 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 80 -p 8 -P 1 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+apollonian_gasket.ascii -i 100 -r 16 -d 80 -p 8 -P 32 --no-iter-save
+
+# --- baboon.ascii ---
+baboon.ascii -i 10 -c -r 16 -d 80 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 10 -r 16 -d 80 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 80 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 50 -r 16 -d 80 -p 8 -P 32 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 80 -p 8 -P 1 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+baboon.ascii -i 100 -r 16 -d 80 -p 8 -P 32 --no-iter-save
+
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 16 -d 80 -p 8 -P 1 --no-iter-save
+lena.ascii -i 10 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+lena.ascii -i 10 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+lena.ascii -i 10 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+lena.ascii -i 10 -r 16 -d 80 -p 8 -P 32 --no-iter-save
+lena.ascii -i 50 -r 16 -d 80 -p 8 -P 1 --no-iter-save
+lena.ascii -i 50 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+lena.ascii -i 50 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+lena.ascii -i 50 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+lena.ascii -i 50 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+lena.ascii -i 50 -r 16 -d 80 -p 8 -P 32 --no-iter-save
+lena.ascii -i 100 -r 16 -d 80 -p 8 -P 1 --no-iter-save
+lena.ascii -i 100 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+lena.ascii -i 100 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+lena.ascii -i 100 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+lena.ascii -i 100 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+lena.ascii -i 100 -r 16 -d 80 -p 8 -P 32 --no-iter-save
+
+# --- text-sample.ascii ---
+text-sample.ascii -i 10 -c -r 16 -d 80 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 10 -r 16 -d 80 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 80 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 50 -r 16 -d 80 -p 8 -P 32 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 80 -p 8 -P 1 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 80 -p 8 -P 2 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 80 -p 8 -P 4 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 80 -p 8 -P 8 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 80 -p 8 -P 16 --no-iter-save
+text-sample.ascii -i 100 -r 16 -d 80 -p 8 -P 32 --no-iter-save

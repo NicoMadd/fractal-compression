@@ -9,14 +9,16 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Added
 
-- **`PipelineParams` / `run.sh`:** **`--no-iter-save`** skips writing **`iter_*`** PGMs each iteration; **`iter_<n>`** is written once at the end and **MSE/MAE/PSNR** are computed from that file (no per-iteration prints; **`benchmark.csv`** keeps per-iter decode times, last row gets final errors). Manifest includes **`skip_iteration_saves`**.
-- **Benchmark manifest / registry:** optional **`decompression_decode_seconds`**, **`decompression_save_seconds`**, **`decompression_snapshot_metrics_seconds`**, and per-pass **`decode_iteration_{avg,min,max}_seconds`** (see [`benchmarks/RUN_RECORD.md`](benchmarks/RUN_RECORD.md)); Java runner logs decode vs save vs metrics+sample and per-pass decode avg/min/max.
-- **`PipelineParams` / `run.sh`:** **`--mr`** (mean domain reduction, default) and **`--br`** (bicubic); mutually exclusive. Mean / bicubic shrink logic lives in **`MeanReductionStrategy`** and **`BicubicReductionStrategy`**.
-- **`PipelineParams` / `run.sh`:** **`-p <n>`** compression thread-pool size (positive integer); if omitted, **`Runtime.getRuntime().availableProcessors()`**.
+- **Benchmark registry / manifest** ([`benchmarks/RUN_RECORD.md`](benchmarks/RUN_RECORD.md)): **`compression_parallelism`**, **`decompression_parallelism`**; **`skip_compression`**, **`skip_decompression`**; optional decode breakdown (**`decompression_{decode,save,snapshot_metrics}_seconds`**, **`decode_iteration_{avg,min,max}_seconds`**).
+- **`PipelineParams` / `run.sh`:** **`-p`** / **`-P`** thread pools; **`--no-iter-save`**; **`--mr`** / **`--br`**; **`--skip-compression`** / **`-sc`** and **`--skip-decompression`** / **`-sd`** (`run.sh` rejects **`-c`** with **`-sc`** and both skips together).
+- **`PGMAPipeline`:** honors skip flags; encode-only runs omit reconstruction PNG baseline when decode is skipped.
+- **PGMA benchmark matrices:** **`matrix.compression-pgma.txt`** (generated: **`generate_compression_pgma_matrix.py`** — **lena** only, **10** **(r,d)** pairs, **`-p`/`-P`** **1…16**, **`-i` 10**, every line **`-c`**); **`matrix.decompression-pgma.txt`** (multi-image decode sweep, **`-p` 8**); index **`matrix.all-pgma.txt`**; **`run_pgma_matrices.sh`** runs compression then decompression matrix.
+- **`implementations/java/benchmarks/run_matrix.sh`:** copies **`benchmarks/registry.jsonl`** to **`benchmarks/snapshots/registry-<timestamp>.jsonl`** after a full matrix pass.
 
 ### Changed
 
-- **`BicubicReductionStrategy.reduce`:** for reduce ratio **2<sup>k</sup>**, repeatedly applies **2:1** separable Catmull–Rom on the **local R×R** tile until **2×2**, then the final sample (no recursive **`GrayBlock.reduce`**); non-power-of-two ratios throw with a clear message (use **mean** or change geometry).
+- **`BicubicReductionStrategy.reduce`:** power-of-two shrink via repeated **2:1** separable Catmull–Rom; non-power-of-two ratios throw (use **mean** or change geometry).
+- **PGMA matrix docs / samples:** replace monolithic **`matrix.all-pgma.example.txt`** with **`matrix.all-pgma.txt`** index + split matrix files; update **`matrix.example.txt`**, [**`benchmarks/README.md`**](benchmarks/README.md), **`.cursor/rules/project-context.mdc`**.
 
 ## [0.4.0] - 2026-04-05 — basic benchmark registry (`feature/4-benchmark-registry`)
 

@@ -1,0 +1,88 @@
+# PGMA matrix — compression (encode / codebook build)
+# Image: lena.ascii | REGENERATE: python3 implementations/java/benchmarks/generate_compression_pgma_matrix.py
+# From repo root:
+#   ./implementations/java/benchmarks/run_matrix.sh ./implementations/java/benchmarks/matrix.compression-pgma.txt
+#
+# Every line: -c (full encode), --no-iter-save. -p/-P paired: 1, 2, 4, 8, 16.
+# Iterations: see ITERATIONS in generate_compression_pgma_matrix.py (default 10).
+# Runs: 50 (stems × geometries × iterations × parallelism).
+
+# ========== range 4, domain 8 (D = 2×R) ==========
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 4 -d 8 -p 1 -P 1 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 8 -p 2 -P 2 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 8 -p 4 -P 4 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 8 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 8 -p 16 -P 16 --no-iter-save
+
+# ========== range 8, domain 16 (D = 2×R) ==========
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 8 -d 16 -p 1 -P 1 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 16 -p 2 -P 2 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 16 -p 4 -P 4 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 16 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 16 -p 16 -P 16 --no-iter-save
+
+# ========== range 16, domain 32 (D = 2×R) ==========
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 16 -d 32 -p 1 -P 1 --no-iter-save
+lena.ascii -i 10 -c -r 16 -d 32 -p 2 -P 2 --no-iter-save
+lena.ascii -i 10 -c -r 16 -d 32 -p 4 -P 4 --no-iter-save
+lena.ascii -i 10 -c -r 16 -d 32 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -c -r 16 -d 32 -p 16 -P 16 --no-iter-save
+
+# ========== range 32, domain 64 (D = 2×R) ==========
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 32 -d 64 -p 1 -P 1 --no-iter-save
+lena.ascii -i 10 -c -r 32 -d 64 -p 2 -P 2 --no-iter-save
+lena.ascii -i 10 -c -r 32 -d 64 -p 4 -P 4 --no-iter-save
+lena.ascii -i 10 -c -r 32 -d 64 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -c -r 32 -d 64 -p 16 -P 16 --no-iter-save
+
+# ========== range 4, domain 16 (D = 4×R) ==========
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 4 -d 16 -p 1 -P 1 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 16 -p 2 -P 2 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 16 -p 4 -P 4 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 16 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 16 -p 16 -P 16 --no-iter-save
+
+# ========== range 4, domain 32 (D = 8×R) ==========
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 4 -d 32 -p 1 -P 1 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 32 -p 2 -P 2 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 32 -p 4 -P 4 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 32 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 32 -p 16 -P 16 --no-iter-save
+
+# ========== range 4, domain 128 (D = 32×R) ==========
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 4 -d 128 -p 1 -P 1 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 128 -p 2 -P 2 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 128 -p 4 -P 4 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 128 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -c -r 4 -d 128 -p 16 -P 16 --no-iter-save
+
+# ========== range 8, domain 32 (D = 4×R) ==========
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 8 -d 32 -p 1 -P 1 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 32 -p 2 -P 2 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 32 -p 4 -P 4 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 32 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 32 -p 16 -P 16 --no-iter-save
+
+# ========== range 8, domain 64 (D = 8×R) ==========
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 8 -d 64 -p 1 -P 1 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 64 -p 2 -P 2 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 64 -p 4 -P 4 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 64 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 64 -p 16 -P 16 --no-iter-save
+
+# ========== range 8, domain 128 (D = 16×R) ==========
+# --- lena.ascii ---
+lena.ascii -i 10 -c -r 8 -d 128 -p 1 -P 1 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 128 -p 2 -P 2 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 128 -p 4 -P 4 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 128 -p 8 -P 8 --no-iter-save
+lena.ascii -i 10 -c -r 8 -d 128 -p 16 -P 16 --no-iter-save

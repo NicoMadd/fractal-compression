@@ -1,0 +1,11 @@
+# PGMA benchmark matrices (split: compression vs decompression)
+#
+# Compression — lena.ascii only; explicit (r,d) grid; -p/-P ∈ {1,2,4,8,16}; -i 10; every line -c.
+#   Regenerate: python3 implementations/java/benchmarks/generate_compression_pgma_matrix.py
+#   ./implementations/java/benchmarks/run_matrix.sh ./implementations/java/benchmarks/matrix.compression-pgma.txt
+#
+# Decompression (decode sweep — -p fixed at 8; varies -P and -i; first row per stem/geometry -c):
+#   ./implementations/java/benchmarks/run_matrix.sh ./implementations/java/benchmarks/matrix.decompression-pgma.txt
+#
+# Both in order (optional):
+#   ./implementations/java/benchmarks/run_pgma_matrices.sh

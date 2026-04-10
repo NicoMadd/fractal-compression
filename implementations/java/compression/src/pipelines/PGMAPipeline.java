@@ -38,7 +38,7 @@ public class PGMAPipeline extends Pipeline {
     public PGMAPipeline(PipelineParams params) throws IOException {
         super(params);
         this.gbc = new GrayBlockCompression(params.rangeSize(), params.domainSize(), params.reductionStrategy(),
-                params.parallelism());
+                params.compressionParallelism());
     }
 
     protected void init(FileInputStream fis) throws IOException {
@@ -53,34 +53,83 @@ public class PGMAPipeline extends Pipeline {
         MemorySampler memorySampler = new MemorySampler();
         memorySampler.sample();
 
+        if (params.skipCompression() && params.skipDecompression()) {
+            throw new IllegalStateException("Cannot skip both compression and decompression.");
+        }
+
         long t0 = System.nanoTime();
 
         Path codebookPath = Codebook.pathForGeometry(runDir, params.rangeSize(), params.domainSize());
 
-        System.out.println("Looking for codebook at " + codebookPath);
-
         List<FractalMapping> mappings = null;
 
-        if (!params.cleanCodebook() && Files.exists(codebookPath)) {
-            Codebook loaded = new Codebook(codebookPath.toString());
-            if (loaded.rangeSize() == params.rangeSize() && loaded.domainSize() == params.domainSize()) {
-                System.out.println("Reading codebook from " + codebookPath);
-                mappings = loaded.getMappings();
-            } else {
-                System.out.println("On-disk codebook range/domain does not match this run; rebuilding.");
+        if (params.skipCompression()) {
+            System.out.println("Skipping compression (--skip-compression); loading codebook from disk.");
+            if (!Files.exists(codebookPath)) {
+                throw new IllegalStateException(
+                        "Missing codebook for --skip-compression: " + codebookPath + " (run without the flag to build).");
             }
-        }
+            Codebook loaded = new Codebook(codebookPath.toString());
+            if (loaded.rangeSize() != params.rangeSize() || loaded.domainSize() != params.domainSize()) {
+                throw new IllegalStateException("On-disk codebook range/domain does not match this run's -r/-d.");
+            }
+            System.out.println("Reading codebook from " + codebookPath);
+            mappings = loaded.getMappings();
+        } else {
+            System.out.println("Looking for codebook at " + codebookPath);
 
-        if (mappings == null) {
-            System.out.println("Processing codebook");
-            mappings = this.gbc.compress(metadata);
-            Codebook cb = new Codebook(params.rangeSize(), params.domainSize(), mappings);
-            cb.save(codebookPath.toString());
-            System.out.println("Codebook saved to " + codebookPath);
+            if (!params.cleanCodebook() && Files.exists(codebookPath)) {
+                Codebook loaded = new Codebook(codebookPath.toString());
+                if (loaded.rangeSize() == params.rangeSize() && loaded.domainSize() == params.domainSize()) {
+                    System.out.println("Reading codebook from " + codebookPath);
+                    mappings = loaded.getMappings();
+                } else {
+                    System.out.println("On-disk codebook range/domain does not match this run; rebuilding.");
+                }
+            }
+
+            if (mappings == null) {
+                System.out.println("Processing codebook");
+                mappings = this.gbc.compress(metadata);
+                Codebook cb = new Codebook(params.rangeSize(), params.domainSize(), mappings);
+                cb.save(codebookPath.toString());
+                System.out.println("Codebook saved to " + codebookPath);
+            }
         }
 
         long t1 = System.nanoTime();
         memorySampler.sample();
+
+        double compressionSeconds = params.skipCompression() ? 0.0 : (t1 - t0) / 1_000_000_000.0;
+
+        SimpleCompressionBenchmark scb = new SimpleCompressionBenchmark();
+        IterationOutMetrics iterationOutMetrics = new IterationOutMetrics();
+
+        double decompressionSeconds;
+        double decompressionDecodeSeconds;
+        double decompressionSaveSeconds;
+        double decompressionSnapshotMetricsSeconds;
+        double decodeIterationAvgSeconds;
+        double decodeIterationMinSeconds;
+        double decodeIterationMaxSeconds;
+        long t2;
+        ExecutorService es = null;
+
+        if (params.skipDecompression()) {
+            System.out.println("Skipping decompression (--skip-decompression); no decode iterations or error metrics.");
+            iterationOutMetrics.setMse(Double.NaN);
+            iterationOutMetrics.setMae(Double.NaN);
+            iterationOutMetrics.setPsnr(Double.NaN);
+            decompressionSeconds = 0.0;
+            decompressionDecodeSeconds = 0.0;
+            decompressionSaveSeconds = 0.0;
+            decompressionSnapshotMetricsSeconds = 0.0;
+            decodeIterationAvgSeconds = 0.0;
+            decodeIterationMinSeconds = 0.0;
+            decodeIterationMaxSeconds = 0.0;
+            scb.saveTo(iterationsDir.toString());
+            t2 = System.nanoTime();
+        } else {
 
         System.out.println("Starting Decompression");
         if (params.skipIterationSaves()) {
@@ -109,11 +158,7 @@ public class PGMAPipeline extends Pipeline {
 
         System.out.println("Iterating over " + iterations + " iterations");
 
-        SimpleCompressionBenchmark scb = new SimpleCompressionBenchmark();
-
-        IterationOutMetrics iterationOutMetrics = new IterationOutMetrics();
-
-        ExecutorService es = Executors.newFixedThreadPool(params.parallelism());
+        es = Executors.newFixedThreadPool(params.decompressionParallelism());
 
         // N iterations
         for (int iter = 0; iter <= iterations; iter++) {
@@ -186,24 +231,20 @@ public class PGMAPipeline extends Pipeline {
             totalSnapshotMetricsNanos += System.nanoTime() - metricsFinalStart;
         }
 
-        long t2 = System.nanoTime();
+        t2 = System.nanoTime();
         memorySampler.sample();
 
-        long compressionElapsedNanos = t1 - t0;
-        double compressionSeconds = compressionElapsedNanos / 1_000_000_000.0;
-
         long decompressionElapsedNanos = t2 - t1;
-        double decompressionSeconds = decompressionElapsedNanos / 1_000_000_000.0;
-        double decompressionDecodeSeconds = totalDecodeNanos / 1_000_000_000.0;
-        double decompressionSaveSeconds = totalSaveNanos / 1_000_000_000.0;
-        double decompressionSnapshotMetricsSeconds = totalSnapshotMetricsNanos / 1_000_000_000.0;
-        double decodeIterationAvgSeconds = decodePassCount > 0
+        decompressionSeconds = decompressionElapsedNanos / 1_000_000_000.0;
+        decompressionDecodeSeconds = totalDecodeNanos / 1_000_000_000.0;
+        decompressionSaveSeconds = totalSaveNanos / 1_000_000_000.0;
+        decompressionSnapshotMetricsSeconds = totalSnapshotMetricsNanos / 1_000_000_000.0;
+        decodeIterationAvgSeconds = decodePassCount > 0
                 ? (totalDecodeNanos / (double) decodePassCount) / 1_000_000_000.0
                 : 0.0;
-        double decodeIterationMinSeconds = decodePassCount > 0 ? minDecodeNanos / 1_000_000_000.0 : 0.0;
-        double decodeIterationMaxSeconds = decodePassCount > 0 ? maxDecodeNanos / 1_000_000_000.0 : 0.0;
+        decodeIterationMinSeconds = decodePassCount > 0 ? minDecodeNanos / 1_000_000_000.0 : 0.0;
+        decodeIterationMaxSeconds = decodePassCount > 0 ? maxDecodeNanos / 1_000_000_000.0 : 0.0;
 
-        System.out.println("Compression took: " + compressionSeconds + "s");
         System.out.println("Decompression took: " + decompressionSeconds + "s (decode " + decompressionDecodeSeconds
                 + "s, save " + decompressionSaveSeconds + "s, metrics+sample " + decompressionSnapshotMetricsSeconds
                 + "s)");
@@ -211,6 +252,14 @@ public class PGMAPipeline extends Pipeline {
                 + "s, max " + decodeIterationMaxSeconds + "s (" + decodePassCount + " passes)");
 
         scb.saveTo(iterationsDir.toString());
+
+        }
+
+        System.out.println("Compression took: " + compressionSeconds + "s"
+                + (params.skipCompression() ? " (--skip-compression; phase not timed)" : ""));
+        if (params.skipDecompression()) {
+            System.out.println("Decompression skipped (--skip-decompression); decode timings are 0 in the manifest.");
+        }
 
         calculateCompressionRatio(originalImagePath, codebookPath.toString());
 
@@ -220,7 +269,9 @@ public class PGMAPipeline extends Pipeline {
                 decodeIterationMaxSeconds, iterationOutMetrics.getMse(), iterationOutMetrics.getMae(),
                 iterationOutMetrics.getPsnr(), memorySampler);
 
-        es.shutdown();
+        if (es != null) {
+            es.shutdown();
+        }
     }
 
     private void recordIterationErrorMetrics(String originalImagePath,
@@ -293,8 +344,13 @@ public class PGMAPipeline extends Pipeline {
         long bytesOriginalCopy = FileUtils.getFileSize(originalCopyPath);
         long bytesCodebook = FileUtils.getFileSize(codebookPath.toString());
         long pngOrig = CompressionBaselines.writePngFromPgm(originalCopyPath, baselinesDir.resolve("original.png"));
-        long pngFinal = CompressionBaselines.writePngFromPgm(finalIterPath,
-                baselinesDir.resolve("reconstruction.png"));
+        long pngFinal;
+        if (params.skipDecompression() || !Files.exists(finalIterPath)) {
+            pngFinal = 0L;
+        } else {
+            pngFinal = CompressionBaselines.writePngFromPgm(finalIterPath,
+                    baselinesDir.resolve("reconstruction.png"));
+        }
         long zipOrig = CompressionBaselines.writeZipDeflatedArchive(originalCopyPath,
                 baselinesDir.resolve("original_deflated.zip"), "original.pgm");
         String zipEntryName = codebookPath.getFileName().toString();
@@ -312,6 +368,10 @@ public class PGMAPipeline extends Pipeline {
                 params.domainSize(),
                 params.cleanCodebook(),
                 params.skipIterationSaves(),
+                params.skipCompression(),
+                params.skipDecompression(),
+                params.compressionParallelism(),
+                params.decompressionParallelism(),
                 compressionSeconds,
                 decompressionSeconds,
                 decompressionDecodeSeconds,

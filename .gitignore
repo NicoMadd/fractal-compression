@@ -2,3 +2,5 @@
 .DS_Store
 .vscode
 /processes/
+# Dated copies of registry.jsonl from implementations/java/benchmarks/run_matrix.sh
+benchmarks/snapshots/

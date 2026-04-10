@@ -27,6 +27,10 @@ Consumers **SHOULD** ignore unknown top-level keys. Producers **MAY** add **`ext
 | `domain_size` | int | Domain block edge length (this project). |
 | `clean_codebook` | bool | Whether the codebook was rebuilt. |
 | `skip_iteration_saves` | bool | *(Optional.)* When true, per-iteration PGM frames were not written (metrics from memory); final iteration PGM may still exist for baselines. |
+| `skip_compression` | bool | *(Optional.)* When true (Java **`--skip-compression`** or **`-sc`**), the encode phase was not run; codebook was loaded from disk; **`compression_seconds`** is **0**. |
+| `skip_decompression` | bool | *(Optional.)* When true (Java **`--skip-decompression`** or **`-sd`**), decode was not run; **`decompression_*`** timings are **0**; **`mse_final`** / **`mae_final`** / **`psnr_final`** may be **`null`**; **`png_bytes_final_iter`** may be **0**. |
+| `compression_parallelism` | int | Thread pool size for encode / codebook search (Java **`-p`**). |
+| `decompression_parallelism` | int | Thread pool size for decode passes (Java **`-P`**, or **`-p`** when **`-P`** omitted). |
 | `compression_seconds` | number | Encode / codebook build time. |
 | `decompression_seconds` | number | Decode phase time. |
 | `decompression_decode_seconds` | number | *(Optional.)* Cumulative wall time for parallel fractal decode only (`latch.await` work per iteration). |
