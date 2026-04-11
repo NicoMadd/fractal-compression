@@ -1,5 +1,28 @@
 #include <iostream>
 
 int main(){
-    std::cout << "Hello World\n";
+
+    // read image path
+
+    // load image
+
+    // COMPRESSION
+
+    // domain blocks
+
+    // range blocks
+
+    // reduce blocks
+
+    // match range - reduced domains
+
+    // serialize file
+
+    // DECOMPRESSION
+
+    // initialize noise images
+
+    // iterate n times
+
+    // calculate errors
 }
