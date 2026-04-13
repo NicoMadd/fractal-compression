@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-g++ -std=c++17 -o main.exe main.cpp
+cd "$(dirname "$0")"
 
-./main.exe
+# All .cpp files under this directory (recursive)
+sources=()
+while IFS= read -r f; do
+  sources+=("$f")
+done < <(find . -name '*.cpp' | LC_ALL=C sort)
+
+g++ -std=c++17 -o main.exe "${sources[@]}"
+
+./main.exe "$@"
