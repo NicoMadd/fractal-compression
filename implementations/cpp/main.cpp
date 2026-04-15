@@ -2,18 +2,13 @@
 #include <string>
 #include "pixel/pixel.hpp"
 #include "image/metadata.hpp"
+#include "utils/utils.hpp"
 
 using namespace std;
 
 struct PipelineParams {
     string imagePath;
 };
-
-
-
-void print(string text){
-    cout << text + '\n';
-}
 
 PipelineParams validateParams(int argc, const char* argv[]){
     PipelineParams params = PipelineParams();
