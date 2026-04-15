@@ -6,13 +6,6 @@
 
 using namespace std;
 
-struct ImageMetadata
-{
-  int width;
-  int height;
-  vector<vector<GrayPixel>> pixels;
-};
-
 class PGMAImageMetadata
 {
   
@@ -20,6 +13,8 @@ class PGMAImageMetadata
     int height;
     int maxVal;
     int width;
+    vector<vector<GrayPixel>> pixels;
+
     PGMAImageMetadata(ifstream &ifs);
   
   
@@ -29,6 +24,7 @@ class PGMAImageMetadata
 
     void readMagicNumber();
     void skipComment();
+    void readPixel(vector<GrayPixel>& bucket);
 };
 
-ImageMetadata loadImage(string imagePath);
+PGMAImageMetadata loadImage(string imagePath);

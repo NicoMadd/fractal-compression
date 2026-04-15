@@ -5,5 +5,6 @@ class GrayPixel {
     public:
         int level;
 
+        GrayPixel(int level);
 
 };

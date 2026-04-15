@@ -25,8 +25,13 @@ int main(int argc, const char* argv[]){
 
     print("Image path: " + params.imagePath);
 
-    ImageMetadata metadata = loadImage(params.imagePath);
+    PGMAImageMetadata metadata = loadImage(params.imagePath);
 
+    print(metadata.height);
+    print(metadata.width);
+    print(metadata.maxVal);
+    print((int)metadata.pixels.size());
+    print((int)metadata.pixels[0].size());
 
     // load image
 
