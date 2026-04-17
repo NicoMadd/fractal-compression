@@ -13,7 +13,7 @@ class PGMAImageMetadata
     int height;
     int maxVal;
     int width;
-    Matrix<GrayPixel> pixels;
+    Matrix<GrayPixel>* pixels = nullptr;
 
     PGMAImageMetadata(ifstream &ifs);
   

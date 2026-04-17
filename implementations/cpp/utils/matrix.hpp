@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 
 using namespace std;
 
@@ -15,7 +16,7 @@ class Matrix {
             data[i].resize(cols);
         }
     }
-    
+
     Matrix(vector<vector<T>> _data)
         : data(_data), rows(_data.size()), cols(_data.empty() ? 0 : _data[0].size()) {}
     void set(int row, int col, T value) { data[row][col] = value; }
@@ -29,3 +30,19 @@ class Matrix {
     int rows;
     int cols;
 };
+
+
+float dotProduct(Matrix<float>& a, Matrix<float>& b);
+
+template<typename T>
+Matrix<float> floatMap(Matrix<T>& matrix, function<float(const T&)> mapper){
+    int rows = matrix.getRows();
+    int cols = matrix.getCols();
+    Matrix<float> floatMatrix(rows, cols);
+    for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < cols; j++) {
+            floatMatrix.set(i, j, mapper(matrix.get(i, j)));
+        }
+    }
+    return floatMatrix;
+}

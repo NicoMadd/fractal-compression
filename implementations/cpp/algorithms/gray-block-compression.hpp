@@ -11,7 +11,7 @@ using namespace std;
 
 class GrayBlockCompression {
   public:
-    GrayBlockCompression(int rbd, int dbd, int parallelism, ReductionStrategy rs);
+    GrayBlockCompression(int rbd, int dbd, int parallelism, ReductionStrategy* rs);
     vector<FractalMapping> compress(PGMAImageMetadata metadata);
 
   private:
@@ -26,13 +26,13 @@ class GrayBlockCompression {
 
     int image_width;
     int image_height;
-    Matrix<GrayPixel> image_pixels;
+    Matrix<GrayPixel>* image_pixels = nullptr;
 
     Matrix<Block> domain_blocks;
     Matrix<Block> range_blocks;
     Matrix<Block> reduced_domain_blocks;
 
-    ReductionStrategy reductionStrategy;
+    ReductionStrategy* reductionStrategy;
 
 
     void build_domains();

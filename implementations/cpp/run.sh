@@ -11,4 +11,4 @@ done < <(find . -name '*.cpp' | LC_ALL=C sort)
 
 g++ -std=c++17 -Werror -o main.exe "${sources[@]}"
 
-./main.exe "$@"
+./main.exe "$@" --debug

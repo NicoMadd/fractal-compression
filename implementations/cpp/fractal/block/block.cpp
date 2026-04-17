@@ -6,8 +6,8 @@ Block::Block() : x(0), y(0), width(0), height(0), pixels(nullptr) {}
 Block::Block(Matrix<GrayPixel>* pixels, int x, int y, int width, int height)
     : x(x), y(y), width(width), height(height), pixels(pixels) {}
 
-Matrix<GrayPixel> Block::reduce(int reduceTo, ReductionStrategy rs){
-    return rs.reduce(*this->pixels, reduceTo);
+Matrix<GrayPixel>* Block::reduce(int reduceTo, ReductionStrategy* rs){
+    return rs->reduce(this->pixels, reduceTo);
 }
 
 float Block::mean(){

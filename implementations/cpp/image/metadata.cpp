@@ -18,7 +18,7 @@ PGMAImageMetadata loadImage(string imagePath) {
 }
 
 
-PGMAImageMetadata::PGMAImageMetadata(ifstream &ifs) : sr(ifs), pixels(0, 0){
+PGMAImageMetadata::PGMAImageMetadata(ifstream &ifs) : sr(ifs) {
   readMagicNumber();
   sr.readWhitespace();
 
@@ -28,21 +28,22 @@ PGMAImageMetadata::PGMAImageMetadata(ifstream &ifs) : sr(ifs), pixels(0, 0){
   this->height = sr.readNextInt();
   this->maxVal = sr.readNextInt();
 
+  this->pixels = new Matrix<GrayPixel>(this->height, this->width);
+  
   sr.readWhitespace();
 
   for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
           readPixel(i,j);
       }
-  }
-
+  }  
 }
 
 void PGMAImageMetadata::readPixel(int i, int j){
   int level = sr.readNextInt();
 
   GrayPixel gp = GrayPixel(level);
-  pixels.set(i, j, gp);
+  this->pixels->set(i, j, gp);
 
 }
 

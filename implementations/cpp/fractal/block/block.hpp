@@ -12,7 +12,7 @@ class Block{
         Block();
         Matrix<GrayPixel>* pixels;
         Block(Matrix<GrayPixel>* pixels, int x, int y, int width, int height);
-        Matrix<GrayPixel> reduce(int reduceTo, ReductionStrategy rs);
+        Matrix<GrayPixel>* reduce(int reduceTo, ReductionStrategy* rs);
         float mean();
         GrayPixel get(int x, int y);
 };

@@ -1,15 +1,15 @@
 #include "gray-block-compression.hpp"
 
 #include <cfloat>
-#include <iostream>
+#include <algorithm>
 #include <vector>
-#include "../utils/utils.hpp"
+#include "../utils/run_logging.hpp"
 #include "../fractal/block/block.hpp"
 #include "../fractal/block/compressed.hpp"
 
 using namespace std;
 
-GrayBlockCompression::GrayBlockCompression(int rbd, int dbd, int parallelism, ReductionStrategy rs) : RBD(rbd), DBD(dbd), parallelism(parallelism), reductionStrategy(rs) {
+GrayBlockCompression::GrayBlockCompression(int rbd, int dbd, int parallelism, ReductionStrategy* rs) : RBD(rbd), DBD(dbd), parallelism(parallelism), reductionStrategy(rs) {
 }
 
 vector<FractalMapping> GrayBlockCompression::compress(PGMAImageMetadata metadata) {
@@ -18,10 +18,28 @@ vector<FractalMapping> GrayBlockCompression::compress(PGMAImageMetadata metadata
     this->image_width = metadata.width;
     this->image_pixels = metadata.pixels;
 
+    int range_cols = this->image_width / this->RBD;
+    int range_rows = this->image_height / this->RBD;
+    int domain_cols = this->image_width / this->DBD;
+    int domain_rows = this->image_height / this->DBD;
+
+    run_logging::debug("Compress: image " + to_string(this->image_width) + "x" + to_string(this->image_height)
+            + ", range " + to_string(this->RBD) + ", domain " + to_string(this->DBD) + " -> "
+            + to_string(range_cols) + "x" + to_string(range_rows) + " ranges, "
+            + to_string(domain_cols) + "x" + to_string(domain_rows) + " domains");
+
+    run_logging::debug("Compress: building range blocks...");
     this->build_ranges();
+    run_logging::debug("Compress: building domain blocks...");
     this->build_domains();
+    int domain_count = domain_cols * domain_rows;
+    run_logging::debug("Compress: " + this->reductionStrategy->description() + " domain blocks ("
+            + to_string(domain_count) + " blocks)...");
     this->build_reduced_domains();
-    return this->build_fractal_mappings();
+    run_logging::debug("Compress: searching best domain + transform per range block...");
+    vector<FractalMapping> fractal_mappings = this->build_fractal_mappings();
+    run_logging::debug("Compression Finished!");
+    return fractal_mappings;
 }
 
 
@@ -35,7 +53,7 @@ void GrayBlockCompression::build_domains(){
 
     for(int i=0;i<rows;i++){
         for(int j=0;j<cols;j++){
-            this->domain_blocks.set(i, j, Block(&this->image_pixels, i*this->DBD, j*this->DBD,this->DBD,this->DBD));
+            this->domain_blocks.set(i, j, Block(this->image_pixels, i*this->DBD, j*this->DBD,this->DBD,this->DBD));
         }
     }
 }
@@ -50,7 +68,7 @@ void GrayBlockCompression::build_ranges(){
     this->range_blocks = Matrix<Block>(rows, cols);
     for(int i=0;i<rows;i++){
         for(int j=0;j<cols;j++){
-            this->range_blocks.set(i, j, Block(&this->image_pixels, i*this->RBD, j*this->RBD,this->RBD,this->RBD));
+            this->range_blocks.set(i, j, Block(this->image_pixels, i*this->RBD, j*this->RBD,this->RBD,this->RBD));
         }
     }
 }
@@ -63,8 +81,8 @@ void GrayBlockCompression::build_reduced_domains(){
     for(int i = 0; i < rows; ++i) {
         for(int j = 0; j < cols; ++j) {
             Block b = this->domain_blocks.get(i, j);
-            Matrix<GrayPixel> reduced_pixels = b.reduce(this->RBD, this->reductionStrategy);
-            Block reduced_block(&reduced_pixels, b.x, b.y, this->RBD, this->RBD);
+            Matrix<GrayPixel>* reduced_pixels = b.reduce(this->RBD, this->reductionStrategy);
+            Block reduced_block(reduced_pixels, b.x, b.y, this->RBD, this->RBD);
             this->reduced_domain_blocks.set(i, j, reduced_block);
         }
     }
@@ -74,6 +92,10 @@ vector<FractalMapping> GrayBlockCompression::build_fractal_mappings(){
 
 
     vector<FractalMapping> fractal_mappings;
+
+    int total_ranges = this->range_blocks.getRows() * this->range_blocks.getCols();
+    int step = max(1, total_ranges / 25);
+    int done = 0;
 
     for(vector<Block> range : this->range_blocks.getData()){
         for(Block range_block : range){
@@ -113,6 +135,13 @@ vector<FractalMapping> GrayBlockCompression::build_fractal_mappings(){
             
 
             fractal_mappings.push_back(FractalMapping(range_block.x, range_block.y, best_compressed_block->domain->x, best_compressed_block->domain->y, best_compressed_block->s, best_compressed_block->o));
+            delete best_compressed_block;
+            best_compressed_block = nullptr;
+
+            done++;
+            if (done == 1 || done == total_ranges || done % step == 0) {
+                run_logging::debug("Compress: matched range blocks " + to_string(done) + "/" + to_string(total_ranges));
+            }
         }
     }
 
