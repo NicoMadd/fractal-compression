@@ -28,3 +28,8 @@ void print(int i){
     cout << i;
     cout << '\n';
 }
+
+void print(float f){
+    cout << f;
+    cout << '\n';
+}

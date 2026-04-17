@@ -13,6 +13,7 @@ public:
   char readWhitespace();
   int readInt();
   bool nextCharIs(char c);
+  bool nextIsEof();
   void skipUntilLineBreak();
   int readNextInt();
 

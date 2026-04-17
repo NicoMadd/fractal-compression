@@ -2,7 +2,7 @@
 
 #include "../pixel/pixel.hpp"
 #include "./sequence-reader.hpp"
-#include <vector>
+#include "../utils/matrix.hpp"
 
 using namespace std;
 
@@ -13,7 +13,7 @@ class PGMAImageMetadata
     int height;
     int maxVal;
     int width;
-    vector<vector<GrayPixel>> pixels;
+    Matrix<GrayPixel> pixels;
 
     PGMAImageMetadata(ifstream &ifs);
   
@@ -24,7 +24,7 @@ class PGMAImageMetadata
 
     void readMagicNumber();
     void skipComment();
-    void readPixel(vector<GrayPixel>& bucket);
+    void readPixel(int i, int j);
 };
 
 PGMAImageMetadata loadImage(string imagePath);

@@ -2,6 +2,8 @@
 #include <cctype>
 #include <vector>
 #include <string>
+#include <ios>
+#include <stdexcept>
 
 using namespace std;
 
@@ -27,14 +29,12 @@ vector<char> SequenceReader::read(int n){
     }
 
     return chars;
-
 }
 
-
 char SequenceReader::readWhitespace(){
-    char c = in_->peek();
-    if(!isWhiteSpace(c)){
-        throw std::runtime_error("Expected whitespace but found non-whitespace character.");
+
+    if(nextIsEof() || !isWhiteSpace(in_->peek())){
+        throw std::runtime_error("Expected whitespace but did not find it at the current position.");
     }
     return in_->get();
 }
@@ -43,10 +43,7 @@ vector<char> SequenceReader::readUntilWhitespace(){
     vector<char> vector;
 
     do{
-
-        char c = in_->peek();
-
-        if(!isWhiteSpace(c)){
+        if(!nextIsEof() && !isWhiteSpace(in_->peek())){
             vector.push_back(in_->get());
         }else{
             break;
@@ -66,15 +63,22 @@ bool SequenceReader::nextCharIs(char c){
     return in_->peek()==c;
 
 }
+
+bool SequenceReader::nextIsEof(){
+    return (in_->peek()) == char_traits<char>::eof();
+}
+
 void SequenceReader::skipUntilLineBreak(){
-    while(!nextCharIs('\n')){
+    while(!nextCharIs('\n') && !nextIsEof()){
         in_->get();
     }
-    in_->get();
+    if(nextCharIs('\n')){
+        in_->get();
+    }
 }
 
 void SequenceReader::skipFollowingWhitespaces(){
-    while(isWhiteSpace(in_->peek())){
+    while(!nextIsEof() && isWhiteSpace(in_->peek())){
         in_->get();
     }
 }

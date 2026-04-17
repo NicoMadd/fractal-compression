@@ -1,7 +1,6 @@
 #include "metadata.hpp"
 
 #include <fstream>
-#include <vector>
 #include "../utils/utils.hpp"
 #include <iostream>
 
@@ -19,7 +18,7 @@ PGMAImageMetadata loadImage(string imagePath) {
 }
 
 
-PGMAImageMetadata::PGMAImageMetadata(ifstream &ifs) : sr(ifs){
+PGMAImageMetadata::PGMAImageMetadata(ifstream &ifs) : sr(ifs), pixels(width, height){
   readMagicNumber();
   sr.readWhitespace();
 
@@ -31,24 +30,19 @@ PGMAImageMetadata::PGMAImageMetadata(ifstream &ifs) : sr(ifs){
 
   sr.readWhitespace();
 
-
-
-
   for (int i = 0; i < height; i++) {
-      vector<GrayPixel> row;
       for (int j = 0; j < width; j++) {
-          readPixel(row);
+          readPixel(i,j);
       }
-      pixels.push_back(row);
   }
 
 }
 
-void PGMAImageMetadata::readPixel(vector<GrayPixel>& bucket){
+void PGMAImageMetadata::readPixel(int i, int j){
   int level = sr.readNextInt();
 
   GrayPixel gp = GrayPixel(level);
-  bucket.push_back(gp);
+  pixels.set(i, j, gp);
 
 }
 

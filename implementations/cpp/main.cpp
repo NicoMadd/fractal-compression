@@ -1,8 +1,9 @@
-#include <iostream>
 #include <string>
-#include "pixel/pixel.hpp"
+#include "fractal/block/reduction/reduction-strategy.hpp"
 #include "image/metadata.hpp"
 #include "utils/utils.hpp"
+#include "pipeline/pipeline.hpp"
+#include "algorithms/gray-block-compression.hpp"
 
 using namespace std;
 
@@ -27,19 +28,12 @@ int main(int argc, const char* argv[]){
 
     PGMAImageMetadata metadata = loadImage(params.imagePath);
 
-    print(metadata.height);
-    print(metadata.width);
-    print(metadata.maxVal);
-    print((int)metadata.pixels.size());
-    print((int)metadata.pixels[0].size());
+    GrayBlockCompression gbc = GrayBlockCompression(4,8,1, MeanReductionStrategy());
 
-    // load image
+    PGMAPipeline pipeline = PGMAPipeline(metadata, gbc);
+    pipeline.run();
 
-    // COMPRESSION
-
-    // domain blocks
-
-    // range blocks
+ 
 
     // reduce blocks
 
