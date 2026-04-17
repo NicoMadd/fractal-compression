@@ -35,7 +35,7 @@ void GrayBlockCompression::build_domains(){
 
     for(int i=0;i<rows;i++){
         for(int j=0;j<cols;j++){
-            this->domain_blocks.set(i, j, Block(this->image_pixels, i*this->DBD, j*this->DBD,this->DBD,this->DBD));
+            this->domain_blocks.set(i, j, Block(&this->image_pixels, i*this->DBD, j*this->DBD,this->DBD,this->DBD));
         }
     }
 }
@@ -50,7 +50,7 @@ void GrayBlockCompression::build_ranges(){
     this->range_blocks = Matrix<Block>(rows, cols);
     for(int i=0;i<rows;i++){
         for(int j=0;j<cols;j++){
-            this->range_blocks.set(i, j, Block(this->image_pixels, i*this->RBD, j*this->RBD,this->RBD,this->RBD));
+            this->range_blocks.set(i, j, Block(&this->image_pixels, i*this->RBD, j*this->RBD,this->RBD,this->RBD));
         }
     }
 }
@@ -64,7 +64,7 @@ void GrayBlockCompression::build_reduced_domains(){
         for(int j = 0; j < cols; ++j) {
             Block b = this->domain_blocks.get(i, j);
             Matrix<GrayPixel> reduced_pixels = b.reduce(this->RBD, this->reductionStrategy);
-            Block reduced_block(reduced_pixels, b.x, b.y, this->RBD, this->RBD);
+            Block reduced_block(&reduced_pixels, b.x, b.y, this->RBD, this->RBD);
             this->reduced_domain_blocks.set(i, j, reduced_block);
         }
     }

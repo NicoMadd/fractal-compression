@@ -18,7 +18,7 @@ PGMAImageMetadata loadImage(string imagePath) {
 }
 
 
-PGMAImageMetadata::PGMAImageMetadata(ifstream &ifs) : sr(ifs), pixels(width, height){
+PGMAImageMetadata::PGMAImageMetadata(ifstream &ifs) : sr(ifs), pixels(0, 0){
   readMagicNumber();
   sr.readWhitespace();
 

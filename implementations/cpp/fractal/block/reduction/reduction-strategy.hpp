@@ -8,11 +8,11 @@ using namespace std;
 class ReductionStrategy {
     public:
         virtual ~ReductionStrategy() = default;
-        virtual void reduce(Matrix<GrayPixel>& pixels, int reduceTo);
+        virtual Matrix<GrayPixel> reduce(Matrix<GrayPixel>& pixels, int reduceTo);
 };
 
 
 class MeanReductionStrategy : public ReductionStrategy {
     public:
-        void reduce(Matrix<GrayPixel>& pixels, int reduceTo) override;
+        Matrix<GrayPixel> reduce(Matrix<GrayPixel>& pixels, int reduceTo) override;
 };
