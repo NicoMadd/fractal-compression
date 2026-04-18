@@ -17,9 +17,7 @@ public class GrayPixel extends Pixel {
 
     @Override
     public void addToFile(FileOutputStream fos) throws IOException {
-
         fos.write(Integer.toString(level).getBytes(StandardCharsets.US_ASCII));
-
     }
 
     @Override
