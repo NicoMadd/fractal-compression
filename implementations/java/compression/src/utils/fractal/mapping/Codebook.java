@@ -14,7 +14,7 @@ import implementations.java.compression.src.utils.fractal.transformation.Transfo
 
 public class Codebook {
 
-    /** Subfolder under each stem’s {@code processes/<stem>/} where {@code codebook_r{r}_d{d}.fc} files live. */
+    /** Subfolder under each stem’s {@code processes/java/<stem>/} where {@code codebook_r{r}_d{d}.fc} files live. */
     public static final String CODEBOOKS_SUBDIR = "codebooks";
 
     private int rangeSize;
@@ -61,7 +61,7 @@ public class Codebook {
     }
 
     /**
-     * Canonical on-disk path for this range/domain geometry under a stem’s {@code processes/<stem>/} folder
+     * Canonical on-disk path for this range/domain geometry under a stem’s {@code processes/java/<stem>/} folder
      * ({@link #CODEBOOKS_SUBDIR} subdirectory).
      */
     public static Path pathForGeometry(Path runDir, int rangeSize, int domainSize) {
