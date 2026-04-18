@@ -6,25 +6,22 @@ using namespace std;
 
 Matrix<GrayPixel>* MeanReductionStrategy::reduce(Matrix<GrayPixel>* pixels, int reduceTo) {
 
-    int rows = pixels->getRows();
-    int cols = pixels->getCols();
-    Matrix<GrayPixel>* reduced = new Matrix<GrayPixel>(rows / reduceTo, cols / reduceTo);
-    Matrix<float> avgKernel = this->avgKernel(reduceTo);
+    int reduceRatio = pixels->getRows() / reduceTo;
+    Matrix<GrayPixel>* reduced = new Matrix<GrayPixel>(reduceTo, reduceTo);
+    Matrix<float> avgKernel = this->avgKernel(reduceRatio);
 
-    for(int i = 0; i < rows; i += reduceTo) {
-        for(int j = 0; j < cols; j += reduceTo) {
-            Matrix<GrayPixel> innerPixels(reduceTo, reduceTo);
-            for(int ii = 0; ii < reduceTo; ii++) {
-                for(int jj = 0; jj < reduceTo; jj++) {
-                    innerPixels.set(ii, jj, pixels->get(i + ii, j + jj));
-                }
-            }
+    for (int ri = 0; ri < reduceTo; ri++) {
+        for (int rj = 0; rj < reduceTo; rj++) {
+            int offI = ri * reduceRatio;
+            int offJ = rj * reduceRatio;
+            Matrix<GrayPixel> innerPixels(reduceRatio, reduceRatio);
+            copySquare(pixels, &innerPixels, offI, offJ, reduceRatio);
 
             Matrix<float> floatInnerPixels = floatMap<GrayPixel>(innerPixels, [](const GrayPixel& pixel) -> float {
                 return pixel.level;
             });
             float value = dotProduct(floatInnerPixels, avgKernel);
-            reduced->set(i / reduceTo, j / reduceTo, GrayPixel(value));
+            reduced->set(ri, rj, GrayPixel(value));
         }
     }
     return reduced;

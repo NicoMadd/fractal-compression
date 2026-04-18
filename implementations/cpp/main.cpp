@@ -6,6 +6,7 @@
 #include "pipeline/pipeline.hpp"
 #include "algorithms/gray-block-compression.hpp"
 #include "utils/run_logging.hpp"
+#include "utils/paths.hpp"
 
 using namespace std;
 
@@ -46,9 +47,13 @@ int main(int argc, const char* argv[]){
     PGMAImageMetadata metadata = loadImage(params.imagePath);
     cout << "Loaded PGM: " << metadata.width << "x" << metadata.height << '\n';
 
+    string runDir = file_paths::cppProcessRunDir(params.imagePath);
+    file_paths::ensureDirectoryExists(runDir);
+    cout << "Process output directory: " << runDir << '\n';
+
     GrayBlockCompression gbc = GrayBlockCompression(8,16,1, new MeanReductionStrategy());
 
-    PGMAPipeline pipeline = PGMAPipeline(metadata, gbc);
+    PGMAPipeline pipeline = PGMAPipeline(metadata, gbc, runDir);
     pipeline.run();
 
  

@@ -3,7 +3,6 @@
 #include <fstream>
 #include "../utils/utils.hpp"
 #include "../files/writers/sequence-writer.hpp"
-#include "../files/writers/sequence-output.hpp"
 #include <iostream>
 
 PGMAImageMetadata loadImage(string imagePath) {
@@ -68,26 +67,27 @@ void PGMAImageMetadata::save(string path){
 
 
 
-  SequenceOutput* so = new SequenceWriter(path+".pgm");
-  so->write("P2");
-  so->bl();
-  so->write(this->width);
-  so->space();
-  so->write(this->height);
-  so->bl();
-  so->write(this->maxVal);
-  so->bl();
+  SequenceWriter so(path+".pgm");
+  so.write("P2");
+  so.bl();
+  so.write(this->width);
+  so.space();
+  so.write(this->height);
+  so.bl();
+  so.write(this->maxVal);
+  so.bl();
 
   for(int i=0;i<this->height;i++){
     for(int j=0;j<this->width;j++){
-      so->write(this->pixels->get(i, j).level);
-      so->space();
+      so.write(this->pixels->get(i, j).level);
+      so.space();  
     }
   }
 }
 
 void pgma::save(Matrix<GrayPixel> pixels, string path){
-  PGMAImageMetadata metadata(pixels.getRows(), pixels.getCols(), 255, &pixels);
-  
+  // width = columns, height = rows (matches Java PGMAImageMetadata(cols, rows, ...))
+  PGMAImageMetadata metadata(pixels.getCols(), pixels.getRows(), 255, &pixels);
+
   metadata.save(path);
 }

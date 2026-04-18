@@ -10,13 +10,16 @@
 #include "../fractal/mapping/codebook.hpp"
 #include "../fractal/mapping/fractal-mapping.hpp"
 
+#include <filesystem>
+
 namespace {
   double fmtMs(double seconds) {
       return seconds * 1000.0;
   }
 }
 
-PGMAPipeline::PGMAPipeline(PGMAImageMetadata& metadata, GrayBlockCompression& gbc) : metadata(metadata), gbc(gbc) {
+PGMAPipeline::PGMAPipeline(PGMAImageMetadata& metadata, GrayBlockCompression& gbc, std::string runDir)
+    : metadata(metadata), gbc(gbc), runDir(std::move(runDir)) {
 }
 
 void PGMAPipeline::run() {
@@ -26,13 +29,15 @@ void PGMAPipeline::run() {
 
   time_util::Stopwatch codebook_sw;
   Codebook codebook(gbc.rangeSize(), gbc.domainSize(), fractalMappings);
-  codebook.save("codebook.fc");
+  const std::filesystem::path codebookPath = std::filesystem::path(runDir) / "codebook.fc";
+  codebook.save(codebookPath.string());
   const double codebook_seconds = codebook_sw.elapsed_seconds();
 
   std::cout << std::fixed << std::setprecision(2);
   std::cout << "--- Summary ---\n";
   std::cout << "Compression: " << fmtMs(compression_seconds) << " ms\n";
   std::cout << "Codebook save: " << fmtMs(codebook_seconds) << " ms\n";
+  std::cout << "Codebook: " << codebookPath.string() << '\n';
   std::cout << "Range mappings: " << fractalMappings.size() << '\n';
 
   this->decompress(fractalMappings);
@@ -99,15 +104,16 @@ void PGMAPipeline::decompress(std::vector<FractalMapping> fractalMappings) {
         }
       }
 
-      std::string path = "next_" + std::to_string(iter);
+      const std::filesystem::path nextPath = std::filesystem::path(runDir) / ("next_" + std::to_string(iter));
 
-      pgma::save(next, path);
-      run_logging::debug("Decompression wrote intermediate " + path + ".pgm");
+      pgma::save(next, nextPath.string());
+      run_logging::debug("Decompression wrote intermediate " + nextPath.string() + ".pgm");
       swap(img, next);
     }
 
-    pgma::save(img, "final");
-    run_logging::debug("Decompression wrote final.pgm");
+    const std::filesystem::path finalBase = std::filesystem::path(runDir) / "final";
+    pgma::save(img, finalBase.string());
+    run_logging::debug("Decompression wrote " + finalBase.string() + ".pgm");
 
     const double decompress_seconds = decompress_sw.elapsed_seconds();
 
@@ -116,5 +122,5 @@ void PGMAPipeline::decompress(std::vector<FractalMapping> fractalMappings) {
     std::cout << "Time: " << fmtMs(decompress_seconds) << " ms\n";
     std::cout << "Iterations: " << kDecompressionIterations << '\n';
     std::cout << "Range mappings: " << fractalMappings.size() << '\n';
-    std::cout << "Output: final.pgm\n";
+    std::cout << "Output: " << (std::filesystem::path(runDir) / "final.pgm").string() << '\n';
 }

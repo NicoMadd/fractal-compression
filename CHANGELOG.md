@@ -14,7 +14,14 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Changed
 
+- **C++ pipeline:** writes **`codebook.fc`**, **`next_*`**, and **`final.pgm`** under **`processes/cpp/<image-stem>/`** (cwd **`implementations/cpp`**); P2 save uses **width = columns, height = rows** to match Java.
 - **Codebook path:** per-geometry **`codebook_r{r}_d{d}.fc`** now lives under **`processes/<stem>/codebooks/`** (see **`Codebook.CODEBOOKS_SUBDIR`** / **`Codebook.pathForGeometry`**).
+
+### Fixed
+
+- **C++ PGMA save:** **`SequenceWriter`** is stack-scoped in **`PGMAImageMetadata::save`** so the stream is flushed/closed (avoids truncated P2 bodies from a leaked writer).
+- **C++ fractal blocks:** **`Block::get` / `mean`** use **`(x,y)`** offsets into the full image for range/domain views, and **local indices** when **`pixels`** is exactly **`height×width`** (reduced-domain matrices); **`Block::reduce`** copies the domain tile before **`MeanReductionStrategy::reduce`**.
+- **C++ mean reduction:** **`MeanReductionStrategy::reduce`** matches Java’s **`reduceRatio`** tiling and output size; tile extraction uses **`copySquare`**.
 
 ## [0.5.0] - 2026-04-09 — concurrent pipeline & benchmark matrices (`feature/5-concurrent-pipeline`)
 
