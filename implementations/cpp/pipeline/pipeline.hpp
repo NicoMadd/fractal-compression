@@ -1,10 +1,9 @@
 #pragma once
 
-#include "../image/metadata.hpp"
 #include "../algorithms/gray-block-compression.hpp"
+#include "../image/metadata.hpp"
 #include <vector>
 
-using namespace std;
 class PGMAPipeline {
   public:
     PGMAPipeline(PGMAImageMetadata& metadata, GrayBlockCompression& gbc);
@@ -12,6 +11,6 @@ class PGMAPipeline {
   private:
     PGMAImageMetadata metadata;
     GrayBlockCompression gbc;
-    vector<FractalMapping> compress();
+    std::vector<FractalMapping> compress();
     void decompress();
 };

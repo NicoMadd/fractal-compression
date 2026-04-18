@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../pixel/pixel.hpp"
-#include "./sequence-reader.hpp"
+#include "../files/readers/sequence-reader.hpp"
 #include "../utils/matrix.hpp"
 
 using namespace std;
