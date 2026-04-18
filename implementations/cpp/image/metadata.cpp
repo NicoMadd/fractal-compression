@@ -2,6 +2,8 @@
 
 #include <fstream>
 #include "../utils/utils.hpp"
+#include "../files/writers/sequence-writer.hpp"
+#include "../files/writers/sequence-output.hpp"
 #include <iostream>
 
 PGMAImageMetadata loadImage(string imagePath) {
@@ -18,11 +20,13 @@ PGMAImageMetadata loadImage(string imagePath) {
 }
 
 
-PGMAImageMetadata::PGMAImageMetadata(ifstream &ifs) : sr(ifs) {
-  readMagicNumber();
+PGMAImageMetadata::PGMAImageMetadata(ifstream &ifs) {
+
+  SequenceReader sr(ifs);
+  readMagicNumber(sr);
   sr.readWhitespace();
 
-  skipComment();
+  skipComment(sr);
 
   this->width = sr.readNextInt();
   this->height = sr.readNextInt();
@@ -34,28 +38,56 @@ PGMAImageMetadata::PGMAImageMetadata(ifstream &ifs) : sr(ifs) {
 
   for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
-          readPixel(i,j);
+          readPixel(sr, i,j);
       }
   }  
 }
 
-void PGMAImageMetadata::readPixel(int i, int j){
+void PGMAImageMetadata::readPixel(SequenceReader &sr, int x, int y){
   int level = sr.readNextInt();
 
   GrayPixel gp = GrayPixel(level);
-  this->pixels->set(i, j, gp);
+  this->pixels->set(x, y, gp);
 
 }
 
-void PGMAImageMetadata::readMagicNumber(){
+void PGMAImageMetadata::readMagicNumber(SequenceReader &sr){
   vector<char> magicNumber = sr.read(2);
 
   // TODO validate equals
   print(magicNumber);
 }
 
-void PGMAImageMetadata::skipComment(){
+void PGMAImageMetadata::skipComment(SequenceReader &sr){
   if(sr.nextCharIs('#')){
     sr.skipUntilLineBreak();
   }
+}
+
+void PGMAImageMetadata::save(string path){
+
+
+
+  SequenceOutput* so = new SequenceWriter(path+".pgm");
+  so->write("P2");
+  so->bl();
+  so->write(this->width);
+  so->space();
+  so->write(this->height);
+  so->bl();
+  so->write(this->maxVal);
+  so->bl();
+
+  for(int i=0;i<this->height;i++){
+    for(int j=0;j<this->width;j++){
+      so->write(this->pixels->get(i, j).level);
+      so->space();
+    }
+  }
+}
+
+void pgma::save(Matrix<GrayPixel> pixels, string path){
+  PGMAImageMetadata metadata(pixels.getRows(), pixels.getCols(), 255, &pixels);
+  
+  metadata.save(path);
 }

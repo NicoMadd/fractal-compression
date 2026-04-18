@@ -1,11 +1,14 @@
 #include "pipeline.hpp"
 
-#include <chrono>
 #include <iomanip>
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include "../utils/run_logging.hpp"
+#include "../utils/time.hpp"
+#include "../fractal/mapping/codebook.hpp"
+#include "../fractal/mapping/fractal-mapping.hpp"
 
 namespace {
   double fmtMs(double seconds) {
@@ -17,27 +20,22 @@ PGMAPipeline::PGMAPipeline(PGMAImageMetadata& metadata, GrayBlockCompression& gb
 }
 
 void PGMAPipeline::run() {
-  const std::chrono::steady_clock::time_point compression_start =
-      std::chrono::steady_clock::now();
+  time_util::Stopwatch compression_sw;
   std::vector<FractalMapping> fractalMappings = this->compress();
-  const std::chrono::steady_clock::time_point compression_end =
-      std::chrono::steady_clock::now();
-  const std::chrono::steady_clock::duration elapsed = compression_end - compression_start;
-  const std::chrono::nanoseconds elapsed_ns =
-      std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
-  const double compression_seconds = static_cast<double>(elapsed_ns.count()) * 1e-9;
+  const double compression_seconds = compression_sw.elapsed_seconds();
+
+  time_util::Stopwatch codebook_sw;
+  Codebook codebook(gbc.rangeSize(), gbc.domainSize(), fractalMappings);
+  codebook.save("codebook.fc");
+  const double codebook_seconds = codebook_sw.elapsed_seconds();
 
   std::cout << std::fixed << std::setprecision(2);
   std::cout << "--- Summary ---\n";
   std::cout << "Compression: " << fmtMs(compression_seconds) << " ms\n";
+  std::cout << "Codebook save: " << fmtMs(codebook_seconds) << " ms\n";
   std::cout << "Range mappings: " << fractalMappings.size() << '\n';
 
-  if (run_logging::is_debug() && !fractalMappings.empty()) {
-    FractalMapping& fm = fractalMappings[0];
-    std::cout << "First mapping (sample): range (" << fm.range_x << "," << fm.range_y << ") domain ("
-              << fm.domain_x << "," << fm.domain_y << ") s=" << fm.s << " o=" << fm.o << '\n';
-  }
-
+  this->decompress(fractalMappings);
 }
 
 std::vector<FractalMapping> PGMAPipeline::compress() {
@@ -45,6 +43,78 @@ std::vector<FractalMapping> PGMAPipeline::compress() {
 
 }
 
-void PGMAPipeline::decompress() {
-    run_logging::debug("Starting decompression");
+void PGMAPipeline::decompress(std::vector<FractalMapping> fractalMappings) {
+    constexpr int kDecompressionIterations = 10;
+
+    run_logging::debug(
+        "Decompression start: image " + std::to_string(metadata.width) + "x" +
+        std::to_string(metadata.height) + ", " + std::to_string(fractalMappings.size()) +
+        " mappings, " + std::to_string(kDecompressionIterations) + " iterations");
+
+    time_util::Stopwatch decompress_sw;
+
+    Matrix<GrayPixel> img;
+    Matrix<GrayPixel> next;
+
+    img.resize(metadata.height, metadata.width);
+    next.resize(metadata.height, metadata.width);
+
+    fill(img, []{return randomGrayPixel();});
+    fill(next, []{return randomGrayPixel();});
+
+    run_logging::debug("Decompression: initialized noise buffers");
+
+    for (int iter = 0; iter < kDecompressionIterations; iter++) {
+      run_logging::debug("Decompression iteration " + std::to_string(iter + 1) + "/" +
+                         std::to_string(kDecompressionIterations));
+
+      for (size_t mi = 0; mi < fractalMappings.size(); mi++) {
+
+        FractalMapping mapping = fractalMappings[mi];
+
+        Matrix<GrayPixel> domainPixels; 
+        domainPixels.resize(gbc.domainSize(), gbc.domainSize());
+
+        copySquare(&img, &domainPixels, mapping.domain_x, mapping.domain_y, gbc.domainSize());
+
+        Matrix<GrayPixel> newRangePixels = Matrix<GrayPixel>(gbc.rangeSize(),gbc.rangeSize());
+
+        ReductionStrategy* rs = gbc.getReductionStrategy();
+
+        Matrix<GrayPixel>* reducedDomain = rs->reduce(&domainPixels, gbc.rangeSize());
+
+        float s = mapping.s;
+        float o = mapping.o;
+
+        for(int i=0;i<reducedDomain->getRows();i++){
+          for(int j=0;j<reducedDomain->getCols();j++){
+            GrayPixel gp = reducedDomain->get(i, j);
+
+            int newLevel = s * gp.level + o;
+
+            GrayPixel newGrayPixel = GrayPixel(newLevel);
+
+            next.set(mapping.range_x+i, mapping.range_y+j, newGrayPixel);
+          }
+        }
+      }
+
+      std::string path = "next_" + std::to_string(iter);
+
+      pgma::save(next, path);
+      run_logging::debug("Decompression wrote intermediate " + path + ".pgm");
+      swap(img, next);
+    }
+
+    pgma::save(img, "final");
+    run_logging::debug("Decompression wrote final.pgm");
+
+    const double decompress_seconds = decompress_sw.elapsed_seconds();
+
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "--- Decompression ---\n";
+    std::cout << "Time: " << fmtMs(decompress_seconds) << " ms\n";
+    std::cout << "Iterations: " << kDecompressionIterations << '\n';
+    std::cout << "Range mappings: " << fractalMappings.size() << '\n';
+    std::cout << "Output: final.pgm\n";
 }

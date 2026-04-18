@@ -20,6 +20,10 @@ int GrayBlockCompression::domainSize() {
     return this->DBD;
 }
 
+ReductionStrategy* GrayBlockCompression::getReductionStrategy(){
+    return this->reductionStrategy;
+}
+
 vector<FractalMapping> GrayBlockCompression::compress(PGMAImageMetadata metadata) {
 
     this->image_height = metadata.height;

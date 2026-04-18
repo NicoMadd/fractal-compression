@@ -46,7 +46,7 @@ int main(int argc, const char* argv[]){
     PGMAImageMetadata metadata = loadImage(params.imagePath);
     cout << "Loaded PGM: " << metadata.width << "x" << metadata.height << '\n';
 
-    GrayBlockCompression gbc = GrayBlockCompression(4,8,1, new MeanReductionStrategy());
+    GrayBlockCompression gbc = GrayBlockCompression(8,16,1, new MeanReductionStrategy());
 
     PGMAPipeline pipeline = PGMAPipeline(metadata, gbc);
     pipeline.run();

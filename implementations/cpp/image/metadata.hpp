@@ -16,15 +16,18 @@ class PGMAImageMetadata
     Matrix<GrayPixel>* pixels = nullptr;
 
     PGMAImageMetadata(ifstream &ifs);
-  
+    PGMAImageMetadata(int width, int height, int maxVal, Matrix<GrayPixel>* pixels) : width(width), height(height), maxVal(maxVal), pixels(pixels){}
+    void save(string path);
   
   private:
-
-    SequenceReader sr;
-
-    void readMagicNumber();
-    void skipComment();
-    void readPixel(int i, int j);
+    void readMagicNumber(SequenceReader &sr);
+    void skipComment(SequenceReader &sr);
+    void readPixel(SequenceReader &sr, int x, int y);
 };
 
 PGMAImageMetadata loadImage(string imagePath);
+
+
+namespace pgma{
+  void save(Matrix<GrayPixel> pixels, string path);
+};

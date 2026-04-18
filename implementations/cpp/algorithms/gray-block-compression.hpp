@@ -15,6 +15,7 @@ class GrayBlockCompression {
     vector<FractalMapping> compress(PGMAImageMetadata metadata);
     int rangeSize();
     int domainSize();
+    ReductionStrategy* getReductionStrategy();
 
   private:
     // RANGE BLOCK DIMENSION

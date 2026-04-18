@@ -10,3 +10,6 @@ class GrayPixel {
         GrayPixel(int level);
 
 };
+
+
+GrayPixel randomGrayPixel();
