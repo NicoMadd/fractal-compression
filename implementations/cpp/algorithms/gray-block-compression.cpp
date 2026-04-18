@@ -12,6 +12,14 @@ using namespace std;
 GrayBlockCompression::GrayBlockCompression(int rbd, int dbd, int parallelism, ReductionStrategy* rs) : RBD(rbd), DBD(dbd), parallelism(parallelism), reductionStrategy(rs) {
 }
 
+int GrayBlockCompression::rangeSize() {
+    return this->RBD;
+}
+
+int GrayBlockCompression::domainSize() {
+    return this->DBD;
+}
+
 vector<FractalMapping> GrayBlockCompression::compress(PGMAImageMetadata metadata) {
 
     this->image_height = metadata.height;
