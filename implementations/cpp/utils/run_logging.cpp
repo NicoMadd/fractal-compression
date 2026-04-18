@@ -22,4 +22,8 @@ void debug(const std::string& message) {
     }
 }
 
+void error(const std::string& message) {
+    std::cerr << "error: " << message << '\n';
+}
+
 }  // namespace run_logging

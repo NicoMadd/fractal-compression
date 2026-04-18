@@ -8,6 +8,10 @@ using namespace std;
 
 SequenceWriter::SequenceWriter(string path) : out(ofstream(path)) {}
 
+bool SequenceWriter::ok() const {
+    return out.is_open();
+}
+
 SequenceWriter::~SequenceWriter() {
     out.flush();
     out.close();

@@ -11,9 +11,12 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 - **`--debug`:** verbose stdout (phase/progress logs). Default is **summary-only** (`--- Summary ---` with timings, ratio, metrics, output paths).
 - **Benchmark manifest / summary:** **`ratio_original_over_zip_codebook`** (`bytes_original_input / zip_bytes_codebook`) and a second **compression ratio** line vs zipped codebook on stdout.
+- **C++ decode metrics:** **`image/error_metrics.hpp`** (MSE / MAE / PSNR vs original, aligned with Java **`PGMAUtils` / `ErrorUtils`**); per-iteration lines on stdout; **`processes/cpp/<stem>/iterations/benchmark.csv`** with the same columns as Java’s **`Iteration`** record.
+- **C++ I/O errors:** **`run_logging::error`** (stderr); **`SequenceWriter::ok()`**; open/create failures for input PGM, PGM/codebook writes, and **`ensureDirectoryExists`**; **`main`** wraps the run in **`try/catch`** for **`std::exception`**.
 
 ### Changed
 
+- **C++ decode:** reconstructed gray is **clamped to [0, 255]** before write (same idea as Java **`Decompressor`**).
 - **C++ pipeline:** writes **`codebook.fc`**, **`next_*`**, and **`final.pgm`** under **`processes/cpp/<image-stem>/`** (cwd **`implementations/cpp`**); P2 save uses **width = columns, height = rows** to match Java.
 - **Codebook path:** per-geometry **`codebook_r{r}_d{d}.fc`** now lives under **`processes/<stem>/codebooks/`** (see **`Codebook.CODEBOOKS_SUBDIR`** / **`Codebook.pathForGeometry`**).
 

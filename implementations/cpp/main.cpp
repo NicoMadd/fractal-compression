@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <string>
 #include "fractal/block/reduction/reduction-strategy.hpp"
@@ -39,22 +40,27 @@ PipelineParams validateParams(int argc, const char* argv[]){
 
 int main(int argc, const char* argv[]){
 
-    PipelineParams params = validateParams(argc, argv);
-    run_logging::set_debug(params.debug);
+    try {
+        PipelineParams params = validateParams(argc, argv);
+        run_logging::set_debug(params.debug);
 
-    cout << "Image path: " << params.imagePath << '\n';
+        cout << "Image path: " << params.imagePath << '\n';
 
-    PGMAImageMetadata metadata = loadImage(params.imagePath);
-    cout << "Loaded PGM: " << metadata.width << "x" << metadata.height << '\n';
+        PGMAImageMetadata metadata = loadImage(params.imagePath);
+        cout << "Loaded PGM: " << metadata.width << "x" << metadata.height << '\n';
 
-    string runDir = file_paths::cppProcessRunDir(params.imagePath);
-    file_paths::ensureDirectoryExists(runDir);
-    cout << "Process output directory: " << runDir << '\n';
+        string runDir = file_paths::cppProcessRunDir(params.imagePath);
+        file_paths::ensureDirectoryExists(runDir);
+        cout << "Process output directory: " << runDir << '\n';
 
-    GrayBlockCompression gbc = GrayBlockCompression(8,16,1, new MeanReductionStrategy());
+        GrayBlockCompression gbc = GrayBlockCompression(8,16,1, new MeanReductionStrategy());
 
-    PGMAPipeline pipeline = PGMAPipeline(metadata, gbc, runDir);
-    pipeline.run();
+        PGMAPipeline pipeline = PGMAPipeline(metadata, gbc, runDir);
+        pipeline.run();
+    } catch (const std::exception& e) {
+        run_logging::error(e.what());
+        return 1;
+    }
 
  
 
@@ -71,4 +77,6 @@ int main(int argc, const char* argv[]){
     // iterate n times
 
     // calculate errors
+
+    return 0;
 }

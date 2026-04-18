@@ -1,9 +1,10 @@
 #include "codebook.hpp"
 
-#include <fstream>
-#include <ios>
+#include <cstdlib>
 #include <string>
 #include <vector>
+
+#include "../../utils/run_logging.hpp"
 #include "fractal-mapping.hpp"
 
 #include "../../files/writers/sequence-writer.hpp"
@@ -17,6 +18,10 @@ Codebook::Codebook(int rangeSize, int domainSize, vector<FractalMapping> mapping
 
 void Codebook::save(string path) {
     SequenceWriter writer(path);
+    if (!writer.ok()) {
+        run_logging::error("could not open for write: " + path);
+        std::exit(1);
+    }
     serialize(writer);
 }
 

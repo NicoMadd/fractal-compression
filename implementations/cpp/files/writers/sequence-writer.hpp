@@ -11,6 +11,7 @@ class SequenceWriter : public SequenceOutput {
     public:
         SequenceWriter(string path);
         ~SequenceWriter();
+        bool ok() const;
         void write(char c) override;
         void write(string text) override;
         void write(short number) override;

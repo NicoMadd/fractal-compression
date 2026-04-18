@@ -1,13 +1,19 @@
 #include "metadata.hpp"
 
+#include <cstdlib>
 #include <fstream>
 #include "../utils/utils.hpp"
+#include "../utils/run_logging.hpp"
 #include "../files/writers/sequence-writer.hpp"
-#include <iostream>
+#include <string>
 
 PGMAImageMetadata loadImage(string imagePath) {
 
   ifstream file(imagePath);
+  if (!file.is_open()) {
+    run_logging::error("could not open image: " + imagePath);
+    std::exit(1);
+  }
 
   PGMAImageMetadata metadata = PGMAImageMetadata(file);
 
@@ -68,6 +74,10 @@ void PGMAImageMetadata::save(string path){
 
 
   SequenceWriter so(path+".pgm");
+  if (!so.ok()) {
+    run_logging::error("could not open for write: " + path + ".pgm");
+    std::exit(1);
+  }
   so.write("P2");
   so.bl();
   so.write(this->width);

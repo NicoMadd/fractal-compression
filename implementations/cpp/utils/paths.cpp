@@ -1,6 +1,10 @@
 #include "paths.hpp"
 
+#include <cstdlib>
 #include <filesystem>
+#include <system_error>
+
+#include "run_logging.hpp"
 
 namespace file_paths {
 
@@ -13,7 +17,12 @@ std::string cppProcessRunDir(const std::string& imagePath) {
 }
 
 void ensureDirectoryExists(const std::string& dirPath) {
-  std::filesystem::create_directories(dirPath);
+  std::error_code ec;
+  std::filesystem::create_directories(dirPath, ec);
+  if (ec) {
+    run_logging::error("could not create directory " + dirPath + ": " + ec.message());
+    std::exit(1);
+  }
 }
 
 }  // namespace file_paths
