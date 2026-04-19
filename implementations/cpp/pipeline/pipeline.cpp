@@ -53,7 +53,6 @@ void PGMAPipeline::run() {
   std::cout << "Range mappings: " << fractalMappings->size() << '\n';
 
   this->decompress(fractalMappings);
-  delete fractalMappings;
 }
 
 std::vector<FractalMapping>* PGMAPipeline::compress() {

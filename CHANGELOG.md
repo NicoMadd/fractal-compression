@@ -18,7 +18,7 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Changed
 
-- **C++ pipeline / codebook:** fractal mappings flow as **`vector<FractalMapping>*`** from **`GrayBlockCompression::compress`** through **`PGMAPipeline`**; **`Codebook`** copies from that pointer; decompression iteration paths use **`file_paths::ensureDirectoryExists`** and string paths (replacing **`std::filesystem`** for these outputs).
+- **C++ pipeline / codebook:** fractal mappings flow as **`vector<FractalMapping>*`** from **`GrayBlockCompression::compress`** through **`PGMAPipeline`**; **`Codebook`** copies from that pointer; **`PGMAPipeline::run`** **`delete`s** the vector after decompress; decompression iteration paths use **`file_paths::ensureDirectoryExists`** and string paths (replacing **`std::filesystem`** for these outputs).
 - **C++ decode:** reconstructed gray is **clamped to [0, 255]** before write (same idea as Java **`Decompressor`**).
 - **C++ pipeline:** writes **`codebook.fc`**, **`next_*`**, and **`final.pgm`** under **`processes/cpp/<image-stem>/`** (cwd **`implementations/cpp`**); P2 save uses **width = columns, height = rows** to match Java.
 - **Codebook path:** per-geometry **`codebook_r{r}_d{d}.fc`** now lives under **`processes/<stem>/codebooks/`** (see **`Codebook.CODEBOOKS_SUBDIR`** / **`Codebook.pathForGeometry`**).

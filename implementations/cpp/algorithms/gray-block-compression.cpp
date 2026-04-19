@@ -3,11 +3,11 @@
 #include <cfloat>
 #include <algorithm>
 #include <iomanip>
-#include <locale>
 #include <sstream>
 #include <vector>
 #include "../utils/run_logging.hpp"
 #include "../fractal/block/block.hpp"
+#include "../fractal/block/compressed.hpp"
 
 using namespace std;
 
@@ -139,10 +139,9 @@ vector<FractalMapping>* GrayBlockCompression::build_fractal_mappings(){
 
 
             float min_error = FLT_MAX;
+            CompressedBlock* best_compressed_block = nullptr;
             int win_di = -1;
             int win_dj = -1;
-            float best_s = 0.f;
-            float best_o = 0.f;
 
             for(int i = 0; i < this->reduced_domain_blocks.getRows(); i++){
                 for(int j = 0; j < this->reduced_domain_blocks.getCols(); j++){
@@ -166,22 +165,25 @@ vector<FractalMapping>* GrayBlockCompression::build_fractal_mappings(){
                         min_error = error;
                         win_di = i;
                         win_dj = j;
-                        best_s = s;
-                        best_o = o;
+                        if(best_compressed_block != nullptr){
+                            delete best_compressed_block;
+                        }
+                        Block* new_domain_block = new Block(reduced_domain_block);
+                        best_compressed_block = new CompressedBlock(&range_block, new_domain_block, s, o);
                     }
                 }
             }
+            
 
-            Block win_rd = this->reduced_domain_blocks.get(win_di, win_dj);
-            fractal_mappings->push_back(
-                FractalMapping(range_block.x, range_block.y, win_rd.x, win_rd.y, best_s, best_o));
-            const float s_win = best_s;
-            const float o_win = best_o;
+            fractal_mappings->push_back(FractalMapping(range_block.x, range_block.y, best_compressed_block->domain->x, best_compressed_block->domain->y, best_compressed_block->s, best_compressed_block->o));
+            const float s_win = best_compressed_block->s;
+            const float o_win = best_compressed_block->o;
             sum_s += s_win;
             min_s_agg = min(min_s_agg, s_win);
             max_s_agg = max(max_s_agg, s_win);
 
             if (run_logging::is_debug() && done < 4 && win_di >= 0) {
+                Block win_rd = this->reduced_domain_blocks.get(win_di, win_dj);
                 const float mean_d_win = win_rd.mean();
                 float ls_num = 0;
                 float ls_den = 0;
@@ -189,13 +191,16 @@ vector<FractalMapping>* GrayBlockCompression::build_fractal_mappings(){
                 run_logging::debug(
                     "build_fractal_mappings: range #" + to_string(done) + " at (" + to_string(range_block.x) + ","
                     + to_string(range_block.y) + ") mean_r=" + fmt_f(mean_r, 4) + " -> best domain grid (" + to_string(win_di)
-                    + "," + to_string(win_dj) + ") image origin (" + to_string(win_rd.x) + ","
-                    + to_string(win_rd.y) + ") mean_d=" + fmt_f(win_rd.mean(), 4));
+                    + "," + to_string(win_dj) + ") image origin (" + to_string(best_compressed_block->domain->x) + ","
+                    + to_string(best_compressed_block->domain->y) + ") mean_d=" + fmt_f(win_rd.mean(), 4));
                 run_logging::debug(
                     "  LS: numerator=" + fmt_f(ls_num, 6) + " denominator=" + fmt_f(ls_den, 6) + " mean_d=" + fmt_f(mean_d_win, 4)
                     + " s=" + fmt_f(s_win, 6) + " o=" + fmt_f(o_win, 6)
                     + " mse_fit=" + fmt_f(min_error / static_cast<float>(RBD * RBD), 6));
             }
+
+            delete best_compressed_block;
+            best_compressed_block = nullptr;
 
             done++;
             if (done == 1 || done == total_ranges || done % step == 0) {
