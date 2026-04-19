@@ -5,14 +5,18 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 class PGMAPipeline {
   public:
-    PGMAPipeline(PGMAImageMetadata& metadata, GrayBlockCompression& gbc, std::string runDir);
+    PGMAPipeline(PGMAImageMetadata& metadata, GrayBlockCompression& gbc, string runDir,
+                 int decompressionIterations);
     void run();
   private:
     PGMAImageMetadata metadata;
     GrayBlockCompression gbc;
-    std::string runDir;
-    std::vector<FractalMapping>* compress();
-    void decompress(std::vector<FractalMapping>* fractalMappings);
+    string runDir;
+    int decompressionIterations;
+    vector<FractalMapping>* compress();
+    void decompress(vector<FractalMapping>* fractalMappings);
 };

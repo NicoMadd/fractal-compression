@@ -9,6 +9,7 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Added
 
+- **C++ CLI (aligned with Java `PipelineParams`):** **`<image.pgm> <iterations> [<range> [<domain>]]`**; **`-r` / `-d`** override positional range/domain; default range **4**, domain **2× range**; **`PGMAPipeline`** takes the iteration count and runs the decode loop **`iter <= iterations`** like Java **`PGMAPipeline`** (same iteration parameter semantics).
 - **C++ compression debug:** optional least-squares numerator/denominator outputs on **`calculate_s`**; debug logs for reduced-domain grid sample, **`MeanReductionStrategy::reduce`** shape (first call), first few range→domain matches (with per-fit MSE), and aggregate **`s`** / zero-denominator statistics.
 - **C++ `run.sh`:** incremental compile — skip **`g++`** when **`main.exe`** is newer than all **`*.cpp`** sources; **`--fc`** or **`FORCE_COMPILE=1`** forces a rebuild; **`--fc`** is not passed through to **`main.exe`**.
 - **`--debug`:** verbose stdout (phase/progress logs). Default is **summary-only** (`--- Summary ---` with timings, ratio, metrics, output paths).
@@ -18,6 +19,8 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Changed
 
+- **C++ `main`:** CLI parsing moved to **`PipelineParams`** (**`pipeline/pipeline-params.hpp`**, **`pipeline-params.cpp`**) — **`parse`** returns **`std::optional`**; **`printUsage`** for the usage banner.
+- **Cursor rules:** default workflow documented — notable changes include **`CHANGELOG.md`** updates; **no automatic git commits** unless the user explicitly requests a commit.
 - **C++ pipeline / codebook:** fractal mappings flow as **`vector<FractalMapping>*`** from **`GrayBlockCompression::compress`** through **`PGMAPipeline`**; **`Codebook`** copies from that pointer; **`PGMAPipeline::run`** **`delete`s** the vector after decompress; decompression iteration paths use **`file_paths::ensureDirectoryExists`** and string paths (replacing **`std::filesystem`** for these outputs).
 - **C++ decode:** reconstructed gray is **clamped to [0, 255]** before write (same idea as Java **`Decompressor`**).
 - **C++ pipeline:** writes **`codebook.fc`**, **`next_*`**, and **`final.pgm`** under **`processes/cpp/<image-stem>/`** (cwd **`implementations/cpp`**); P2 save uses **width = columns, height = rows** to match Java.
