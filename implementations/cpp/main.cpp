@@ -15,7 +15,7 @@ using namespace std;
 int main(int argc, const char* argv[]) {
 
     try {
-        optional<PipelineParams> parsed = PipelineParams::parse(argc, argv);
+        std::optional<PipelineParams> parsed = PipelineParams::parse(argc, argv);
         if (!parsed.has_value()) {
             return 1;
         }
