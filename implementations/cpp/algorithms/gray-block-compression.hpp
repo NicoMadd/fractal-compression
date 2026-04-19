@@ -12,7 +12,7 @@ using namespace std;
 class GrayBlockCompression {
   public:
     GrayBlockCompression(int rbd, int dbd, int parallelism, ReductionStrategy* rs);
-    vector<FractalMapping> compress(PGMAImageMetadata metadata);
+    vector<FractalMapping>* compress(PGMAImageMetadata metadata);
     int rangeSize();
     int domainSize();
     ReductionStrategy* getReductionStrategy();
@@ -41,8 +41,11 @@ class GrayBlockCompression {
     void build_domains();
     void build_ranges();
     void build_reduced_domains();
-    vector<FractalMapping> build_fractal_mappings();
-    float calculate_s(Block& range_block, Block& reduced_domain_block, float mean_r, float mean_d);
+    vector<FractalMapping>* build_fractal_mappings();
+    /** Optional {@code out_numerator} / {@code out_denominator} for debug (least-squares accumulators). */
+    float calculate_s(Block& range_block, Block& reduced_domain_block, float mean_r, float mean_d,
+                        float* out_numerator = nullptr, float* out_denominator = nullptr,
+                        bool count_zero_denominator = true);
     float calculate_o(float mean_r, float mean_d, float s);
 
 };

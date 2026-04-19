@@ -13,7 +13,7 @@
 using namespace std;
 
 
-Codebook::Codebook(int rangeSize, int domainSize, vector<FractalMapping> mappings) : rangeSize(rangeSize), domainSize(domainSize), mappings(mappings) {}
+Codebook::Codebook(int rangeSize, int domainSize, vector<FractalMapping>* mappings) : rangeSize(rangeSize), domainSize(domainSize), mappings(*mappings) {}
 
 
 void Codebook::save(string path) {

@@ -13,6 +13,6 @@ class PGMAPipeline {
     PGMAImageMetadata metadata;
     GrayBlockCompression gbc;
     std::string runDir;
-    std::vector<FractalMapping> compress();
-    void decompress(std::vector<FractalMapping> mapping);
+    std::vector<FractalMapping>* compress();
+    void decompress(std::vector<FractalMapping>* fractalMappings);
 };

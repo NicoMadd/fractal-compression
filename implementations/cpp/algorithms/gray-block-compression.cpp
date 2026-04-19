@@ -2,12 +2,25 @@
 
 #include <cfloat>
 #include <algorithm>
+#include <iomanip>
+#include <locale>
+#include <sstream>
 #include <vector>
 #include "../utils/run_logging.hpp"
 #include "../fractal/block/block.hpp"
-#include "../fractal/block/compressed.hpp"
 
 using namespace std;
+
+namespace {
+long long g_ls_zero_denominator_pairs = 0;
+
+string fmt_f(float v, int prec) {
+    ostringstream oss;
+    oss.imbue(locale::classic());
+    oss << fixed << setprecision(prec) << v;
+    return oss.str();
+}
+}  // namespace
 
 GrayBlockCompression::GrayBlockCompression(int rbd, int dbd, int parallelism, ReductionStrategy* rs) : RBD(rbd), DBD(dbd), parallelism(parallelism), reductionStrategy(rs) {
 }
@@ -24,7 +37,7 @@ ReductionStrategy* GrayBlockCompression::getReductionStrategy(){
     return this->reductionStrategy;
 }
 
-vector<FractalMapping> GrayBlockCompression::compress(PGMAImageMetadata metadata) {
+vector<FractalMapping>* GrayBlockCompression::compress(PGMAImageMetadata metadata) {
 
     this->image_height = metadata.height;
     this->image_width = metadata.width;
@@ -49,7 +62,7 @@ vector<FractalMapping> GrayBlockCompression::compress(PGMAImageMetadata metadata
             + to_string(domain_count) + " blocks)...");
     this->build_reduced_domains();
     run_logging::debug("Compress: searching best domain + transform per range block...");
-    vector<FractalMapping> fractal_mappings = this->build_fractal_mappings();
+    vector<FractalMapping>* fractal_mappings = this->build_fractal_mappings();
     run_logging::debug("Compression Finished!");
     return fractal_mappings;
 }
@@ -98,16 +111,27 @@ void GrayBlockCompression::build_reduced_domains(){
             this->reduced_domain_blocks.set(i, j, reduced_block);
         }
     }
+
+    if (run_logging::is_debug() && rows > 0 && cols > 0) {
+        Block sample = this->reduced_domain_blocks.get(0, 0);
+        run_logging::debug(
+            "build_reduced_domains: grid " + to_string(rows) + "x" + to_string(cols)
+            + " reduced blocks; sample [0,0] domain origin (" + to_string(sample.x) + "," + to_string(sample.y)
+            + ") mean=" + fmt_f(sample.mean(), 4));
+    }
 }
 
-vector<FractalMapping> GrayBlockCompression::build_fractal_mappings(){
+vector<FractalMapping>* GrayBlockCompression::build_fractal_mappings(){
 
 
-    vector<FractalMapping> fractal_mappings;
+    vector<FractalMapping>* fractal_mappings = new vector<FractalMapping>();
 
     int total_ranges = this->range_blocks.getRows() * this->range_blocks.getCols();
     int step = max(1, total_ranges / 25);
     int done = 0;
+    float sum_s = 0;
+    float min_s_agg = FLT_MAX;
+    float max_s_agg = -FLT_MAX;
 
     for(vector<Block> range : this->range_blocks.getData()){
         for(Block range_block : range){
@@ -115,7 +139,10 @@ vector<FractalMapping> GrayBlockCompression::build_fractal_mappings(){
 
 
             float min_error = FLT_MAX;
-            CompressedBlock* best_compressed_block = nullptr;
+            int win_di = -1;
+            int win_dj = -1;
+            float best_s = 0.f;
+            float best_o = 0.f;
 
             for(int i = 0; i < this->reduced_domain_blocks.getRows(); i++){
                 for(int j = 0; j < this->reduced_domain_blocks.getCols(); j++){
@@ -137,18 +164,38 @@ vector<FractalMapping> GrayBlockCompression::build_fractal_mappings(){
 
                     if(error < min_error){
                         min_error = error;
-                        if(best_compressed_block != nullptr){
-                            delete best_compressed_block;
-                        }
-                        best_compressed_block = new CompressedBlock(&range_block, &reduced_domain_block, s, o);
+                        win_di = i;
+                        win_dj = j;
+                        best_s = s;
+                        best_o = o;
                     }
                 }
             }
-            
 
-            fractal_mappings.push_back(FractalMapping(range_block.x, range_block.y, best_compressed_block->domain->x, best_compressed_block->domain->y, best_compressed_block->s, best_compressed_block->o));
-            delete best_compressed_block;
-            best_compressed_block = nullptr;
+            Block win_rd = this->reduced_domain_blocks.get(win_di, win_dj);
+            fractal_mappings->push_back(
+                FractalMapping(range_block.x, range_block.y, win_rd.x, win_rd.y, best_s, best_o));
+            const float s_win = best_s;
+            const float o_win = best_o;
+            sum_s += s_win;
+            min_s_agg = min(min_s_agg, s_win);
+            max_s_agg = max(max_s_agg, s_win);
+
+            if (run_logging::is_debug() && done < 4 && win_di >= 0) {
+                const float mean_d_win = win_rd.mean();
+                float ls_num = 0;
+                float ls_den = 0;
+                calculate_s(range_block, win_rd, mean_r, mean_d_win, &ls_num, &ls_den, false);
+                run_logging::debug(
+                    "build_fractal_mappings: range #" + to_string(done) + " at (" + to_string(range_block.x) + ","
+                    + to_string(range_block.y) + ") mean_r=" + fmt_f(mean_r, 4) + " -> best domain grid (" + to_string(win_di)
+                    + "," + to_string(win_dj) + ") image origin (" + to_string(win_rd.x) + ","
+                    + to_string(win_rd.y) + ") mean_d=" + fmt_f(win_rd.mean(), 4));
+                run_logging::debug(
+                    "  LS: numerator=" + fmt_f(ls_num, 6) + " denominator=" + fmt_f(ls_den, 6) + " mean_d=" + fmt_f(mean_d_win, 4)
+                    + " s=" + fmt_f(s_win, 6) + " o=" + fmt_f(o_win, 6)
+                    + " mse_fit=" + fmt_f(min_error / static_cast<float>(RBD * RBD), 6));
+            }
 
             done++;
             if (done == 1 || done == total_ranges || done % step == 0) {
@@ -157,10 +204,24 @@ vector<FractalMapping> GrayBlockCompression::build_fractal_mappings(){
         }
     }
 
+    if (run_logging::is_debug() && total_ranges > 0) {
+        const float mean_s = sum_s / static_cast<float>(total_ranges);
+        run_logging::debug(
+            "build_fractal_mappings: s stats over all ranges — min=" + fmt_f(min_s_agg, 6) + " max=" + fmt_f(max_s_agg, 6)
+            + " mean=" + fmt_f(mean_s, 6));
+        run_logging::debug(
+            "calculate_s: pairs with zero denominator (s forced to 0): " + to_string(g_ls_zero_denominator_pairs)
+            + " (out of " + to_string(static_cast<long long>(total_ranges) * this->reduced_domain_blocks.getRows()
+                                      * this->reduced_domain_blocks.getCols())
+            + " range×domain evaluations)");
+    }
+
     return fractal_mappings;
 }
 
-float GrayBlockCompression::calculate_s(Block& range, Block& reduced_domain,float mean_r, float mean_d){
+float GrayBlockCompression::calculate_s(Block& range, Block& reduced_domain,float mean_r, float mean_d,
+                                         float* out_numerator, float* out_denominator,
+                                         bool count_zero_denominator){
 
     float numerator=0;
     float denominator=0;
@@ -175,10 +236,19 @@ float GrayBlockCompression::calculate_s(Block& range, Block& reduced_domain,floa
         }
     }
 
+    if (out_numerator != nullptr) {
+        *out_numerator = numerator;
+    }
+    if (out_denominator != nullptr) {
+        *out_denominator = denominator;
+    }
+
     float s = 0;
 
     if (denominator != 0) {
         s = numerator / denominator;
+    } else if (count_zero_denominator) {
+        g_ls_zero_denominator_pairs++;
     }
 
     return s;

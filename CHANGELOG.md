@@ -9,6 +9,8 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Added
 
+- **C++ compression debug:** optional least-squares numerator/denominator outputs on **`calculate_s`**; debug logs for reduced-domain grid sample, **`MeanReductionStrategy::reduce`** shape (first call), first few range→domain matches (with per-fit MSE), and aggregate **`s`** / zero-denominator statistics.
+- **C++ `run.sh`:** incremental compile — skip **`g++`** when **`main.exe`** is newer than all **`*.cpp`** sources; **`--fc`** or **`FORCE_COMPILE=1`** forces a rebuild; **`--fc`** is not passed through to **`main.exe`**.
 - **`--debug`:** verbose stdout (phase/progress logs). Default is **summary-only** (`--- Summary ---` with timings, ratio, metrics, output paths).
 - **Benchmark manifest / summary:** **`ratio_original_over_zip_codebook`** (`bytes_original_input / zip_bytes_codebook`) and a second **compression ratio** line vs zipped codebook on stdout.
 - **C++ decode metrics:** **`image/error_metrics.hpp`** (MSE / MAE / PSNR vs original, aligned with Java **`PGMAUtils` / `ErrorUtils`**); per-iteration lines on stdout; **`processes/cpp/<stem>/iterations/benchmark.csv`** with the same columns as Java’s **`Iteration`** record.
@@ -16,12 +18,14 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Changed
 
+- **C++ pipeline / codebook:** fractal mappings flow as **`vector<FractalMapping>*`** from **`GrayBlockCompression::compress`** through **`PGMAPipeline`**; **`Codebook`** copies from that pointer; decompression iteration paths use **`file_paths::ensureDirectoryExists`** and string paths (replacing **`std::filesystem`** for these outputs).
 - **C++ decode:** reconstructed gray is **clamped to [0, 255]** before write (same idea as Java **`Decompressor`**).
 - **C++ pipeline:** writes **`codebook.fc`**, **`next_*`**, and **`final.pgm`** under **`processes/cpp/<image-stem>/`** (cwd **`implementations/cpp`**); P2 save uses **width = columns, height = rows** to match Java.
 - **Codebook path:** per-geometry **`codebook_r{r}_d{d}.fc`** now lives under **`processes/<stem>/codebooks/`** (see **`Codebook.CODEBOOKS_SUBDIR`** / **`Codebook.pathForGeometry`**).
 
 ### Fixed
 
+- **C++ encode / codebook:** each mapping’s **domain** **`(x,y)`** is taken from the winning **`reduced_domain_blocks`** cell after the search (fixes incorrect domains when **`CompressedBlock`** held pointers into the inner search loop).
 - **C++ PGMA save:** **`SequenceWriter`** is stack-scoped in **`PGMAImageMetadata::save`** so the stream is flushed/closed (avoids truncated P2 bodies from a leaked writer).
 - **C++ fractal blocks:** **`Block::get` / `mean`** use **`(x,y)`** offsets into the full image for range/domain views, and **local indices** when **`pixels`** is exactly **`height×width`** (reduced-domain matrices); **`Block::reduce`** copies the domain tile before **`MeanReductionStrategy::reduce`**.
 - **C++ mean reduction:** **`MeanReductionStrategy::reduce`** matches Java’s **`reduceRatio`** tiling and output size; tile extraction uses **`copySquare`**.

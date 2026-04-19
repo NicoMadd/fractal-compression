@@ -11,7 +11,7 @@ using namespace std;
 class Codebook {
 
     public:
-        Codebook(int rangeSize, int domainSize, vector<FractalMapping> mappings);
+        Codebook(int rangeSize, int domainSize, vector<FractalMapping>* mappings);
     public:
         void save(string path);
 
