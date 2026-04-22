@@ -11,5 +11,6 @@ class FractalMapping{
         int domain_y;
         float s;
         float o;
+        FractalMapping();
         FractalMapping(int range_x, int range_y, int domain_x, int domain_y, float s, float o);
 };

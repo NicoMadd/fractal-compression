@@ -6,10 +6,12 @@
 #include "../fractal/block/block.hpp"
 #include "../fractal/block/reduction/reduction-strategy.hpp"
 #include "../utils/matrix.hpp"
+#include "concurrent/domain-finder.hpp"
 
 using namespace std;
 
 class GrayBlockCompression {
+  friend class DomainFinder;
   public:
     GrayBlockCompression(int rbd, int dbd, int parallelism, ReductionStrategy* rs);
     vector<FractalMapping>* compress(PGMAImageMetadata metadata);
@@ -37,10 +39,12 @@ class GrayBlockCompression {
 
     ReductionStrategy* reductionStrategy;
 
-
     void build_domains();
     void build_ranges();
     void build_reduced_domains();
+    void finalize_range_match(const RangeBlockMatchResult& r, const Block& range_block_for_debug,
+                              vector<FractalMapping>* fractal_mappings, int& done, int total_ranges, int step,
+                              float& sum_s, float& min_s_agg, float& max_s_agg);
     vector<FractalMapping>* build_fractal_mappings();
     /** Optional {@code out_numerator} / {@code out_denominator} for debug (least-squares accumulators). */
     float calculate_s(Block& range_block, Block& reduced_domain_block, float mean_r, float mean_d,

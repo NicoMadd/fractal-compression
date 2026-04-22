@@ -13,7 +13,9 @@
 #include "../image/error_metrics.hpp"
 #include "../utils/run_logging.hpp"
 #include "../utils/time.hpp"
+#include "../algorithms/concurrent/decompressor.hpp"
 #include "../fractal/mapping/codebook.hpp"
+#include "../executors/executors.hpp"
 #include "../fractal/mapping/fractal-mapping.hpp"
 #include "../utils/paths.hpp"
 
@@ -33,9 +35,10 @@ namespace {
 }
 
 PGMAPipeline::PGMAPipeline(PGMAImageMetadata& metadata, GrayBlockCompression& gbc, string runDir,
-                           int decompressionIterations)
+                           int decompressionIterations, int decompressionParallelism)
     : metadata(metadata), gbc(gbc), runDir(std::move(runDir)),
-      decompressionIterations(decompressionIterations) {
+      decompressionIterations(decompressionIterations),
+      decompressionParallelism(decompressionParallelism) {
 }
 
 void PGMAPipeline::run() {
@@ -99,40 +102,24 @@ void PGMAPipeline::decompress(vector<FractalMapping>* fractalMappings) {
     double last_mae = 0;
     double last_psnr = 0;
 
+    Decompressor decompressor(gbc.domainSize(), gbc.rangeSize(), gbc.getReductionStrategy());
+
     for (int iter = 0; iter <= decompressionIterations; iter++) {
       run_logging::debug("Iteration " + to_string(iter));
       const auto iteration_start = chrono::steady_clock::now();
 
-      for (size_t mi = 0; mi < fractalMappings->size(); mi++) {
-
-        FractalMapping mapping = fractalMappings->at(mi);
-
-        Matrix<GrayPixel> domainPixels; 
-        domainPixels.resize(gbc.domainSize(), gbc.domainSize());
-
-        copySquare(&img, &domainPixels, mapping.domain_x, mapping.domain_y, gbc.domainSize());
-
-        Matrix<GrayPixel> newRangePixels = Matrix<GrayPixel>(gbc.rangeSize(),gbc.rangeSize());
-
-        ReductionStrategy* rs = gbc.getReductionStrategy();
-
-        Matrix<GrayPixel>* reducedDomain = rs->reduce(&domainPixels, gbc.rangeSize());
-
-        float s = mapping.s;
-        float o = mapping.o;
-
-        for(int i=0;i<reducedDomain->getRows();i++){
-          for(int j=0;j<reducedDomain->getCols();j++){
-            GrayPixel gp = reducedDomain->get(i, j);
-
-            int newLevel = static_cast<int>(s * static_cast<float>(gp.level) + o);
-            newLevel = std::max(0, std::min(255, newLevel));
-
-            GrayPixel newGrayPixel = GrayPixel(newLevel);
-
-            next.set(mapping.range_x+i, mapping.range_y+j, newGrayPixel);
-          }
+      if (decompressionParallelism <= 1) {
+        for (size_t mi = 0; mi < fractalMappings->size(); mi++) {
+          decompressor.apply(fractalMappings->at(mi), img, next);
         }
+      } else {
+        Executor ex(decompressionParallelism);
+        for (size_t mi = 0; mi < fractalMappings->size(); mi++) {
+          FractalMapping m = fractalMappings->at(mi);
+          ex.submit([&decompressor, m, &img, &next]() { decompressor.apply(m, img, next); });
+        }
+        ex.shutdown();
+        ex.join();
       }
 
       const auto iteration_end = std::chrono::steady_clock::now();

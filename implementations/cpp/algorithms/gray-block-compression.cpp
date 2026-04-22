@@ -2,17 +2,20 @@
 
 #include <cfloat>
 #include <algorithm>
+#include <atomic>
+#include <cmath>
 #include <iomanip>
+#include <mutex>
 #include <sstream>
 #include <vector>
 #include "../utils/run_logging.hpp"
 #include "../fractal/block/block.hpp"
-#include "../fractal/block/compressed.hpp"
+#include "../executors/executors.hpp"
 
 using namespace std;
 
 namespace {
-long long g_ls_zero_denominator_pairs = 0;
+std::atomic<long long> g_ls_zero_denominator_pairs{0};
 
 string fmt_f(float v, int prec) {
     ostringstream oss;
@@ -121,6 +124,37 @@ void GrayBlockCompression::build_reduced_domains(){
     }
 }
 
+void GrayBlockCompression::finalize_range_match(const RangeBlockMatchResult& r, const Block& range_block_for_debug,
+                                                vector<FractalMapping>* fractal_mappings, int& done, int total_ranges,
+                                                int step, float& sum_s, float& min_s_agg, float& max_s_agg) {
+    fractal_mappings->push_back(r.mapping);
+    sum_s += r.s_win;
+    min_s_agg = min(min_s_agg, r.s_win);
+    max_s_agg = max(max_s_agg, r.s_win);
+
+    if (run_logging::is_debug() && done < 4 && r.win_di >= 0) {
+        Block win_rd = this->reduced_domain_blocks.get(r.win_di, r.win_dj);
+        const float mean_d_win = win_rd.mean();
+        float ls_num = 0;
+        float ls_den = 0;
+        Block dbg = range_block_for_debug;
+        calculate_s(dbg, win_rd, r.mean_r, mean_d_win, &ls_num, &ls_den, false);
+        run_logging::debug("build_fractal_mappings: range #" + to_string(done) + " at ("
+                           + to_string(range_block_for_debug.x) + "," + to_string(range_block_for_debug.y) + ") mean_r="
+                           + fmt_f(r.mean_r, 4) + " -> best domain grid (" + to_string(r.win_di) + "," + to_string(r.win_dj)
+                           + ") image origin (" + to_string(r.mapping.domain_x) + "," + to_string(r.mapping.domain_y)
+                           + ") mean_d=" + fmt_f(win_rd.mean(), 4));
+        run_logging::debug("  LS: numerator=" + fmt_f(ls_num, 6) + " denominator=" + fmt_f(ls_den, 6) + " mean_d="
+                           + fmt_f(mean_d_win, 4) + " s=" + fmt_f(r.s_win, 6) + " o=" + fmt_f(r.o_win, 6)
+                           + " mse_fit=" + fmt_f(r.min_error / static_cast<float>(RBD * RBD), 6));
+    }
+
+    done++;
+    if (done == 1 || done == total_ranges || done % step == 0) {
+        run_logging::debug("Compress: matched range blocks " + to_string(done) + "/" + to_string(total_ranges));
+    }
+}
+
 vector<FractalMapping>* GrayBlockCompression::build_fractal_mappings(){
 
 
@@ -133,81 +167,25 @@ vector<FractalMapping>* GrayBlockCompression::build_fractal_mappings(){
     float min_s_agg = FLT_MAX;
     float max_s_agg = -FLT_MAX;
 
-    for(vector<Block> range : this->range_blocks.getData()){
-        for(Block range_block : range){
-            float mean_r = range_block.mean();
+    const int n_workers = max(1, this->parallelism);
 
-
-            float min_error = FLT_MAX;
-            CompressedBlock* best_compressed_block = nullptr;
-            int win_di = -1;
-            int win_dj = -1;
-
-            for(int i = 0; i < this->reduced_domain_blocks.getRows(); i++){
-                for(int j = 0; j < this->reduced_domain_blocks.getCols(); j++){
-                    Block reduced_domain_block = this->reduced_domain_blocks.get(i, j);
-                    float mean_d = reduced_domain_block.mean();
-
-                    float s = calculate_s(range_block, reduced_domain_block,mean_r, mean_d);
-                    float o = calculate_o(mean_r,mean_d, s);
-
-                    float error = 0;
-
-                    for(int k=0;k<reduced_domain_block.height;k++){
-                        for(int l=0;l<reduced_domain_block.width;l++){
-                            float approx_range = s * reduced_domain_block.get(k, l).level + o;
-                            float range_diff = range_block.get(k, l).level - approx_range;
-                            error += pow(range_diff,2);
-                        }
-                    }
-
-                    if(error < min_error){
-                        min_error = error;
-                        win_di = i;
-                        win_dj = j;
-                        if(best_compressed_block != nullptr){
-                            delete best_compressed_block;
-                        }
-                        Block* new_domain_block = new Block(reduced_domain_block);
-                        best_compressed_block = new CompressedBlock(&range_block, new_domain_block, s, o);
-                    }
-                }
+    std::mutex merge_mtx;
+    Executor executor(n_workers);
+    for (vector<Block> range : this->range_blocks.getData()) {
+        vector<Block> range_row = range;
+        executor.submit([this, range_row, fractal_mappings, &merge_mtx, &done, total_ranges, step, &sum_s, &min_s_agg,
+                         &max_s_agg]() {
+            DomainFinder finder(this->reduced_domain_blocks, *this);
+            for (Block range_block : range_row) {
+                RangeBlockMatchResult r = finder.findBest(range_block);
+                std::lock_guard<std::mutex> lock(merge_mtx);
+                this->finalize_range_match(r, range_block, fractal_mappings, done, total_ranges, step, sum_s, min_s_agg,
+                                           max_s_agg);
             }
-            
-
-            fractal_mappings->push_back(FractalMapping(range_block.x, range_block.y, best_compressed_block->domain->x, best_compressed_block->domain->y, best_compressed_block->s, best_compressed_block->o));
-            const float s_win = best_compressed_block->s;
-            const float o_win = best_compressed_block->o;
-            sum_s += s_win;
-            min_s_agg = min(min_s_agg, s_win);
-            max_s_agg = max(max_s_agg, s_win);
-
-            if (run_logging::is_debug() && done < 4 && win_di >= 0) {
-                Block win_rd = this->reduced_domain_blocks.get(win_di, win_dj);
-                const float mean_d_win = win_rd.mean();
-                float ls_num = 0;
-                float ls_den = 0;
-                calculate_s(range_block, win_rd, mean_r, mean_d_win, &ls_num, &ls_den, false);
-                run_logging::debug(
-                    "build_fractal_mappings: range #" + to_string(done) + " at (" + to_string(range_block.x) + ","
-                    + to_string(range_block.y) + ") mean_r=" + fmt_f(mean_r, 4) + " -> best domain grid (" + to_string(win_di)
-                    + "," + to_string(win_dj) + ") image origin (" + to_string(best_compressed_block->domain->x) + ","
-                    + to_string(best_compressed_block->domain->y) + ") mean_d=" + fmt_f(win_rd.mean(), 4));
-                run_logging::debug(
-                    "  LS: numerator=" + fmt_f(ls_num, 6) + " denominator=" + fmt_f(ls_den, 6) + " mean_d=" + fmt_f(mean_d_win, 4)
-                    + " s=" + fmt_f(s_win, 6) + " o=" + fmt_f(o_win, 6)
-                    + " mse_fit=" + fmt_f(min_error / static_cast<float>(RBD * RBD), 6));
-            }
-
-            delete best_compressed_block;
-            best_compressed_block = nullptr;
-
-            done++;
-            if (done == 1 || done == total_ranges || done % step == 0) {
-                run_logging::debug("Compress: matched range blocks " + to_string(done) + "/" + to_string(total_ranges));
-            }
-        }
+        });
     }
+    executor.shutdown();
+    executor.join();
 
     if (run_logging::is_debug() && total_ranges > 0) {
         const float mean_s = sum_s / static_cast<float>(total_ranges);
@@ -215,7 +193,8 @@ vector<FractalMapping>* GrayBlockCompression::build_fractal_mappings(){
             "build_fractal_mappings: s stats over all ranges — min=" + fmt_f(min_s_agg, 6) + " max=" + fmt_f(max_s_agg, 6)
             + " mean=" + fmt_f(mean_s, 6));
         run_logging::debug(
-            "calculate_s: pairs with zero denominator (s forced to 0): " + to_string(g_ls_zero_denominator_pairs)
+            "calculate_s: pairs with zero denominator (s forced to 0): "
+            + to_string(g_ls_zero_denominator_pairs.load())
             + " (out of " + to_string(static_cast<long long>(total_ranges) * this->reduced_domain_blocks.getRows()
                                       * this->reduced_domain_blocks.getCols())
             + " range×domain evaluations)");
@@ -253,7 +232,7 @@ float GrayBlockCompression::calculate_s(Block& range, Block& reduced_domain,floa
     if (denominator != 0) {
         s = numerator / denominator;
     } else if (count_zero_denominator) {
-        g_ls_zero_denominator_pairs++;
+        g_ls_zero_denominator_pairs.fetch_add(1, std::memory_order_relaxed);
     }
 
     return s;

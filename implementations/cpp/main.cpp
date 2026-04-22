@@ -31,11 +31,11 @@ int main(int argc, const char* argv[]) {
         file_paths::ensureDirectoryExists(runDir);
         cout << "Process output directory: " << runDir << '\n';
 
-        GrayBlockCompression gbc = GrayBlockCompression(
-            params.rangeSize, params.domainSize, 1, new MeanReductionStrategy());
+        GrayBlockCompression gbc = GrayBlockCompression(params.rangeSize, params.domainSize,
+                                                          params.compressionParallelism, new MeanReductionStrategy());
 
-        PGMAPipeline pipeline =
-            PGMAPipeline(metadata, gbc, runDir, params.iterations);
+        PGMAPipeline pipeline = PGMAPipeline(metadata, gbc, runDir, params.iterations,
+                                            params.decompressionParallelism);
         pipeline.run();
     } catch (const exception& e) {
         run_logging::error(e.what());

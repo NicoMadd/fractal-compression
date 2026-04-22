@@ -5,6 +5,7 @@
 #include <iostream>
 #include <optional>
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace {
@@ -50,20 +51,42 @@ bool parsePositiveInt(const char* label, const char* s, int& out) {
 void PipelineParams::printUsage(const char* programPath) {
     std::cerr << "Usage: " << programPath
               << " <image.pgm> <iterations> [<range size> [<domain size>]] [-r <range>] [-d "
-                 "<domain>] [--debug]\n";
+                 "<domain>] [-p <threads>] [-P <threads>] [--debug]\n";
     std::cerr << "  Default range size is 4 if omitted. Domain defaults to 2× range if omitted.\n";
     std::cerr << "  -r / -d override positional range/domain when given.\n";
+    std::cerr << "  -p: compression parallelism (positive integer); default = hardware concurrency or 1.\n";
+    std::cerr << "  -P: decompression parallelism; default = same as -p.\n";
 }
 
 std::optional<PipelineParams> PipelineParams::parse(int argc, const char* argv[]) {
     int rangeFlag = 0;
     int domainFlag = 0;
+    int compressionParFlag = 0;
+    int decompressionParFlag = 0;
     bool debug = false;
     std::vector<std::string> positionals;
 
     for (int i = 1; i < argc;) {
         std::string a = argv[i];
-        if (a == "-r") {
+        if (a == "-p") {
+            if (i + 1 >= argc) {
+                std::cerr << "Usage: -p requires a thread count (positive integer).\n";
+                return std::nullopt;
+            }
+            if (!parsePositiveInt("Compression parallelism", argv[i + 1], compressionParFlag)) {
+                return std::nullopt;
+            }
+            i += 2;
+        } else if (a == "-P") {
+            if (i + 1 >= argc) {
+                std::cerr << "Usage: -P requires a thread count (positive integer) for decompression.\n";
+                return std::nullopt;
+            }
+            if (!parsePositiveInt("Decompression parallelism", argv[i + 1], decompressionParFlag)) {
+                return std::nullopt;
+            }
+            i += 2;
+        } else if (a == "-r") {
             if (i + 1 >= argc) {
                 std::cerr << "Usage: -r requires a range size (positive integer).\n";
                 return std::nullopt;
@@ -126,5 +149,13 @@ std::optional<PipelineParams> PipelineParams::parse(int argc, const char* argv[]
 
     params.rangeSize = rangeSize;
     params.domainSize = domainSize;
+
+    unsigned hc = std::thread::hardware_concurrency();
+    int defaultCompressionPar = hc == 0 ? 1 : static_cast<int>(hc);
+    params.compressionParallelism =
+        compressionParFlag > 0 ? compressionParFlag : defaultCompressionPar;
+    params.decompressionParallelism =
+        decompressionParFlag > 0 ? decompressionParFlag : params.compressionParallelism;
+
     return params;
 }
