@@ -5,6 +5,10 @@ import implementations.java.compression.src.utils.fractal.transformation.Transfo
 import implementations.java.compression.src.utils.matrix.MatrixShape;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
+/**
+ * 90° clockwise rotation. Square {@code n×n}: {@code (i,j) -> (j, n-1-i)} with
+ * {@code n = shape.rows()}.
+ */
 public class RotationCW90 extends Transformation {
 
     public RotationCW90() {
@@ -14,8 +18,6 @@ public class RotationCW90 extends Transformation {
     @Override
     public <T> void transform(T[][] src, T[][] transformed) {
         MatrixShape shape = MatrixUtils.shape(src);
-
-        // assuming square matrix
         int dimension = shape.rows();
 
         for (int i = 0; i < shape.rows(); i++) {

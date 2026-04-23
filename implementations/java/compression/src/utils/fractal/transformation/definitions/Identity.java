@@ -4,6 +4,7 @@ import implementations.java.compression.src.utils.fractal.transformation.Transfo
 import implementations.java.compression.src.utils.fractal.transformation.TransformationType;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
+/** {@code IDENTITY}: copies {@code src} into {@code transformed}. */
 public class Identity extends Transformation {
 
     public Identity() {

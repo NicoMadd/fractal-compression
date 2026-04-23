@@ -6,10 +6,8 @@ import implementations.java.compression.src.utils.matrix.MatrixShape;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
 /**
- * Vertical reflection over the y-axis ({@code VC}): reverses the vertical
- * (row / {@code y}) coordinate, {@code i -> n-1-i}; column index {@code j} is
- * unchanged (top ↔ bottom). The mirror line is the horizontal midline of the
- * block.
+ * {@code VC}: top–bottom flip, {@code (i,j) -> (n-1-i, j)} with {@code n = shape.rows()}
+ * (square blocks). Mirror line is horizontal through the block center.
  */
 public class ReflectionVc extends Transformation {
 
