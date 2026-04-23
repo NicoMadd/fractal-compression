@@ -2,6 +2,7 @@
 
 
 #include "block.hpp"
+#include "../transformation/type.hpp"
 
 
 class CompressedBlock{
@@ -10,6 +11,7 @@ class CompressedBlock{
         Block* domain;
         float s;
         float o;
+        TransformationType transformation_type;
         CompressedBlock();
-        CompressedBlock(Block* range, Block* domain, float s, float o);
+        CompressedBlock(Block* range, Block* domain, float s, float o, TransformationType transformation_type);
 };

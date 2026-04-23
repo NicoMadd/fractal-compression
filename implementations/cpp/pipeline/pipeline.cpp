@@ -47,7 +47,7 @@ void PGMAPipeline::run() {
   const double compression_seconds = compression_sw.elapsed_seconds();
 
   time_util::Stopwatch codebook_sw;
-  Codebook codebook(gbc.rangeSize(), gbc.domainSize(), fractalMappings);
+  Codebook codebook(gbc.range_size(), gbc.domain_size(), fractalMappings);
   const std::string codebookPath = runDir + "/codebook.fc";
   codebook.save(codebookPath);
   const double codebook_seconds = codebook_sw.elapsed_seconds();
@@ -102,7 +102,7 @@ void PGMAPipeline::decompress(vector<FractalMapping>* fractalMappings) {
     double last_mae = 0;
     double last_psnr = 0;
 
-    Decompressor decompressor(gbc.domainSize(), gbc.rangeSize(), gbc.getReductionStrategy());
+    Decompressor decompressor(gbc.domain_size(), gbc.range_size(), gbc.get_reduction_strategy());
 
     for (int iter = 0; iter <= decompressionIterations; iter++) {
       run_logging::debug("Iteration " + to_string(iter));

@@ -48,10 +48,10 @@ void Codebook::serialize(SequenceOutput& so){
         so.write(mapping.s);
         so.space();
         so.write(mapping.o);
+        so.space();
+        so.write(mapping.transformation_type);
         so.bl();
     }
     
-
-
 
 }

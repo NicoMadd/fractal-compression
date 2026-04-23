@@ -46,7 +46,18 @@ else
   echo "Skipping compile (main.exe up to date). Set FORCE_COMPILE=1 or use --fc to rebuild."
 fi
 
-echo "Running executable with debug mode..."
+run_debug=0
+for arg in "${pass_args[@]}"; do
+  if [[ "$arg" == "--debug" ]]; then
+    run_debug=1
+    break
+  fi
+done
+if [[ "$run_debug" -eq 1 ]]; then
+  echo "Running ./main.exe (verbose: --debug)…"
+else
+  echo "Running ./main.exe…"
+fi
 if [[ ${#pass_args[@]} -gt 0 ]]; then
   ./main.exe "${pass_args[@]}"
 else

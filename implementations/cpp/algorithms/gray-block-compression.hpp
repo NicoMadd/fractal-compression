@@ -11,13 +11,12 @@
 using namespace std;
 
 class GrayBlockCompression {
-  friend class DomainFinder;
   public:
     GrayBlockCompression(int rbd, int dbd, int parallelism, ReductionStrategy* rs);
     vector<FractalMapping>* compress(PGMAImageMetadata metadata);
-    int rangeSize();
-    int domainSize();
-    ReductionStrategy* getReductionStrategy();
+    int range_size();
+    int domain_size();
+    ReductionStrategy* get_reduction_strategy();
 
   private:
     // RANGE BLOCK DIMENSION
@@ -37,19 +36,13 @@ class GrayBlockCompression {
     Matrix<Block> range_blocks;
     Matrix<Block> reduced_domain_blocks;
 
-    ReductionStrategy* reductionStrategy;
+    ReductionStrategy* reduction_strategy;
 
     void build_domains();
     void build_ranges();
     void build_reduced_domains();
-    void finalize_range_match(const RangeBlockMatchResult& r, const Block& range_block_for_debug,
-                              vector<FractalMapping>* fractal_mappings, int& done, int total_ranges, int step,
-                              float& sum_s, float& min_s_agg, float& max_s_agg);
+    void finalize_range_match(const FractalMapping& mapping,
+                              vector<FractalMapping>* fractal_mappings, int& done, int total_ranges, int step);
     vector<FractalMapping>* build_fractal_mappings();
-    /** Optional {@code out_numerator} / {@code out_denominator} for debug (least-squares accumulators). */
-    float calculate_s(Block& range_block, Block& reduced_domain_block, float mean_r, float mean_d,
-                        float* out_numerator = nullptr, float* out_denominator = nullptr,
-                        bool count_zero_denominator = true);
-    float calculate_o(float mean_r, float mean_d, float s);
 
 };

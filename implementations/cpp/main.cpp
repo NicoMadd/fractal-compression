@@ -17,7 +17,7 @@ int main(int argc, const char* argv[]) {
     try {
         std::optional<PipelineParams> parsed = PipelineParams::parse(argc, argv);
         if (!parsed.has_value()) {
-            return 1;
+            return 1; 
         }
         PipelineParams params = *parsed;
         run_logging::set_debug(params.debug);

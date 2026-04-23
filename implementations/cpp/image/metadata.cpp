@@ -17,10 +17,6 @@ PGMAImageMetadata loadImage(string imagePath) {
 
   PGMAImageMetadata metadata = PGMAImageMetadata(file);
 
-  print(metadata.height);
-  print(metadata.width);
-  print(metadata.maxVal);
-
   return  metadata;
 }
 
@@ -60,7 +56,6 @@ void PGMAImageMetadata::readMagicNumber(SequenceReader &sr){
   vector<char> magicNumber = sr.read(2);
 
   // TODO validate equals
-  print(magicNumber);
 }
 
 void PGMAImageMetadata::skipComment(SequenceReader &sr){

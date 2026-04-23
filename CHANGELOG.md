@@ -9,6 +9,7 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Added
 
+- **C++ fractal transforms:** [`implementations/cpp/fractal/transformation/`](implementations/cpp/fractal/transformation/) — **`TransformationType`**, **`Transformation`** hierarchy for all eight isometries, **`Transformation::from`** registry, **`transform(Matrix*, Matrix*)`** aligned with the Java gray codec.
 - **VS Code / Cursor C++ IntelliSense:** [`.vscode/c_cpp_properties.json`](.vscode/c_cpp_properties.json) — **`cppStandard: c++17`**, **`includePath`** **`implementations/cpp`**, **`intelliSenseMode`** **`${default}`** so the Microsoft **C/C++** extension parses **`std::optional`** (it does not read [`.clangd`](.clangd)).
 - **C++ CLI (aligned with Java `PipelineParams`):** **`<image.pgm> <iterations> [<range> [<domain>]]`**; **`-r` / `-d`** override positional range/domain; default range **4**, domain **2× range**; **`-p`** / **`-P`** compression / decompression thread counts (defaults: **`std::thread::hardware_concurrency()`** or **1**, and decompression defaults to **`-p`**); **`PGMAPipeline`** takes iteration count and decompression parallelism and runs the decode loop **`iter <= iterations`** like Java; **`GrayBlockCompression`** uses **`-p`** to run **`compute_best_match_for_range_block`** in parallel per range row with a merge mutex, **`shutdown()` + `join()`** on **`Executor`**, and **`std::atomic`** for **`g_ls_zero_denominator_pairs`**.
 - **C++ decode threading:** **`PGMAPipeline::applyOneDecompressMapping`** + **`Executor`** when **`-P` > 1** (per-iteration batch).
@@ -21,10 +22,12 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Changed
 
-- **C++ encode:** best-domain search for a range block moved to **`algorithms/concurrent/DomainFinder`** (**`domain-finder.hpp`**, **`domain-finder.cpp`**); **`RangeBlockMatchResult`** lives there; **`GrayBlockCompression`** declares **`friend class DomainFinder`** for **`calculate_s`** / **`calculate_o`**.
+- **C++ `DomainFinder`:** **`findBest`** returns **`FractalMapping`**; one **`Matrix<GrayPixel>`** scratch per search; **`calculate_s`** takes **`Block*`** range plus transformed reduced-domain pixels so LS and MSE use the same range window; winner stored as domain grid indices with **`(s, o, transformation_type)`**.
+- **C++ `Decompressor::apply`:** applies the mapping’s **`TransformationType`** to the reduced domain before affine **`s`** / **`o`** (decode matches encode for non-identity transforms).
+- **C++ `GrayBlockCompression` / `PGMAPipeline`:** refactored mapping discovery, **`FractalMapping`** / **`Codebook`** wiring, and parallel **`Executor`** submission for range tasks.
+- **C++ `run.sh`:** prints **`Running ./main.exe…`**, or **`(verbose: --debug)`** when **`--debug`** is passed (replaces misleading “debug mode” wording).
 - **C++ `GrayBlockCompression::build_fractal_mappings`:** always uses **`Executor`** (one worker when **`-p` ≤ 1**); the previous serial loop without **`Executor`** was removed.
 - **C++ decode:** single-mapping apply moved to **`algorithms/concurrent/Decompressor`** (**`decompressor.hpp`**, **`decompressor.cpp`**); **`PGMAPipeline`** constructs one **`Decompressor`** and calls **`apply`** (parallel **`Executor`** submits lambdas that use the same instance).
-- **C++ `GrayBlockCompression`:** best-domain search for one range block moved to private **`record_best_mapping_for_range_block`** (**`gray-block-compression.hpp` / `.cpp`**).
 - **C++ `Executor`:** **`shutdown_requested`** + **`condition_variable`** predicate so workers exit after draining the queue; **`submit`** ignores new work after shutdown; **`notify_one`** on submit / **`notify_all`** on shutdown; **`join`** only joins **`joinable`** threads; header includes **`queue` / `mutex` / `condition_variable`**.
 - **C++ `main`:** CLI parsing moved to **`PipelineParams`** (**`pipeline/pipeline-params.hpp`**, **`pipeline-params.cpp`**) — **`parse`** returns **`std::optional`**; **`printUsage`** for the usage banner.
 - **Cursor rules:** default workflow documented — notable changes include **`CHANGELOG.md`** updates; **no automatic git commits** unless the user explicitly requests a commit.
@@ -35,6 +38,7 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ### Fixed
 
+- **C++ `DomainFinder` least-squares:** range side uses **`Block::get(i, j)`** (block-relative indices into the full image window), not **`range->pixels->get(i, j)`** on the top-left of the frame, so **`s`** / **`o`** match the MSE loop and Java’s **`DomainFinder`** behavior.
 - **C++ encode / codebook:** each mapping’s **domain** **`(x,y)`** is taken from the winning **`reduced_domain_blocks`** cell after the search (fixes incorrect domains when **`CompressedBlock`** held pointers into the inner search loop).
 - **C++ PGMA save:** **`SequenceWriter`** is stack-scoped in **`PGMAImageMetadata::save`** so the stream is flushed/closed (avoids truncated P2 bodies from a leaked writer).
 - **C++ fractal blocks:** **`Block::get` / `mean`** use **`(x,y)`** offsets into the full image for range/domain views, and **local indices** when **`pixels`** is exactly **`height×width`** (reduced-domain matrices); **`Block::reduce`** copies the domain tile before **`MeanReductionStrategy::reduce`**.
