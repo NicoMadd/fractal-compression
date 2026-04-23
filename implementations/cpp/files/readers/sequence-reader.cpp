@@ -87,3 +87,10 @@ int SequenceReader::readNextInt(){
     skipFollowingWhitespaces();
     return readInt();
 }
+
+float SequenceReader::readNextFloat() {
+    skipFollowingWhitespaces();
+    vector<char> chars = readUntilWhitespace();
+    string s(chars.begin(), chars.end());
+    return stof(s);
+}

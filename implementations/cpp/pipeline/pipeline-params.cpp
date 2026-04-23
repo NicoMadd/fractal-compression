@@ -51,11 +51,12 @@ bool parsePositiveInt(const char* label, const char* s, int& out) {
 void PipelineParams::printUsage(const char* programPath) {
     std::cerr << "Usage: " << programPath
               << " <image.pgm> <iterations> [<range size> [<domain size>]] [-r <range>] [-d "
-                 "<domain>] [-p <threads>] [-P <threads>] [--debug]\n";
+                 "<domain>] [-p <threads>] [-P <threads>] [-c] [--debug]\n";
     std::cerr << "  Default range size is 4 if omitted. Domain defaults to 2× range if omitted.\n";
     std::cerr << "  -r / -d override positional range/domain when given.\n";
     std::cerr << "  -p: compression parallelism (positive integer); default = hardware concurrency or 1.\n";
     std::cerr << "  -P: decompression parallelism; default = same as -p.\n";
+    std::cerr << "  -c: force codebook rebuild (ignore existing codebook for this range/domain).\n";
 }
 
 std::optional<PipelineParams> PipelineParams::parse(int argc, const char* argv[]) {
@@ -63,12 +64,16 @@ std::optional<PipelineParams> PipelineParams::parse(int argc, const char* argv[]
     int domainFlag = 0;
     int compressionParFlag = 0;
     int decompressionParFlag = 0;
+    bool cleanCodebook = false;
     bool debug = false;
     std::vector<std::string> positionals;
 
     for (int i = 1; i < argc;) {
         std::string a = argv[i];
-        if (a == "-p") {
+        if (a == "-c") {
+            cleanCodebook = true;
+            i += 1;
+        } else if (a == "-p") {
             if (i + 1 >= argc) {
                 std::cerr << "Usage: -p requires a thread count (positive integer).\n";
                 return std::nullopt;
@@ -119,6 +124,7 @@ std::optional<PipelineParams> PipelineParams::parse(int argc, const char* argv[]
     }
 
     PipelineParams params;
+    params.cleanCodebook = cleanCodebook;
     params.debug = debug;
     params.imagePath = positionals[0];
     if (!parseNonNegativeInt("Iterations", positionals[1].c_str(), params.iterations)) {

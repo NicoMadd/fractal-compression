@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include <filesystem>
+
 #include "../image/error_metrics.hpp"
 #include "../utils/run_logging.hpp"
 #include "../utils/time.hpp"
@@ -18,6 +20,7 @@
 #include "../executors/executors.hpp"
 #include "../fractal/mapping/fractal-mapping.hpp"
 #include "../utils/paths.hpp"
+#include "../utils/compression_baselines.hpp"
 
 using namespace std;
 
@@ -35,31 +38,70 @@ namespace {
 }
 
 PGMAPipeline::PGMAPipeline(PGMAImageMetadata& metadata, GrayBlockCompression& gbc, string runDir,
-                           int decompressionIterations, int decompressionParallelism)
+                           int decompressionIterations, int decompressionParallelism, bool cleanCodebook,
+                           string originalImagePath)
     : metadata(metadata), gbc(gbc), runDir(std::move(runDir)),
       decompressionIterations(decompressionIterations),
-      decompressionParallelism(decompressionParallelism) {
+      decompressionParallelism(decompressionParallelism), cleanCodebook(cleanCodebook),
+      originalImagePath(std::move(originalImagePath)) {
 }
 
 void PGMAPipeline::run() {
+  namespace fs = std::filesystem;
+  file_paths::copyOriginalToRunDir(this->originalImagePath, this->runDir);
+  const std::string codebookPath =
+      file_paths::codebookPathForGeometry(runDir, gbc.range_size(), gbc.domain_size());
+
   time_util::Stopwatch compression_sw;
-  vector<FractalMapping>* fractalMappings = this->compress();
+  vector<FractalMapping>* fractalMappings = nullptr;
+  bool loaded_from_disk = false;
+
+  if (!cleanCodebook && fs::exists(codebookPath)) {
+    try {
+      Codebook on_disk;
+      on_disk.read(codebookPath);
+      if (on_disk.getRangeSize() == gbc.range_size() && on_disk.getDomainSize() == gbc.domain_size()) {
+        fractalMappings = new vector<FractalMapping>(on_disk.getMappings());
+        loaded_from_disk = true;
+        run_logging::debug("Loaded codebook from " + codebookPath);
+      }
+    } catch (const std::exception& e) {
+      run_logging::debug(string("Codebook load failed, will compress: ") + e.what());
+    }
+  }
+
+  if (fractalMappings == nullptr) {
+    fractalMappings = this->compress();
+  }
   const double compression_seconds = compression_sw.elapsed_seconds();
 
-  time_util::Stopwatch codebook_sw;
-  Codebook codebook(gbc.range_size(), gbc.domain_size(), fractalMappings);
-  const std::string codebookPath = runDir + "/codebook.fc";
-  codebook.save(codebookPath);
-  const double codebook_seconds = codebook_sw.elapsed_seconds();
+  double codebook_seconds = 0;
+  if (!loaded_from_disk) {
+    time_util::Stopwatch codebook_sw;
+    fs::path cbp(codebookPath);
+    if (cbp.has_parent_path()) {
+      file_paths::ensureDirectoryExists(cbp.parent_path().string());
+    }
+    Codebook codebook(gbc.range_size(), gbc.domain_size(), fractalMappings);
+    codebook.save(codebookPath);
+    codebook_seconds = codebook_sw.elapsed_seconds();
+  }
 
   cout << fixed << setprecision(2);
   cout << "--- Summary ---\n";
-  cout << "Compression: " << fmtMs(compression_seconds) << " ms\n";
-  cout << "Codebook save: " << fmtMs(codebook_seconds) << " ms\n";
+  if (loaded_from_disk) {
+    cout << "Compression: " << fmtMs(compression_seconds) << " ms (codebook reused)\n";
+    cout << "Codebook save: skipped\n";
+  } else {
+    cout << "Compression: " << fmtMs(compression_seconds) << " ms\n";
+    cout << "Codebook save: " << fmtMs(codebook_seconds) << " ms\n";
+  }
   cout << "Codebook: " << codebookPath << '\n';
   cout << "Range mappings: " << fractalMappings->size() << '\n';
 
-  this->decompress(fractalMappings);
+  const DecompressResult dr = this->decompress(fractalMappings);
+  compression_baselines::printRunBaselinesAndCompressionRatios(
+      this->runDir, codebookPath, this->originalImagePath, this->decompressionIterations, dr.mse, dr.mae, dr.psnr);
 }
 
 vector<FractalMapping>* PGMAPipeline::compress() {
@@ -67,7 +109,7 @@ vector<FractalMapping>* PGMAPipeline::compress() {
 
 }
 
-void PGMAPipeline::decompress(vector<FractalMapping>* fractalMappings) {
+DecompressResult PGMAPipeline::decompress(vector<FractalMapping>* fractalMappings) {
     run_logging::debug(
         "Decompression start: image " + to_string(metadata.width) + "x" +
         to_string(metadata.height) + ", " + to_string(fractalMappings->size()) +
@@ -87,8 +129,8 @@ void PGMAPipeline::decompress(vector<FractalMapping>* fractalMappings) {
     run_logging::debug("Iterating over " + to_string(decompressionIterations) + " iterations");
     run_logging::debug("Decompression: initialized noise buffers");
 
+    file_paths::cleanAndCreateIterationsDir(runDir);
     const string iterations_dir = runDir + "/iterations";
-    file_paths::ensureDirectoryExists(iterations_dir);
     const string benchmark_csv = iterations_dir + "/benchmark.csv";
     ofstream csv(benchmark_csv, ios::out | ios::trunc);
     if (!csv.is_open()) {
@@ -98,9 +140,7 @@ void PGMAPipeline::decompress(vector<FractalMapping>* fractalMappings) {
     csv.imbue(locale::classic());
     csv << "n,timestamp,durationNanos,durationSeconds,mse,mae,psnr\n";
 
-    double last_mse = 0;
-    double last_mae = 0;
-    double last_psnr = 0;
+    DecompressResult out;
 
     Decompressor decompressor(gbc.domain_size(), gbc.range_size(), gbc.get_reduction_strategy());
 
@@ -128,28 +168,29 @@ void PGMAPipeline::decompress(vector<FractalMapping>* fractalMappings) {
                                            .count();
       const int64_t timestamp_nanos =
           std::chrono::duration_cast<std::chrono::nanoseconds>(iteration_end.time_since_epoch()).count();
+      const double duration_seconds = static_cast<double>(duration_nanos) / 1e9;
 
-      const ImageErrorMetrics err = computeErrorVsReference(*metadata.pixels, next);
-      last_mse = err.mse;
-      last_mae = err.mae;
-      last_psnr = psnrFromMse(err.mse);
+      const std::string iterFrameBase = iterations_dir + "/iter_" + std::to_string(iter);
+      pgma::save(next, iterFrameBase);
+      run_logging::debug("Decompression wrote intermediate " + iterFrameBase + ".pgm");
+
+      const ImageErrorMetrics err = computeErrorMetricsFromPgmPaths(
+          this->originalImagePath, iterFrameBase + ".pgm");
+      out.mse = err.mse;
+      out.mae = err.mae;
+      out.psnr = psnrFromMse(err.mse);
       run_logging::debug("MSE: " + fmt3(err.mse));
       run_logging::debug("MAE: " + fmt3(err.mae));
-      run_logging::debug("PSNR: " + fmt3(last_psnr));
+      run_logging::debug("PSNR: " + fmt3(out.psnr));
 
       std::cout << "Iteration " << iter << "  MSE: " << fmt3(err.mse) << "  MAE: " << fmt3(err.mae)
-                << "  PSNR: " << fmt3(last_psnr) << '\n';
+                << "  PSNR: " << fmt3(out.psnr) << '\n';
 
-      const double duration_seconds = static_cast<double>(duration_nanos) / 1e9;
       csv << iter << ',' << timestamp_nanos << ',' << duration_nanos << ','
           << std::setprecision(12) << duration_seconds << ','
-          << std::setprecision(12) << err.mse << ',' << std::setprecision(12) << err.mae << ','
-          << std::setprecision(12) << last_psnr << '\n';
+          << std::setprecision(12) << err.mse << ','           << std::setprecision(12) << err.mae << ','
+          << std::setprecision(12) << out.psnr << '\n';
 
-      const std::string nextPath = runDir + "/next_" + std::to_string(iter);
-
-      pgma::save(next, nextPath);
-      run_logging::debug("Decompression wrote intermediate " + nextPath + ".pgm");
       swap(img, next);
     }
 
@@ -164,8 +205,7 @@ void PGMAPipeline::decompress(vector<FractalMapping>* fractalMappings) {
     std::cout << "Time: " << fmtMs(decompress_seconds) << " ms\n";
     std::cout << "Iterations: " << decompressionIterations << '\n';
     std::cout << "Range mappings: " << fractalMappings->size() << '\n';
-    std::cout << "MSE: " << fmt3(last_mse) << "  MAE: " << fmt3(last_mae) << "  PSNR: " << fmt3(last_psnr)
-              << '\n';
     std::cout << "Iteration metrics: " << benchmark_csv << '\n';
     std::cout << "Output: " << runDir + "/final.pgm" << '\n';
+    return out;
 }

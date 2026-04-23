@@ -3,20 +3,27 @@
 #include "../pixel/pixel.hpp"
 #include "../utils/matrix.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
+#include <string>
 
 struct ImageErrorMetrics {
     double mse = 0;
     double mae = 0;
 };
 
-/** Per-pixel MSE and MAE vs reference (same dimensions as {@code recon}). */
+/**
+ * MSE/MAE over the overlapping rectangle (min rows × min cols), same as Java
+ * `PGMAUtils` when both rasters are indexed with the top-left
+ * `height × width` of the original. Extra pixels in the larger image are ignored; no
+ * silent zeros on mismatch.
+ */
 inline ImageErrorMetrics computeErrorVsReference(Matrix<GrayPixel>& ref, Matrix<GrayPixel>& recon) {
     ImageErrorMetrics out;
-    const int rows = ref.getRows();
-    const int cols = ref.getCols();
-    if (rows != recon.getRows() || cols != recon.getCols()) {
+    const int rows = std::min(ref.getRows(), recon.getRows());
+    const int cols = std::min(ref.getCols(), recon.getCols());
+    if (rows <= 0 || cols <= 0) {
         return out;
     }
     double total_sq = 0;
@@ -35,6 +42,9 @@ inline ImageErrorMetrics computeErrorVsReference(Matrix<GrayPixel>& ref, Matrix<
     out.mae = total_abs / n;
     return out;
 }
+
+/** MSE/MAE by loading two P2 PGMs (matches Java `PGMAUtils.calculateErrorMetrics`). */
+ImageErrorMetrics computeErrorMetricsFromPgmPaths(const std::string& refPgm, const std::string& otherPgm);
 
 /** PSNR for 8-bit gray; matches {@code ErrorUtils.calculatePSNR} in Java. */
 inline double psnrFromMse(double mse) {

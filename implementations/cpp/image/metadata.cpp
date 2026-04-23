@@ -96,3 +96,38 @@ void pgma::save(Matrix<GrayPixel> pixels, string path){
 
   metadata.save(path);
 }
+
+static void readPgmHeader(SequenceReader& sr, int& width, int& height, int& maxVal) {
+  vector<char> magic = sr.read(2);
+  (void)magic;
+  sr.readWhitespace();
+  if (sr.nextCharIs('#')) {
+    sr.skipUntilLineBreak();
+  }
+  width = sr.readNextInt();
+  height = sr.readNextInt();
+  maxVal = sr.readNextInt();
+  sr.readWhitespace();
+}
+
+Matrix<GrayPixel> pgma::read_matrix(const string& path) {
+  ifstream file(path);
+  if (!file.is_open()) {
+    run_logging::error("could not open image: " + path);
+    std::exit(1);
+  }
+  SequenceReader sr(file);
+  int width = 0;
+  int height = 0;
+  int maxVal = 0;
+  readPgmHeader(sr, width, height, maxVal);
+  (void)maxVal;
+  Matrix<GrayPixel> out(height, width);
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      int level = sr.readNextInt();
+      out.set(i, j, GrayPixel(level));
+    }
+  }
+  return out;
+}

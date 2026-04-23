@@ -35,7 +35,8 @@ int main(int argc, const char* argv[]) {
                                                           params.compressionParallelism, new MeanReductionStrategy());
 
         PGMAPipeline pipeline = PGMAPipeline(metadata, gbc, runDir, params.iterations,
-                                            params.decompressionParallelism);
+                                            params.decompressionParallelism, params.cleanCodebook,
+                                            params.imagePath);
         pipeline.run();
     } catch (const exception& e) {
         run_logging::error(e.what());

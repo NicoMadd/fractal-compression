@@ -13,6 +13,8 @@ class PipelineParams {
     int compressionParallelism = 1;
     /** Decompression thread pool size (Java `-P`). Default: same as compression parallelism. */
     int decompressionParallelism = 1;
+    /** When true, always re-run compression and overwrite the on-disk codebook (Java `-c`). */
+    bool cleanCodebook = false;
     bool debug = false;
 
     /** Same rules as Java `PipelineParams.parse`: argv[0] is program name. */

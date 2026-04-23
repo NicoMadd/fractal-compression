@@ -8,10 +8,17 @@
 
 using namespace std;
 
+struct DecompressResult {
+  double mse = 0;
+  double mae = 0;
+  double psnr = 0;
+};
+
 class PGMAPipeline {
   public:
     PGMAPipeline(PGMAImageMetadata& metadata, GrayBlockCompression& gbc, string runDir,
-                   int decompressionIterations, int decompressionParallelism);
+                 int decompressionIterations, int decompressionParallelism, bool cleanCodebook,
+                 string originalImagePath);
     void run();
   private:
     PGMAImageMetadata metadata;
@@ -19,7 +26,10 @@ class PGMAPipeline {
     string runDir;
     int decompressionIterations;
     int decompressionParallelism;
+    bool cleanCodebook;
+    /** Path to the input reference PGM; used to re-read pixels for MSE/MAE like Java `recordIterationErrorMetrics`. */
+    string originalImagePath;
 
     vector<FractalMapping>* compress();
-    void decompress(vector<FractalMapping>* fractalMappings);
+    DecompressResult decompress(vector<FractalMapping>* fractalMappings);
 };

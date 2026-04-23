@@ -4,3 +4,5 @@
 /processes/
 # Dated copies of registry.jsonl from implementations/java/benchmarks/run_matrix.sh
 benchmarks/snapshots/
+# C object files from implementations/cpp/run.sh (miniz)
+implementations/cpp/third_party/*.o

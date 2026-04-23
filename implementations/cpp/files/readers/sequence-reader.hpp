@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -16,6 +17,7 @@ public:
   bool nextIsEof();
   void skipUntilLineBreak();
   int readNextInt();
+  float readNextFloat();
 
 private:
   ifstream *in_;

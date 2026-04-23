@@ -30,4 +30,6 @@ PGMAImageMetadata loadImage(string imagePath);
 
 namespace pgma{
   void save(Matrix<GrayPixel> pixels, string path);
+  /** Load a P2 PGM; matrix shape is (height × width) rows×cols, same as {@link PGMAImageMetadata(ifs)}. */
+  Matrix<GrayPixel> read_matrix(const std::string& path);
 };

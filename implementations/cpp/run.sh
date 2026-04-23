@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# No `set -u` so an empty `pass_args` is safe in all bash versions
+set -eo pipefail
 
 cd "$(dirname "$0")"
 
@@ -28,9 +29,23 @@ case "${FORCE_COMPILE}" in
 esac
 [[ "$force_compile_arg" -eq 1 ]] && should_compile=1
 
+# Miniz (C) for DEFLATE .zip baselines, same as Java {@code ZipOutputStream} / level 9
+miniz_c=(third_party/miniz.c third_party/miniz_tdef.c third_party/miniz_tinfl.c third_party/miniz_zip.c)
+miniz_o=()
+for c in "${miniz_c[@]}"; do
+  miniz_o+=("${c%.c}.o")
+done
+
 if [[ "$should_compile" -eq 0 && -f main.exe ]]; then
   for f in "${sources[@]}"; do
     if [[ "$f" -nt main.exe ]]; then
+      should_compile=1
+      break
+    fi
+  done
+  for c in "${miniz_c[@]}"; do
+    o="${c%.c}.o"
+    if [[ ! -f "$o" || "$c" -nt "$o" || "$c" -nt main.exe ]]; then
       should_compile=1
       break
     fi
@@ -40,7 +55,13 @@ else
 fi
 
 if [[ "$should_compile" -eq 1 ]]; then
-  g++ -std=c++17 -Werror -O3 -o main.exe "${sources[@]}"
+  for c in "${miniz_c[@]}"; do
+    o="${c%.c}.o"
+    # Third-party C; -Werror would fail on all warnings in miniz
+    gcc -O3 -std=c11 -c -I"$(pwd)/third_party" -o "$o" "$c"
+  done
+  # stb_image_write.h uses sprintf in HDR path (not used for our PNGs); third-party
+  g++ -std=c++17 -Werror -Wno-deprecated-declarations -O3 -o main.exe "${sources[@]}" "${miniz_o[@]}"
   echo "Compiled executable: ./main.exe"
 else
   echo "Skipping compile (main.exe up to date). Set FORCE_COMPILE=1 or use --fc to rebuild."
