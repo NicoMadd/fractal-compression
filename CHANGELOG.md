@@ -7,6 +7,10 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-04-23 — C++ PGMA pipeline (`feature/6-cpp-implementation`)
+
+Merged **[#1](https://github.com/NicoMadd/fractal-compression/pull/1)** — reference **C++** implementation under [`implementations/cpp/`](implementations/cpp/) aligned with the Java gray **PGMA** codec (encode/decode, **`.fc`** codebook, **`processes/cpp/<stem>/`** layout, baselines, threading).
+
 ### Added
 
 - **C++ fractal transforms:** [`implementations/cpp/fractal/transformation/`](implementations/cpp/fractal/transformation/) — **`TransformationType`**, **`Transformation`** hierarchy for all eight isometries, **`Transformation::from`** registry, **`transform(Matrix*, Matrix*)`** aligned with the Java gray codec.
