@@ -11,6 +11,8 @@ import implementations.java.compression.src.utils.image.pixel.GrayPixel;
 
 public class PGMAImageMetadata implements ImageMetadata<GrayPixel> {
 
+    private static final byte[] SPACE_BYTES = " ".getBytes();
+
     private int width;
     private int height;
     private int maxVal;
@@ -98,9 +100,7 @@ public class PGMAImageMetadata implements ImageMetadata<GrayPixel> {
                 for (int col = 0; col < width; col++) {
                     GrayPixel p = pixels[row][col];
                     p.addToFile(fos);
-                    fos.write(" ".getBytes());
-                    fos.write(" ".getBytes());
-
+                    fos.write(SPACE_BYTES);
                 }
             }
         }

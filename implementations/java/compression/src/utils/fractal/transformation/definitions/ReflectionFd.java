@@ -6,8 +6,9 @@ import implementations.java.compression.src.utils.matrix.MatrixShape;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
 /**
- * First-diagonal reflection ({@code FD}): mirror across the primary diagonal
- * (top-left to bottom-right). Equivalent to matrix transpose: {@code (i,j) -> (j,i)}.
+ * {@code FD}: mirror across the main diagonal (top-left to bottom-right). Same as matrix
+ * transpose, {@code (i,j) -> (j,i)}; valid for any rectangle if {@code transformed} has
+ * swapped row/column count (here callers use square blocks).
  */
 public class ReflectionFd extends Transformation {
 

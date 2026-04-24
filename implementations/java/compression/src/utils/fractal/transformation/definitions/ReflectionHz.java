@@ -6,10 +6,9 @@ import implementations.java.compression.src.utils.matrix.MatrixShape;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
 /**
- * Horizontal reflection over the x-axis ({@code HZ}): reverses the horizontal
- * (column / {@code x}) coordinate, {@code j -> n-1-j}; row index {@code i} is
- * unchanged (left ↔ right). The mirror line is the vertical midline of the
- * block.
+ * {@code HZ}: left–right flip, {@code (i,j) -> (i, n-1-j)} with {@code n = shape.rows()}
+ * (square blocks in the codec, so {@code n} matches the column count). Mirror line is
+ * vertical through the block center.
  */
 public class ReflectionHz extends Transformation {
 

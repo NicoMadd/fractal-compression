@@ -12,9 +12,9 @@ import java.util.stream.Stream;
 public class FileUtils {
 
     /**
-     * Root directory: {@code processes/} at repo level when cwd is the Java module.
+     * Root directory: {@code processes/java/} at repo level when cwd is the Java module.
      */
-    public static final Path PROCESSES_ROOT = Paths.get("").toAbsolutePath().resolve("../../../processes");
+    public static final Path PROCESSES_ROOT = Paths.get("").toAbsolutePath().resolve("../../../processes/java");
 
     /**
      * Subdirectory under each image folder where iteration outputs (PGMs,

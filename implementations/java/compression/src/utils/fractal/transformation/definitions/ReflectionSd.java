@@ -6,8 +6,8 @@ import implementations.java.compression.src.utils.matrix.MatrixShape;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
 /**
- * Secondary-diagonal reflection ({@code SD}): mirror across the other diagonal
- * (top-right to bottom-left). Maps {@code (i,j) -> (n-1-j, n-1-i)} for an {@code n x n} block.
+ * {@code SD}: mirror across the anti-diagonal (top-right to bottom-left). Square
+ * {@code n×n}: {@code (i,j) -> (n-1-j, n-1-i)} with {@code n = shape.rows()}.
  */
 public class ReflectionSd extends Transformation {
 

@@ -5,6 +5,10 @@ import implementations.java.compression.src.utils.fractal.transformation.Transfo
 import implementations.java.compression.src.utils.matrix.MatrixShape;
 import implementations.java.compression.src.utils.matrix.MatrixUtils;
 
+/**
+ * 180° rotation. With {@code n = shape.rows()}: {@code (i,j) -> (n-1-i, n-1-j)}; square
+ * blocks use the same {@code n} for rows and columns.
+ */
 public class RotationCW180 extends Transformation {
 
     public RotationCW180() {
@@ -14,8 +18,6 @@ public class RotationCW180 extends Transformation {
     @Override
     public <T> void transform(T[][] src, T[][] transformed) {
         MatrixShape shape = MatrixUtils.shape(src);
-
-        // assuming square matrix
         int dimension = shape.rows();
 
         for (int i = 0; i < shape.rows(); i++) {
