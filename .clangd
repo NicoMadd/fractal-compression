@@ -2,3 +2,5 @@ CompileFlags:
   Add:
     - -std=c++17
     - -Iimplementations/cpp
+  Compiler: /usr/bin/g++
+QueryDriver: /usr/bin/g++
