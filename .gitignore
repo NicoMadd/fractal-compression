@@ -8,4 +8,4 @@ benchmarks/snapshots/
 implementations/cpp/third_party/*.o
 
 # CUDA test workspace
-implementations/implementations/cuda-old
+implementations/cuda-old
