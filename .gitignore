@@ -6,3 +6,6 @@
 benchmarks/snapshots/
 # C object files from implementations/cpp/run.sh (miniz)
 implementations/cpp/third_party/*.o
+
+# CUDA test workspace
+implementations/implementations/cuda-old
