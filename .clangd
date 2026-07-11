@@ -2,5 +2,7 @@ CompileFlags:
   Add:
     - -std=c++17
     - -Iimplementations/cpp
+    - -Iimplementations/cuda
+    - -Iimplementations/cuda-old
   Compiler: /usr/bin/g++
 QueryDriver: /usr/bin/g++
