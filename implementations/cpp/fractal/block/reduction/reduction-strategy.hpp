@@ -3,6 +3,8 @@
 #include "../../../pixel/pixel.hpp"
 #include "../../../utils/matrix.hpp"
 
+#include <string>
+
 using namespace std;
 
 class ReductionStrategy {
