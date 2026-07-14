@@ -149,11 +149,6 @@ vector<FractalMapping> *GrayBlockCompression::build_fractal_mappings() {
 
   vector<FractalMapping> *fractal_mappings = new vector<FractalMapping>();
 
-  int total_ranges =
-      this->range_blocks.getRows() * this->range_blocks.getCols();
-  int step = max(1, total_ranges / 25);
-  int done = 0;
-
   const int n_workers = max(1, this->parallelism);
 
   std::mutex merge_mtx;
@@ -162,7 +157,7 @@ vector<FractalMapping> *GrayBlockCompression::build_fractal_mappings() {
   for (vector<Block> range_row : this->range_blocks.getData()) {
     for (Block range_block : range_row) {
       executor.submit(
-          [this, range_block, fractal_mappings, &merge_mtx, &done, total_ranges, step]() {
+          [this, range_block, fractal_mappings, &merge_mtx]() {
             DomainFinder finder(this->reduced_domain_blocks, *this);
             FractalMapping mapping = finder.findBest(range_block);
             {
