@@ -7,6 +7,18 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 
+### Changed
+
+- **C++ `run.sh`:** unified **`COMMON_FLAGS`** (**`-std=c++17`**, **`-Werror`**, **`-Wall`**, **`-Wextra`**, **`-Wno-deprecated-declarations`**); platform defines — **`-D_LIBCPP_REMOVE_TRANSITIVE_INCLUDES`** (macOS/Clang) or **`-D_GLIBCXX_RELEASE`** (Linux/GCC); **`--release`** selects **`-O3`**, default dev build uses **`-O0 -g`**; output binary **`main`** (was **`main.exe`**); incremental compile and run messages updated accordingly.
+- **C++ `PGMAImageMetadata`:** member declaration order **`width`** before **`height`** so constructor init list matches **`-Wreorder-ctor`**.
+- **C++ `GrayBlockCompression::build_fractal_mappings`:** drop unused lambda captures (**`step`**, **`done`**, **`total_ranges`**) for **`-Wunused-lambda-capture`**.
+- **C++ third-party `stb_image_write.h`:** **`stbi__write_context s{}`** instead of **`{ 0 }`** for **`-Wmissing-field-initializers`** under **`-Wextra`**.
+- **C++ `.gitignore`:** ignore built **`main`** executable.
+
+### Fixed
+
+- **C++ build (Linux / strict Clang):** **`run.sh`** flags and small source/third-party tweaks so **`g++`** with **`-Werror -Wall -Wextra`** compiles cleanly on macOS and Linux.
+
 ## [0.6.0] - 2026-04-23 — C++ PGMA pipeline (`feature/6-cpp-implementation`)
 
 Merged **[#1](https://github.com/NicoMadd/fractal-compression/pull/1)** — reference **C++** implementation under [`implementations/cpp/`](implementations/cpp/) aligned with the Java gray **PGMA** codec (encode/decode, **`.fc`** codebook, **`processes/cpp/<stem>/`** layout, baselines, threading).
