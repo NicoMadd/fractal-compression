@@ -3,6 +3,15 @@ CompileFlags:
     - -std=c++17
     - -Iimplementations/cpp
     - -Iimplementations/cuda
-    - -Iimplementations/cuda-old
+    - -I/usr/include/c++/11
+    - -I/usr/include/x86_64-linux-gnu/c++/11
+    - -I/usr/lib/gcc/x86_64-linux-gnu/11/include
+    - -I/usr/include/x86_64-linux-gnu
+    - -I/usr/include
   Compiler: /usr/bin/g++
-QueryDriver: /usr/bin/g++
+---
+If:
+  PathMatch: .*\.cuh$
+CompileFlags:
+  Add:
+    - -xc++-header

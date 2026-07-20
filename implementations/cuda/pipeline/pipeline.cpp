@@ -148,19 +148,9 @@ DecompressResult PGMAPipeline::decompress(vector<FractalMapping>* fractalMapping
       run_logging::debug("Iteration " + to_string(iter));
       const auto iteration_start = chrono::steady_clock::now();
 
-      if (decompressionParallelism <= 1) {
-        for (size_t mi = 0; mi < fractalMappings->size(); mi++) {
-          decompressor.apply(fractalMappings->at(mi), img, next);
-        }
-      } else {
-        Executor ex(decompressionParallelism);
-        for (size_t mi = 0; mi < fractalMappings->size(); mi++) {
-          FractalMapping m = fractalMappings->at(mi);
-          ex.submit([&decompressor, m, &img, &next]() { decompressor.apply(m, img, next); });
-        }
-        ex.shutdown();
-        ex.join();
-      }
+
+      decompressor.apply(fractalMappings, img, next);
+ 
 
       const auto iteration_end = std::chrono::steady_clock::now();
       const int64_t duration_nanos = std::chrono::duration_cast<std::chrono::nanoseconds>(
