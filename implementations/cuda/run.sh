@@ -5,7 +5,7 @@ set -eo pipefail
 cd "$(dirname "$0")"
 
 # Set FORCE_COMPILE=1, or pass --fc, to always recompile. Otherwise skip g++
-# when main.exe exists and is newer than all .cpp sources.
+# when main exists and is newer than all .cpp / .cu sources.
 FORCE_COMPILE="${FORCE_COMPILE:-0}"
 
 # Set flags used by both Mac and Linux
@@ -39,11 +39,29 @@ else
   echo "Using development flags"
 fi
 
+CUDA_ARCH="${CUDA_ARCH:-sm_75}"
+NVCC_FLAGS=(-std=c++17 -arch="${CUDA_ARCH}" -Xcompiler -Wall,-Wextra)
+if [[ "$release_arg" -eq 1 ]]; then
+  NVCC_FLAGS+=(-O3)
+else
+  NVCC_FLAGS+=(-O0 -g)
+fi
+
 # All .cpp files under this directory (recursive)
 sources=()
 while IFS= read -r f; do
   sources+=("$f")
 done < <(find . -name '*.cpp' | LC_ALL=C sort)
+
+cuda_sources=()
+while IFS= read -r f; do
+  cuda_sources+=("$f")
+done < <(find . -name '*.cu' | LC_ALL=C sort)
+
+cuda_objects=()
+for f in "${cuda_sources[@]}"; do
+  cuda_objects+=("${f%.cu}.o")
+done
 
 should_compile=0
 case "${FORCE_COMPILE}" in
@@ -72,6 +90,13 @@ if [[ "$should_compile" -eq 0 && -f main ]]; then
       break
     fi
   done
+  for f in "${cuda_sources[@]}"; do
+    o="${f%.cu}.o"
+    if [[ ! -f "$o" || "$f" -nt "$o" || "$o" -nt main ]]; then
+      should_compile=1
+      break
+    fi
+  done
 else
   should_compile=1
 fi
@@ -83,7 +108,13 @@ if [[ "$should_compile" -eq 1 ]]; then
     gcc -O3 -std=c11 -c -I"$(pwd)/third_party" -o "$o" "$c"
   done
   # stb_image_write.h uses sprintf in HDR path (not used for our PNGs); third-party
-  g++ "${COMMON_FLAGS[@]}" "${PLATFORM_FLAGS[@]}" -o main "${sources[@]}" "${miniz_o[@]}"
+  for f in "${cuda_sources[@]}"; do
+    o="${f%.cu}.o"
+    nvcc "${NVCC_FLAGS[@]}" -c "$f" -o "$o"
+  done
+
+  g++ "${COMMON_FLAGS[@]}" "${PLATFORM_FLAGS[@]}" \
+    -o main "${sources[@]}" "${cuda_objects[@]}" "${miniz_o[@]}" -lcudart
   echo "Compiled executable: ./main"
 else
   echo "Skipping compile (main executable up to date). Set FORCE_COMPILE=1 or use --fc to rebuild."

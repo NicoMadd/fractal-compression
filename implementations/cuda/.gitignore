@@ -1,2 +1,4 @@
 *.exe
 main
+# Object files from run.sh (miniz, nvcc .cu)
+*.o
