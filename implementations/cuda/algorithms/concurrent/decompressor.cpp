@@ -11,10 +11,9 @@
 #include "decompressor_cuda.cuh"
 
 Decompressor::Decompressor(int domainSize, int rangeSize, ReductionStrategy* reductionStrategy)
-    : domainSize_(domainSize), rangeSize_(rangeSize), reductionStrategy_(reductionStrategy), d_img_(nullptr),
-    d_next_(nullptr),
-    d_mappings_(nullptr),
-    gpu_initialized_(false) {}
+    : domainSize_(domainSize),
+      rangeSize_(rangeSize),
+      reductionStrategy_(reductionStrategy) {}
 
 Decompressor::~Decompressor() {
     cudaFree(d_img_);
