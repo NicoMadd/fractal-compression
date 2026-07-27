@@ -1,0 +1,187 @@
+% Sección "Materiales y métodos" alineada con la implementación real del
+% repositorio. Requiere: graphicx, subcaption, booktabs, hyperref.
+
+\section{Materiales y métodos}
+
+\subsection{Conjunto de imágenes}
+
+Para la evaluación se seleccionaron las imágenes Apollonian Gasket, Lena y Baboon. Los archivos originales se encuentran en formato PGM ASCII (magic number \texttt{P2}) y fueron obtenidos del repositorio disponible en \url{https://people.sc.fsu.edu/~jburkardt/data/pgma/pgma.html}. Este formato representa imágenes en escala de grises mediante valores de intensidad almacenados sin compresión.
+
+Apollonian Gasket, originalmente de $600\times600$ píxeles, fue recortada desde su región central a $512\times512$ píxeles y se identifica como \texttt{apollonian\_gasket\_512}. Lena y Baboon ya poseen $512\times512$ píxeles y se utilizaron sin modificaciones. De esta manera, las tres imágenes comparten dimensiones y son divisibles por todos los tamaños de bloque evaluados.
+
+Las versiones PNG y JPEG fueron generadas a partir de los mismos archivos PGM que consume el compresor fractal, asegurando que todos los métodos partan exactamente del mismo contenido visual. Los niveles de intensidad se copian sin reescalado desde el archivo PGM, de modo que el valor \texttt{maxval} declarado en la cabecera no altera las muestras; esto es relevante porque Lena declara \texttt{maxval} $=245$ mientras que las otras dos declaran $255$.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcrc}
+\toprule
+Imagen & Dimensión & Tamaño (bytes) & Autosimilitud \\
+\midrule
+Apollonian Gasket & $512\times512$ & 1\,048\,134 & Alta \\
+Lena & $512\times512$ & 966\,593 & Media \\
+Baboon & $512\times512$ & 996\,517 & Baja \\
+\bottomrule
+\end{tabular}
+\caption{Conjunto de imágenes utilizado en la evaluación experimental. El tamaño corresponde al archivo PGM ASCII de entrada.}
+\label{tab:conjunto_imagenes}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+
+    \begin{subfigure}[b]{0.31\textwidth}
+        \centering
+        \includegraphics[
+            width=\linewidth,
+            trim=60 60 60 60,
+            clip
+        ]{images/apollonian_gasket_512.png}
+        \caption{Apollonian Gasket}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.31\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/lena.png}
+        \caption{Lena}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.31\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/baboon.png}
+        \caption{Baboon}
+    \end{subfigure}
+
+    \caption{Imágenes utilizadas en la evaluación experimental.}
+    \label{fig:imagenes_evaluacion}
+\end{figure}
+
+\subsection{Clasificación de la autosimilitud}
+
+La autosimilitud fue clasificada de manera perceptiva antes de realizar los experimentos. Para ello, se observaron la presencia de patrones repetitivos, regiones uniformes, texturas y bordes.
+
+\begin{itemize}
+    \item Alta: presencia clara de estructuras repetitivas (Apollonian Gasket).
+    \item Media: presencia parcial de regiones semejantes (Lena).
+    \item Baja: abundancia de texturas, bordes o estructuras poco repetitivas (Baboon).
+\end{itemize}
+
+Cada nivel queda representado por exactamente una imagen del conjunto, lo que permite asociar de manera directa el comportamiento observado con el grado de autosimilitud.
+
+\subsection{Configuración de los métodos}
+
+Para la compresión fractal se utilizaron dos configuraciones:
+
+\begin{itemize}
+    \item Bloques rango de $4\times4$ y dominio de $8\times8$.
+    \item Bloques rango de $8\times8$ y dominio de $16\times16$.
+\end{itemize}
+
+En ambos casos el bloque de dominio duplica el lado del bloque rango, por lo que la reducción al tamaño del rango se realiza con un factor $2{:}1$ mediante el promediado de vecindades de $2\times2$ píxeles. Los bloques rango forman una partición sin solapamiento de la imagen, y los bloques de dominio se toman de una grilla también sin solapamiento.
+
+Se utilizaron ocho transformaciones geométricas básicas: identidad, rotaciones de $90^\circ$, $180^\circ$ y $270^\circ$, reflexiones horizontal y vertical, y reflexiones respecto de las dos diagonales. Para cada bloque rango se evaluaron todos los bloques de dominio reducidos combinados con las ocho transformaciones. Para cada par se calcularon los coeficientes de contraste $s$ y brillo $o$ por mínimos cuadrados, y se conservó la combinación de menor error cuadrático. La búsqueda es exhaustiva: no se aplicó ningún umbral máximo de error ni criterio de terminación anticipada, de modo que el costo de codificación es determinista y depende únicamente de la geometría de bloques.
+
+Cada bloque rango queda descrito por la posición del dominio elegido, el índice de la transformación y el par $(s, o)$. El conjunto de estas asignaciones constituye el \emph{codebook} y es el artefacto que se mide como salida comprimida del método fractal, según se detalla en la Sección~\ref{sec:tamano_comprimido}.
+
+La reconstrucción parte de una imagen inicial de ruido aleatorio y aplica de forma iterativa el sistema de funciones iteradas, lo que permite verificar que el punto fijo alcanzado no depende de la imagen de partida. La calidad se evaluó en la iteración 10 y en la iteración 20. Las iteraciones se indexan desde 0, por lo que las imágenes reportadas como iteración 10 y 20 corresponden, respectivamente, a 11 y 21 aplicaciones del operador de reconstrucción.
+
+Para JPEG se evaluaron niveles de calidad de 25, 50, 75 y 90, sin submuestreo de croma (las imágenes son de un solo canal). Para PNG se utilizó compresión sin pérdida con la configuración predeterminada del codificador. El Cuadro~\ref{tab:referencias} resume los tamaños obtenidos por estas referencias.
+
+\begin{table}[h]
+\centering
+\setlength{\tabcolsep}{10pt}
+\begin{tabular}{llrr}
+\toprule
+Imagen & Formato & Tamaño (bytes) & Bits por píxel \\
+\midrule
+Apollonian Gasket & PNG     &  23\,039 & 0,70 \\
+                  & JPEG 25 &   9\,461 & 0,29 \\
+                  & JPEG 50 &  12\,992 & 0,40 \\
+                  & JPEG 75 &  17\,487 & 0,53 \\
+                  & JPEG 90 &  25\,150 & 0,77 \\
+\midrule
+Lena              & PNG     & 160\,263 & 4,89 \\
+                  & JPEG 25 &  13\,581 & 0,41 \\
+                  & JPEG 50 &  20\,913 & 0,64 \\
+                  & JPEG 75 &  32\,559 & 0,99 \\
+                  & JPEG 90 &  59\,252 & 1,81 \\
+\midrule
+Baboon            & PNG     & 210\,918 & 6,44 \\
+                  & JPEG 25 &  31\,112 & 0,95 \\
+                  & JPEG 50 &  48\,852 & 1,49 \\
+                  & JPEG 75 &  73\,167 & 2,23 \\
+                  & JPEG 90 & 119\,506 & 3,65 \\
+\bottomrule
+\end{tabular}
+\caption{Tamaño y bits por píxel de las referencias PNG y JPEG generadas a partir de los archivos PGM del experimento. PNG es sin pérdida; el número que acompaña a JPEG indica el nivel de calidad.}
+\label{tab:referencias}
+\end{table}
+
+\subsection{Implementación y entorno de ejecución}
+
+La implementación de la compresión fractal fue desarrollada en Java, con codificación y decodificación paralelizadas mediante un pool de hilos de tamaño configurable. Los archivos de referencia PNG y JPEG se generaron con la biblioteca Pillow (que utiliza \textit{libjpeg} y \textit{zlib}) a partir de los mismos archivos PGM empleados por el compresor fractal. El código fuente se encuentra disponible en:
+
+\begin{center}
+\url{[URL del repositorio]}
+\end{center}
+
+\begin{itemize}
+    \item Procesador: Apple M4 Pro (12 núcleos, arquitectura \texttt{aarch64}).
+    \item Memoria RAM: 24\,GiB.
+    \item Sistema operativo: macOS 15.1 (build 24B2082).
+    \item Versión de Java: OpenJDK 25.0.1, GraalVM CE 25.0.1+8.1 (HotSpot, modo mixto).
+    \item Cantidad de hilos: 12 hilos de compresión y 12 de descompresión.
+\end{itemize}
+
+Cada configuración se ejecutó una vez por imagen, sin calentamiento previo de la JVM, de modo que los tiempos reportados incluyen el costo de interpretación y de compilación JIT inicial. Por esta razón, los tiempos deben interpretarse como órdenes de magnitud comparativos entre configuraciones y no como mediciones de régimen estacionario.
+
+\subsection{Medición del tamaño comprimido}
+\label{sec:tamano_comprimido}
+
+La salida del codificador fractal es un conjunto de asignaciones, una por bloque rango. Cada asignación requiere el índice del bloque de dominio seleccionado, el índice de la transformación aplicada y los coeficientes de contraste $s$ y brillo $o$. La posición del bloque rango no necesita almacenarse: las asignaciones se emiten en el orden de recorrido de la imagen, por lo que el bloque al que corresponde cada una queda determinado de forma implícita por su posición en la secuencia.
+
+El costo de almacenamiento es por lo tanto determinista y depende únicamente de la geometría de bloques: con $N_d$ bloques de dominio se requieren $\lceil \log_2 N_d \rceil$ bits para identificar el dominio y $3$ bits para la transformación, mientras que los coeficientes se cuantizan con $5$ bits para $s$ y $7$ bits para $o$, siguiendo la convención habitual en la literatura. El Cuadro~\ref{tab:costo_codebook} resume el costo resultante para las dos geometrías evaluadas.
+
+\begin{table}[h]
+\centering
+\setlength{\tabcolsep}{10pt}
+\begin{tabular}{lrrrr}
+\toprule
+Geometría & Bloques rango & Bits por bloque & Total (bytes) & bpp \\
+\midrule
+$r=4$, $d=8$  & 16\,384 & 27 & 55\,296 & 1,69 \\
+$r=8$, $d=16$ &  4\,096 & 25 & 12\,800 & 0,39 \\
+\bottomrule
+\end{tabular}
+\caption{Costo de almacenamiento del conjunto de asignaciones fractales para una imagen de $512\times512$ píxeles.}
+\label{tab:costo_codebook}
+\end{table}
+
+El archivo \texttt{.fc} que produce la implementación almacena estos campos en representación textual, e incluye además de manera explícita las coordenadas del bloque rango y las coordenadas absolutas del dominio, con el fin de permitir su inspección directa. Esos campos son redundantes y no se contabilizan en el Cuadro~\ref{tab:costo_codebook}. El tamaño en disco del archivo no se utiliza como medida de tasa, ya que refleja el formato de serialización elegido y no el contenido de información del código fractal.
+
+\subsection{Métricas y procedimiento experimental}
+
+Se registraron PSNR, MSE, MAE, tamaño original, tamaño comprimido, bits por píxel, relación de compresión y tiempos de codificación y decodificación. Los bits por píxel se calculan como
+\[
+\mathrm{bpp} = \frac{8 \cdot B}{W \cdot H},
+\]
+donde $B$ es el tamaño en bytes de la representación comprimida y $W \times H$ la resolución de la imagen.
+
+La relación de compresión se define respecto de la imagen en escala de grises sin comprimir, es decir un byte por píxel u $8$ bpp, de modo que
+\[
+\text{relación de compresión} = \frac{8}{\mathrm{bpp}}.
+\]
+Se adopta esta referencia, y no el tamaño del archivo PGM ASCII de entrada, porque dicho formato almacena cada píxel como texto y ocupa cerca de cuatro veces el espacio de la imagen sin comprimir; medir contra él sobreestimaría de manera sistemática el desempeño de todos los métodos evaluados.
+
+El PSNR se calcula sobre un rango dinámico de 255 niveles,
+\[
+\mathrm{PSNR} = 10 \log_{10}\!\left(\frac{255^{2}}{\mathrm{MSE}}\right),
+\]
+tomando como referencia la imagen PGM original y como estimación la imagen reconstruida en la iteración correspondiente. MSE y MAE se calculan píxel a píxel sobre la totalidad de la imagen.
+
+Para cada imagen se aplicaron las dos configuraciones fractales, los cuatro niveles de JPEG y PNG. Luego se reconstruyeron las imágenes y se compararon la calidad, los tamaños obtenidos y los tiempos de ejecución.
+
+\subsection{Reproducibilidad}
+
+Las imágenes del experimento y sus referencias se distribuyen bajo \texttt{data/experiments/}. El utilitario \texttt{generate\_experiment\_assets.py} reconstruye todo el conjunto desde los archivos PGM originales: aplica el recorte central de Apollonian Gasket, escribe los PGM utilizados en \texttt{images/pgma/}, y genera \texttt{images/png/} e \texttt{images/jpeg/} para los cuatro niveles de calidad. El archivo \texttt{assets\_manifest.json} deja registradas las dimensiones, los tamaños en bytes y los bits por píxel de cada artefacto generado.
+
+Cada ejecución del compresor fractal agrega una línea al registro \texttt{benchmarks/registry.jsonl}, con la configuración empleada, las métricas de calidad, los tamaños, los tiempos y una descripción del entorno de ejecución.

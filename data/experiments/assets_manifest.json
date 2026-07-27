@@ -1,0 +1,119 @@
+[
+  {
+    "stem": "apollonian_gasket_512",
+    "source": "data/images/pgma/apollonian_gasket.ascii.pgm",
+    "source_size": "600x600",
+    "size": "512x512",
+    "maxval": 255,
+    "self_similarity": "alta",
+    "pgma": {
+      "path": "data/experiments/images/pgma/apollonian_gasket_512.ascii.pgm",
+      "bytes": 1048134
+    },
+    "png": {
+      "path": "data/experiments/images/png/apollonian_gasket_512.png",
+      "bytes": 23039,
+      "bpp": 0.703094
+    },
+    "jpeg": {
+      "25": {
+        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q25.jpg",
+        "bytes": 9461,
+        "bpp": 0.288727
+      },
+      "50": {
+        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q50.jpg",
+        "bytes": 12992,
+        "bpp": 0.396484
+      },
+      "75": {
+        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q75.jpg",
+        "bytes": 17487,
+        "bpp": 0.533661
+      },
+      "90": {
+        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q90.jpg",
+        "bytes": 25150,
+        "bpp": 0.767517
+      }
+    }
+  },
+  {
+    "stem": "lena",
+    "source": "data/images/pgma/lena.ascii.pgm",
+    "source_size": "512x512",
+    "size": "512x512",
+    "maxval": 245,
+    "self_similarity": "media",
+    "pgma": {
+      "path": "data/experiments/images/pgma/lena.ascii.pgm",
+      "bytes": 966593
+    },
+    "png": {
+      "path": "data/experiments/images/png/lena.png",
+      "bytes": 160263,
+      "bpp": 4.890839
+    },
+    "jpeg": {
+      "25": {
+        "path": "data/experiments/images/jpeg/lena_q25.jpg",
+        "bytes": 13581,
+        "bpp": 0.414459
+      },
+      "50": {
+        "path": "data/experiments/images/jpeg/lena_q50.jpg",
+        "bytes": 20913,
+        "bpp": 0.638214
+      },
+      "75": {
+        "path": "data/experiments/images/jpeg/lena_q75.jpg",
+        "bytes": 32559,
+        "bpp": 0.993622
+      },
+      "90": {
+        "path": "data/experiments/images/jpeg/lena_q90.jpg",
+        "bytes": 59252,
+        "bpp": 1.808228
+      }
+    }
+  },
+  {
+    "stem": "baboon",
+    "source": "data/images/pgma/baboon.ascii.pgm",
+    "source_size": "512x512",
+    "size": "512x512",
+    "maxval": 255,
+    "self_similarity": "baja",
+    "pgma": {
+      "path": "data/experiments/images/pgma/baboon.ascii.pgm",
+      "bytes": 996517
+    },
+    "png": {
+      "path": "data/experiments/images/png/baboon.png",
+      "bytes": 210918,
+      "bpp": 6.436707
+    },
+    "jpeg": {
+      "25": {
+        "path": "data/experiments/images/jpeg/baboon_q25.jpg",
+        "bytes": 31112,
+        "bpp": 0.949463
+      },
+      "50": {
+        "path": "data/experiments/images/jpeg/baboon_q50.jpg",
+        "bytes": 48852,
+        "bpp": 1.490845
+      },
+      "75": {
+        "path": "data/experiments/images/jpeg/baboon_q75.jpg",
+        "bytes": 73167,
+        "bpp": 2.23288
+      },
+      "90": {
+        "path": "data/experiments/images/jpeg/baboon_q90.jpg",
+        "bytes": 119506,
+        "bpp": 3.647034
+      }
+    }
+  }
+]

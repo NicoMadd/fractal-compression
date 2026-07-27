@@ -7,8 +7,14 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 
+### Added
+
+- **Experiment image set:** [`data/experiments/`](data/experiments/) — frozen inputs for the paper's evaluation, built by [`generate_experiment_assets.py`](data/experiments/generate_experiment_assets.py) (Pillow). Three **512×512** images: **`apollonian_gasket_512`** (center crop of the original **600×600** `apollonian_gasket.ascii.pgm`), **`lena`** and **`baboon`**. Per image the script emits, under **`images/`**, **`pgma/<stem>.ascii.pgm`** (P2, levels copied verbatim so `maxval` never rescales samples), **`png/<stem>.png`** (lossless) and **`jpeg/<stem>_q{25,50,75,90}.jpg`** (no chroma subsampling), plus **`assets_manifest.json`** with dimensions, byte sizes and **bits per pixel** for every artifact.
+- **Paper section draft:** [`docs/paper/materiales_y_metodos.tex`](docs/paper/materiales_y_metodos.tex) — "Materiales y métodos" aligned with the actual implementation: image table with self-similarity labels, exhaustive 8-isometry search with least-squares contrast/brightness and no error threshold, random-noise initial image, 0-indexed reconstruction loop, bpp definition, PSNR over a 255-level dynamic range, and the measured execution environment (Apple M4 Pro, 12 cores, 24 GiB, macOS 15.1, GraalVM CE 25.0.1).
+
 ### Changed
 
+- **Evaluation set:** **Casablanca** dropped from the experiments — it is **460×360**, neither square nor divisible by the **8** / **16** domain block sizes used, which `GrayBlockCompression` assumes. The source file stays in [`data/images/pgma/`](data/images/pgma/).
 - **C++ `run.sh`:** unified **`COMMON_FLAGS`** (**`-std=c++17`**, **`-Werror`**, **`-Wall`**, **`-Wextra`**, **`-Wno-deprecated-declarations`**); platform defines — **`-D_LIBCPP_REMOVE_TRANSITIVE_INCLUDES`** (macOS/Clang) or **`-D_GLIBCXX_RELEASE`** (Linux/GCC); **`--release`** selects **`-O3`**, default dev build uses **`-O0 -g`**; output binary **`main`** (was **`main.exe`**); incremental compile and run messages updated accordingly.
 - **C++ `PGMAImageMetadata`:** member declaration order **`width`** before **`height`** so constructor init list matches **`-Wreorder-ctor`**.
 - **C++ `GrayBlockCompression::build_fractal_mappings`:** drop unused lambda captures (**`step`**, **`done`**, **`total_ranges`**) for **`-Wunused-lambda-capture`**.
