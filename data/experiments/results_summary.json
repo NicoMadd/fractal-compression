@@ -1,0 +1,764 @@
+{
+  "images": [
+    {
+      "stem": "apollonian_gasket_512",
+      "size": "512x512",
+      "self_similarity": "alta",
+      "pgma_bytes": 1048134
+    },
+    {
+      "stem": "lena",
+      "size": "512x512",
+      "self_similarity": "media",
+      "pgma_bytes": 966593
+    },
+    {
+      "stem": "baboon",
+      "size": "512x512",
+      "self_similarity": "baja",
+      "pgma_bytes": 996517
+    },
+    {
+      "stem": "sun_tzu_512",
+      "size": "512x512",
+      "self_similarity": "baja (texto)",
+      "pgma_bytes": 1027181
+    }
+  ],
+  "fractal": [
+    {
+      "stem": "apollonian_gasket_512",
+      "method": "FBC r=4, d=8",
+      "range_size": 4,
+      "domain_size": 8,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 424521,
+      "bpp": 12.955353,
+      "compression_ratio": 0.6175,
+      "range_blocks": 16384,
+      "encode_ms": 16722.9161,
+      "decode_total_ms": 512.445,
+      "decode_pass_avg_ms": 24.4021,
+      "quality": {
+        "5": {
+          "mse": 174.712025,
+          "mae": 2.49284,
+          "psnr": 25.7076,
+          "decode_pass_ms": 23.047
+        },
+        "10": {
+          "mse": 44.784706,
+          "mae": 1.280388,
+          "psnr": 31.6195,
+          "decode_pass_ms": 22.5675
+        },
+        "20": {
+          "mse": 34.117645,
+          "mae": 1.105614,
+          "psnr": 32.801,
+          "decode_pass_ms": 23.5848
+        }
+      }
+    },
+    {
+      "stem": "apollonian_gasket_512",
+      "method": "FBC r=8, d=16",
+      "range_size": 8,
+      "domain_size": 16,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 106572,
+      "bpp": 3.252319,
+      "compression_ratio": 2.4598,
+      "range_blocks": 4096,
+      "encode_ms": 3046.9624,
+      "decode_total_ms": 349.1801,
+      "decode_pass_avg_ms": 16.6276,
+      "quality": {
+        "5": {
+          "mse": 218.733322,
+          "mae": 3.528694,
+          "psnr": 24.7317,
+          "decode_pass_ms": 14.0114
+        },
+        "10": {
+          "mse": 126.452,
+          "mae": 2.868717,
+          "psnr": 27.1115,
+          "decode_pass_ms": 9.4958
+        },
+        "20": {
+          "mse": 129.908733,
+          "mae": 2.908474,
+          "psnr": 26.9944,
+          "decode_pass_ms": 12.5866
+        }
+      }
+    },
+    {
+      "stem": "apollonian_gasket_512",
+      "method": "FBC r=16, d=32",
+      "range_size": 16,
+      "domain_size": 32,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 26779,
+      "bpp": 0.81723,
+      "compression_ratio": 9.7892,
+      "range_blocks": 1024,
+      "encode_ms": 818.4684,
+      "decode_total_ms": 278.0617,
+      "decode_pass_avg_ms": 13.241,
+      "quality": {
+        "5": {
+          "mse": 247.185074,
+          "mae": 4.926765,
+          "psnr": 24.2006,
+          "decode_pass_ms": 11.3582
+        },
+        "10": {
+          "mse": 251.093719,
+          "mae": 4.917664,
+          "psnr": 24.1324,
+          "decode_pass_ms": 10.17
+        },
+        "20": {
+          "mse": 249.159565,
+          "mae": 4.904446,
+          "psnr": 24.166,
+          "decode_pass_ms": 9.6925
+        }
+      }
+    },
+    {
+      "stem": "baboon",
+      "method": "FBC r=4, d=8",
+      "range_size": 4,
+      "domain_size": 8,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 483511,
+      "bpp": 14.755585,
+      "compression_ratio": 0.5422,
+      "range_blocks": 16384,
+      "encode_ms": 16899.6825,
+      "decode_total_ms": 478.3529,
+      "decode_pass_avg_ms": 22.7787,
+      "quality": {
+        "5": {
+          "mse": 153.236446,
+          "mae": 8.468906,
+          "psnr": 26.2772,
+          "decode_pass_ms": 26.187
+        },
+        "10": {
+          "mse": 123.485359,
+          "mae": 7.687881,
+          "psnr": 27.2146,
+          "decode_pass_ms": 19.0302
+        },
+        "20": {
+          "mse": 123.366123,
+          "mae": 7.685001,
+          "psnr": 27.2188,
+          "decode_pass_ms": 16.4372
+        }
+      }
+    },
+    {
+      "stem": "baboon",
+      "method": "FBC r=8, d=16",
+      "range_size": 8,
+      "domain_size": 16,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 121135,
+      "bpp": 3.696747,
+      "compression_ratio": 2.1641,
+      "range_blocks": 4096,
+      "encode_ms": 2481.0232,
+      "decode_total_ms": 234.5204,
+      "decode_pass_avg_ms": 11.1676,
+      "quality": {
+        "5": {
+          "mse": 469.404972,
+          "mae": 15.289463,
+          "psnr": 21.4153,
+          "decode_pass_ms": 14.2152
+        },
+        "10": {
+          "mse": 466.05093,
+          "mae": 15.227222,
+          "psnr": 21.4465,
+          "decode_pass_ms": 8.4006
+        },
+        "20": {
+          "mse": 466.182816,
+          "mae": 15.232056,
+          "psnr": 21.4452,
+          "decode_pass_ms": 10.5271
+        }
+      }
+    },
+    {
+      "stem": "baboon",
+      "method": "FBC r=16, d=32",
+      "range_size": 16,
+      "domain_size": 32,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 30228,
+      "bpp": 0.922485,
+      "compression_ratio": 8.6722,
+      "range_blocks": 1024,
+      "encode_ms": 694.8525,
+      "decode_total_ms": 229.6383,
+      "decode_pass_avg_ms": 10.9352,
+      "quality": {
+        "5": {
+          "mse": 764.691978,
+          "mae": 20.06057,
+          "psnr": 19.2959,
+          "decode_pass_ms": 17.6672
+        },
+        "10": {
+          "mse": 754.822285,
+          "mae": 19.996387,
+          "psnr": 19.3524,
+          "decode_pass_ms": 8.048
+        },
+        "20": {
+          "mse": 762.300625,
+          "mae": 20.063099,
+          "psnr": 19.3095,
+          "decode_pass_ms": 8.1262
+        }
+      }
+    },
+    {
+      "stem": "lena",
+      "method": "FBC r=4, d=8",
+      "range_size": 4,
+      "domain_size": 8,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 477456,
+      "bpp": 14.570801,
+      "compression_ratio": 0.549,
+      "range_blocks": 16384,
+      "encode_ms": 19312.988,
+      "decode_total_ms": 576.3637,
+      "decode_pass_avg_ms": 27.4459,
+      "quality": {
+        "5": {
+          "mse": 43.251152,
+          "mae": 3.76017,
+          "psnr": 31.7708,
+          "decode_pass_ms": 23.3091
+        },
+        "10": {
+          "mse": 17.960712,
+          "mae": 2.798756,
+          "psnr": 35.5876,
+          "decode_pass_ms": 25.6557
+        },
+        "20": {
+          "mse": 17.76442,
+          "mae": 2.789307,
+          "psnr": 35.6353,
+          "decode_pass_ms": 26.5875
+        }
+      }
+    },
+    {
+      "stem": "lena",
+      "method": "FBC r=8, d=16",
+      "range_size": 8,
+      "domain_size": 16,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 118894,
+      "bpp": 3.628357,
+      "compression_ratio": 2.2049,
+      "range_blocks": 4096,
+      "encode_ms": 3089.1083,
+      "decode_total_ms": 279.2235,
+      "decode_pass_avg_ms": 13.2964,
+      "quality": {
+        "5": {
+          "mse": 51.311676,
+          "mae": 4.33931,
+          "psnr": 31.0286,
+          "decode_pass_ms": 11.1692
+        },
+        "10": {
+          "mse": 50.578644,
+          "mae": 4.307838,
+          "psnr": 31.0911,
+          "decode_pass_ms": 10.8645
+        },
+        "20": {
+          "mse": 50.575523,
+          "mae": 4.307793,
+          "psnr": 31.0914,
+          "decode_pass_ms": 12.0778
+        }
+      }
+    },
+    {
+      "stem": "lena",
+      "method": "FBC r=16, d=32",
+      "range_size": 16,
+      "domain_size": 32,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 29663,
+      "bpp": 0.905243,
+      "compression_ratio": 8.8374,
+      "range_blocks": 1024,
+      "encode_ms": 895.1759,
+      "decode_total_ms": 281.8173,
+      "decode_pass_avg_ms": 13.4199,
+      "quality": {
+        "5": {
+          "mse": 151.875294,
+          "mae": 7.389965,
+          "psnr": 26.3159,
+          "decode_pass_ms": 10.4671
+        },
+        "10": {
+          "mse": 146.233276,
+          "mae": 7.242996,
+          "psnr": 26.4803,
+          "decode_pass_ms": 10.0102
+        },
+        "20": {
+          "mse": 146.197208,
+          "mae": 7.24197,
+          "psnr": 26.4814,
+          "decode_pass_ms": 10.7313
+        }
+      }
+    },
+    {
+      "stem": "sun_tzu_512",
+      "method": "FBC r=4, d=8",
+      "range_size": 4,
+      "domain_size": 8,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 456701,
+      "bpp": 13.937408,
+      "compression_ratio": 0.574,
+      "range_blocks": 16384,
+      "encode_ms": 15468.7226,
+      "decode_total_ms": 433.8113,
+      "decode_pass_avg_ms": 20.6577,
+      "quality": {
+        "5": {
+          "mse": 529.042343,
+          "mae": 9.842735,
+          "psnr": 20.8959,
+          "decode_pass_ms": 20.2839
+        },
+        "10": {
+          "mse": 227.783096,
+          "mae": 6.525925,
+          "psnr": 24.5556,
+          "decode_pass_ms": 20.2638
+        },
+        "20": {
+          "mse": 219.916496,
+          "mae": 6.399887,
+          "psnr": 24.7082,
+          "decode_pass_ms": 20.9171
+        }
+      }
+    },
+    {
+      "stem": "sun_tzu_512",
+      "method": "FBC r=8, d=16",
+      "range_size": 8,
+      "domain_size": 16,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 115054,
+      "bpp": 3.511169,
+      "compression_ratio": 2.2784,
+      "range_blocks": 4096,
+      "encode_ms": 2718.946,
+      "decode_total_ms": 252.6669,
+      "decode_pass_avg_ms": 12.0318,
+      "quality": {
+        "5": {
+          "mse": 1480.97068,
+          "mae": 19.361778,
+          "psnr": 16.4253,
+          "decode_pass_ms": 8.5722
+        },
+        "10": {
+          "mse": 1302.914734,
+          "mae": 18.283096,
+          "psnr": 16.9816,
+          "decode_pass_ms": 33.4705
+        },
+        "20": {
+          "mse": 1318.542156,
+          "mae": 18.4203,
+          "psnr": 16.9299,
+          "decode_pass_ms": 10.1682
+        }
+      }
+    },
+    {
+      "stem": "sun_tzu_512",
+      "method": "FBC r=16, d=32",
+      "range_size": 16,
+      "domain_size": 32,
+      "iterations": 20,
+      "compression_parallelism": 12,
+      "decompression_parallelism": 12,
+      "bytes": 28970,
+      "bpp": 0.884094,
+      "compression_ratio": 9.0488,
+      "range_blocks": 1024,
+      "encode_ms": 667.8046,
+      "decode_total_ms": 236.5203,
+      "decode_pass_avg_ms": 11.2629,
+      "quality": {
+        "5": {
+          "mse": 2620.601204,
+          "mae": 31.384537,
+          "psnr": 13.9468,
+          "decode_pass_ms": 10.1571
+        },
+        "10": {
+          "mse": 2663.685501,
+          "mae": 31.05323,
+          "psnr": 13.876,
+          "decode_pass_ms": 9.3754
+        },
+        "20": {
+          "mse": 2664.804821,
+          "mae": 31.045811,
+          "psnr": 13.8741,
+          "decode_pass_ms": 8.6587
+        }
+      }
+    }
+  ],
+  "references": [
+    {
+      "stem": "apollonian_gasket_512",
+      "method": "PNG",
+      "format": "png",
+      "quality": null,
+      "path": "data/experiments/images/png/apollonian_gasket_512.png",
+      "bytes": 23039,
+      "bpp": 0.703094,
+      "compression_ratio": 11.3783,
+      "mse": 0.0,
+      "mae": 0.0,
+      "psnr": null,
+      "encode_ms": 1.0961,
+      "decode_ms": 0.5255
+    },
+    {
+      "stem": "apollonian_gasket_512",
+      "method": "JPEG 25",
+      "format": "jpeg",
+      "quality": 25,
+      "path": "data/experiments/images/jpeg/apollonian_gasket_512_q25.jpeg",
+      "bytes": 9461,
+      "bpp": 0.288727,
+      "compression_ratio": 27.7079,
+      "mse": 37.436054,
+      "mae": 1.427097,
+      "psnr": 32.3979,
+      "encode_ms": 0.2393,
+      "decode_ms": 0.133
+    },
+    {
+      "stem": "apollonian_gasket_512",
+      "method": "JPEG 50",
+      "format": "jpeg",
+      "quality": 50,
+      "path": "data/experiments/images/jpeg/apollonian_gasket_512_q50.jpeg",
+      "bytes": 12992,
+      "bpp": 0.396484,
+      "compression_ratio": 20.1773,
+      "mse": 18.817162,
+      "mae": 1.027557,
+      "psnr": 35.3853,
+      "encode_ms": 0.2266,
+      "decode_ms": 0.1348
+    },
+    {
+      "stem": "apollonian_gasket_512",
+      "method": "JPEG 75",
+      "format": "jpeg",
+      "quality": 75,
+      "path": "data/experiments/images/jpeg/apollonian_gasket_512_q75.jpeg",
+      "bytes": 17487,
+      "bpp": 0.533661,
+      "compression_ratio": 14.9908,
+      "mse": 7.154297,
+      "mae": 0.64608,
+      "psnr": 39.5851,
+      "encode_ms": 0.24,
+      "decode_ms": 0.1529
+    },
+    {
+      "stem": "apollonian_gasket_512",
+      "method": "JPEG 90",
+      "format": "jpeg",
+      "quality": 90,
+      "path": "data/experiments/images/jpeg/apollonian_gasket_512_q90.jpeg",
+      "bytes": 25150,
+      "bpp": 0.767517,
+      "compression_ratio": 10.4232,
+      "mse": 1.397182,
+      "mae": 0.293316,
+      "psnr": 46.6783,
+      "encode_ms": 0.2493,
+      "decode_ms": 0.1705
+    },
+    {
+      "stem": "lena",
+      "method": "PNG",
+      "format": "png",
+      "quality": null,
+      "path": "data/experiments/images/png/lena.png",
+      "bytes": 160263,
+      "bpp": 4.890839,
+      "compression_ratio": 1.6357,
+      "mse": 0.0,
+      "mae": 0.0,
+      "psnr": null,
+      "encode_ms": 3.3633,
+      "decode_ms": 1.522
+    },
+    {
+      "stem": "lena",
+      "method": "JPEG 25",
+      "format": "jpeg",
+      "quality": 25,
+      "path": "data/experiments/images/jpeg/lena_q25.jpeg",
+      "bytes": 13581,
+      "bpp": 0.414459,
+      "compression_ratio": 19.3023,
+      "mse": 27.748821,
+      "mae": 3.735966,
+      "psnr": 33.6984,
+      "encode_ms": 0.3011,
+      "decode_ms": 0.175
+    },
+    {
+      "stem": "lena",
+      "method": "JPEG 50",
+      "format": "jpeg",
+      "quality": 50,
+      "path": "data/experiments/images/jpeg/lena_q50.jpeg",
+      "bytes": 20913,
+      "bpp": 0.638214,
+      "compression_ratio": 12.535,
+      "mse": 17.07412,
+      "mae": 2.969658,
+      "psnr": 35.8074,
+      "encode_ms": 0.309,
+      "decode_ms": 0.204
+    },
+    {
+      "stem": "lena",
+      "method": "JPEG 75",
+      "format": "jpeg",
+      "quality": 75,
+      "path": "data/experiments/images/jpeg/lena_q75.jpeg",
+      "bytes": 32559,
+      "bpp": 0.993622,
+      "compression_ratio": 8.0514,
+      "mse": 10.710556,
+      "mae": 2.40197,
+      "psnr": 37.8327,
+      "encode_ms": 0.3477,
+      "decode_ms": 0.2719
+    },
+    {
+      "stem": "lena",
+      "method": "JPEG 90",
+      "format": "jpeg",
+      "quality": 90,
+      "path": "data/experiments/images/jpeg/lena_q90.jpeg",
+      "bytes": 59252,
+      "bpp": 1.808228,
+      "compression_ratio": 4.4242,
+      "mse": 5.384857,
+      "mae": 1.752953,
+      "psnr": 40.8191,
+      "encode_ms": 0.3652,
+      "decode_ms": 0.3465
+    },
+    {
+      "stem": "baboon",
+      "method": "PNG",
+      "format": "png",
+      "quality": null,
+      "path": "data/experiments/images/png/baboon.png",
+      "bytes": 210918,
+      "bpp": 6.436707,
+      "compression_ratio": 1.2429,
+      "mse": 0.0,
+      "mae": 0.0,
+      "psnr": null,
+      "encode_ms": 3.4983,
+      "decode_ms": 1.4104
+    },
+    {
+      "stem": "baboon",
+      "method": "JPEG 25",
+      "format": "jpeg",
+      "quality": 25,
+      "path": "data/experiments/images/jpeg/baboon_q25.jpeg",
+      "bytes": 31112,
+      "bpp": 0.949463,
+      "compression_ratio": 8.4258,
+      "mse": 191.814522,
+      "mae": 10.138931,
+      "psnr": 25.302,
+      "encode_ms": 0.341,
+      "decode_ms": 0.2778
+    },
+    {
+      "stem": "baboon",
+      "method": "JPEG 50",
+      "format": "jpeg",
+      "quality": 50,
+      "path": "data/experiments/images/jpeg/baboon_q50.jpeg",
+      "bytes": 48852,
+      "bpp": 1.490845,
+      "compression_ratio": 5.3661,
+      "mse": 109.190117,
+      "mae": 7.757622,
+      "psnr": 27.749,
+      "encode_ms": 0.3701,
+      "decode_ms": 0.3608
+    },
+    {
+      "stem": "baboon",
+      "method": "JPEG 75",
+      "format": "jpeg",
+      "quality": 75,
+      "path": "data/experiments/images/jpeg/baboon_q75.jpeg",
+      "bytes": 73167,
+      "bpp": 2.23288,
+      "compression_ratio": 3.5828,
+      "mse": 51.729279,
+      "mae": 5.487457,
+      "psnr": 30.9934,
+      "encode_ms": 0.4166,
+      "decode_ms": 0.4527
+    },
+    {
+      "stem": "baboon",
+      "method": "JPEG 90",
+      "format": "jpeg",
+      "quality": 90,
+      "path": "data/experiments/images/jpeg/baboon_q90.jpeg",
+      "bytes": 119506,
+      "bpp": 3.647034,
+      "compression_ratio": 2.1936,
+      "mse": 13.133389,
+      "mae": 2.835072,
+      "psnr": 36.947,
+      "encode_ms": 0.492,
+      "decode_ms": 0.6569
+    },
+    {
+      "stem": "sun_tzu_512",
+      "method": "PNG",
+      "format": "png",
+      "quality": null,
+      "path": "data/experiments/images/png/sun_tzu_512.png",
+      "bytes": 126887,
+      "bpp": 3.872284,
+      "compression_ratio": 2.066,
+      "mse": 0.0,
+      "mae": 0.0,
+      "psnr": null,
+      "encode_ms": 2.7616,
+      "decode_ms": 1.0389
+    },
+    {
+      "stem": "sun_tzu_512",
+      "method": "JPEG 25",
+      "format": "jpeg",
+      "quality": 25,
+      "path": "data/experiments/images/jpeg/sun_tzu_512_q25.jpeg",
+      "bytes": 33157,
+      "bpp": 1.011871,
+      "compression_ratio": 7.9061,
+      "mse": 184.617485,
+      "mae": 6.756386,
+      "psnr": 25.4681,
+      "encode_ms": 0.3529,
+      "decode_ms": 0.3001
+    },
+    {
+      "stem": "sun_tzu_512",
+      "method": "JPEG 50",
+      "format": "jpeg",
+      "quality": 50,
+      "path": "data/experiments/images/jpeg/sun_tzu_512_q50.jpeg",
+      "bytes": 48442,
+      "bpp": 1.478333,
+      "compression_ratio": 5.4115,
+      "mse": 83.096447,
+      "mae": 4.760548,
+      "psnr": 28.935,
+      "encode_ms": 0.392,
+      "decode_ms": 0.3434
+    },
+    {
+      "stem": "sun_tzu_512",
+      "method": "JPEG 75",
+      "format": "jpeg",
+      "quality": 75,
+      "path": "data/experiments/images/jpeg/sun_tzu_512_q75.jpeg",
+      "bytes": 66431,
+      "bpp": 2.027313,
+      "compression_ratio": 3.9461,
+      "mse": 32.87886,
+      "mae": 3.038109,
+      "psnr": 32.9616,
+      "encode_ms": 0.398,
+      "decode_ms": 0.3972
+    },
+    {
+      "stem": "sun_tzu_512",
+      "method": "JPEG 90",
+      "format": "jpeg",
+      "quality": 90,
+      "path": "data/experiments/images/jpeg/sun_tzu_512_q90.jpeg",
+      "bytes": 100905,
+      "bpp": 3.079376,
+      "compression_ratio": 2.5979,
+      "mse": 0.434216,
+      "mae": 0.295475,
+      "psnr": 51.7537,
+      "encode_ms": 0.445,
+      "decode_ms": 0.5337
+    }
+  ]
+}
