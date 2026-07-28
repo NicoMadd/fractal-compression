@@ -5,11 +5,11 @@ For every image in SOURCES the script writes, under ``data/experiments/images/``
 
   pgma/<stem>.ascii.pgm   PGM ASCII (P2), optionally center-cropped
   png/<stem>.png          lossless PNG
-  jpeg/<stem>_q<Q>.jpg    JPEG at each quality in JPEG_QUALITIES
+  jpeg/<stem>_q<Q>.jpeg   JPEG at each quality in JPEG_QUALITIES
 
-Pixel levels are copied verbatim from the source file. The PGM ``maxval`` is
-kept in the header but never used to rescale samples, matching how the Java
-reader (``PGMAImageMetadata``) interprets these files.
+Pixel levels are copied verbatim from the source file. After writing the
+experiment PGMA, PNG and JPEG are produced by re-reading that PGMA so every
+reference shares the same on-disk samples the fractal compressor consumes.
 """
 
 from __future__ import annotations
@@ -131,29 +131,31 @@ def main() -> None:
         pgm_path = IMAGES_ROOT / "pgma" / f"{source.stem}.ascii.pgm"
         write_pgm_ascii(raster, pgm_path, comment)
 
-        image = to_image(raster)
+        # PNG/JPEG come from the written PGMA, not from the in-memory crop.
+        experiment = read_pgm_ascii(pgm_path)
+        image = to_image(experiment)
         png_path = IMAGES_ROOT / "png" / f"{source.stem}.png"
         png_path.parent.mkdir(parents=True, exist_ok=True)
         image.save(png_path, format="PNG")
 
         jpegs = {}
         for quality in JPEG_QUALITIES:
-            jpeg_path = IMAGES_ROOT / "jpeg" / f"{source.stem}_q{quality}.jpg"
+            jpeg_path = IMAGES_ROOT / "jpeg" / f"{source.stem}_q{quality}.jpeg"
             jpeg_path.parent.mkdir(parents=True, exist_ok=True)
             image.save(jpeg_path, format="JPEG", quality=quality, subsampling=0)
             jpegs[str(quality)] = {
                 "path": str(jpeg_path.relative_to(REPO_ROOT)),
                 "bytes": jpeg_path.stat().st_size,
-                "bpp": round(jpeg_path.stat().st_size * 8 / (raster.width * raster.height), 6),
+                "bpp": round(jpeg_path.stat().st_size * 8 / (experiment.width * experiment.height), 6),
             }
 
-        pixels = raster.width * raster.height
+        pixels = experiment.width * experiment.height
         manifest.append({
             "stem": source.stem,
             "source": str(source_path.relative_to(REPO_ROOT)),
             "source_size": original_size,
-            "size": f"{raster.width}x{raster.height}",
-            "maxval": raster.maxval,
+            "size": f"{experiment.width}x{experiment.height}",
+            "maxval": experiment.maxval,
             "self_similarity": source.self_similarity,
             "pgma": {
                 "path": str(pgm_path.relative_to(REPO_ROOT)),
@@ -167,7 +169,7 @@ def main() -> None:
             "jpeg": jpegs,
         })
 
-        print(f"{source.stem:<24} {original_size} -> {raster.width}x{raster.height}  "
+        print(f"{source.stem:<24} {original_size} -> {experiment.width}x{experiment.height}  "
               f"pgm={pgm_path.stat().st_size}B png={png_path.stat().st_size}B "
               + " ".join(f"q{q}={jpegs[str(q)]['bytes']}B" for q in JPEG_QUALITIES))
 

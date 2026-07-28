@@ -17,22 +17,22 @@
     },
     "jpeg": {
       "25": {
-        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q25.jpg",
+        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q25.jpeg",
         "bytes": 9461,
         "bpp": 0.288727
       },
       "50": {
-        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q50.jpg",
+        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q50.jpeg",
         "bytes": 12992,
         "bpp": 0.396484
       },
       "75": {
-        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q75.jpg",
+        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q75.jpeg",
         "bytes": 17487,
         "bpp": 0.533661
       },
       "90": {
-        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q90.jpg",
+        "path": "data/experiments/images/jpeg/apollonian_gasket_512_q90.jpeg",
         "bytes": 25150,
         "bpp": 0.767517
       }
@@ -56,22 +56,22 @@
     },
     "jpeg": {
       "25": {
-        "path": "data/experiments/images/jpeg/lena_q25.jpg",
+        "path": "data/experiments/images/jpeg/lena_q25.jpeg",
         "bytes": 13581,
         "bpp": 0.414459
       },
       "50": {
-        "path": "data/experiments/images/jpeg/lena_q50.jpg",
+        "path": "data/experiments/images/jpeg/lena_q50.jpeg",
         "bytes": 20913,
         "bpp": 0.638214
       },
       "75": {
-        "path": "data/experiments/images/jpeg/lena_q75.jpg",
+        "path": "data/experiments/images/jpeg/lena_q75.jpeg",
         "bytes": 32559,
         "bpp": 0.993622
       },
       "90": {
-        "path": "data/experiments/images/jpeg/lena_q90.jpg",
+        "path": "data/experiments/images/jpeg/lena_q90.jpeg",
         "bytes": 59252,
         "bpp": 1.808228
       }
@@ -95,22 +95,22 @@
     },
     "jpeg": {
       "25": {
-        "path": "data/experiments/images/jpeg/baboon_q25.jpg",
+        "path": "data/experiments/images/jpeg/baboon_q25.jpeg",
         "bytes": 31112,
         "bpp": 0.949463
       },
       "50": {
-        "path": "data/experiments/images/jpeg/baboon_q50.jpg",
+        "path": "data/experiments/images/jpeg/baboon_q50.jpeg",
         "bytes": 48852,
         "bpp": 1.490845
       },
       "75": {
-        "path": "data/experiments/images/jpeg/baboon_q75.jpg",
+        "path": "data/experiments/images/jpeg/baboon_q75.jpeg",
         "bytes": 73167,
         "bpp": 2.23288
       },
       "90": {
-        "path": "data/experiments/images/jpeg/baboon_q90.jpg",
+        "path": "data/experiments/images/jpeg/baboon_q90.jpeg",
         "bytes": 119506,
         "bpp": 3.647034
       }
@@ -134,22 +134,22 @@
     },
     "jpeg": {
       "25": {
-        "path": "data/experiments/images/jpeg/sun_tzu_512_q25.jpg",
+        "path": "data/experiments/images/jpeg/sun_tzu_512_q25.jpeg",
         "bytes": 33157,
         "bpp": 1.011871
       },
       "50": {
-        "path": "data/experiments/images/jpeg/sun_tzu_512_q50.jpg",
+        "path": "data/experiments/images/jpeg/sun_tzu_512_q50.jpeg",
         "bytes": 48442,
         "bpp": 1.478333
       },
       "75": {
-        "path": "data/experiments/images/jpeg/sun_tzu_512_q75.jpg",
+        "path": "data/experiments/images/jpeg/sun_tzu_512_q75.jpeg",
         "bytes": 66431,
         "bpp": 2.027313
       },
       "90": {
-        "path": "data/experiments/images/jpeg/sun_tzu_512_q90.jpg",
+        "path": "data/experiments/images/jpeg/sun_tzu_512_q90.jpeg",
         "bytes": 100905,
         "bpp": 3.079376
       }
