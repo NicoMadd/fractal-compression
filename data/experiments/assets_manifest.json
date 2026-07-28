@@ -115,5 +115,44 @@
         "bpp": 3.647034
       }
     }
+  },
+  {
+    "stem": "sun_tzu_512",
+    "source": "data/images/pgma/sun_tzu.ascii.pgm",
+    "source_size": "593x1024",
+    "size": "512x512",
+    "maxval": 255,
+    "self_similarity": "baja (texto)",
+    "pgma": {
+      "path": "data/experiments/images/pgma/sun_tzu_512.ascii.pgm",
+      "bytes": 1027181
+    },
+    "png": {
+      "path": "data/experiments/images/png/sun_tzu_512.png",
+      "bytes": 126887,
+      "bpp": 3.872284
+    },
+    "jpeg": {
+      "25": {
+        "path": "data/experiments/images/jpeg/sun_tzu_512_q25.jpg",
+        "bytes": 33157,
+        "bpp": 1.011871
+      },
+      "50": {
+        "path": "data/experiments/images/jpeg/sun_tzu_512_q50.jpg",
+        "bytes": 48442,
+        "bpp": 1.478333
+      },
+      "75": {
+        "path": "data/experiments/images/jpeg/sun_tzu_512_q75.jpg",
+        "bytes": 66431,
+        "bpp": 2.027313
+      },
+      "90": {
+        "path": "data/experiments/images/jpeg/sun_tzu_512_q90.jpg",
+        "bytes": 100905,
+        "bpp": 3.079376
+      }
+    }
   }
 ]

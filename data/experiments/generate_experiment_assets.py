@@ -41,6 +41,7 @@ SOURCES = (
     Source("apollonian_gasket.ascii.pgm", "apollonian_gasket_512", "alta", crop_to=512),
     Source("lena.ascii.pgm", "lena", "media"),
     Source("baboon.ascii.pgm", "baboon", "baja"),
+    Source("sun_tzu.ascii.pgm", "sun_tzu_512", "baja (texto)", crop_to=512),
 )
 
 
