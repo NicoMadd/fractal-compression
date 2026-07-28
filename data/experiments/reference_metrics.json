@@ -15,8 +15,8 @@
       "mse": 0.0,
       "mae": 0.0,
       "psnr": null,
-      "encode_ms": 1.0961,
-      "decode_ms": 0.5255
+      "encode_ms": 1.2847,
+      "decode_ms": 0.6018
     },
     {
       "stem": "apollonian_gasket_512",
@@ -30,8 +30,8 @@
       "mse": 37.436054,
       "mae": 1.427097,
       "psnr": 32.3979,
-      "encode_ms": 0.2393,
-      "decode_ms": 0.133
+      "encode_ms": 0.2533,
+      "decode_ms": 0.1287
     },
     {
       "stem": "apollonian_gasket_512",
@@ -45,8 +45,8 @@
       "mse": 18.817162,
       "mae": 1.027557,
       "psnr": 35.3853,
-      "encode_ms": 0.2266,
-      "decode_ms": 0.1348
+      "encode_ms": 0.2503,
+      "decode_ms": 0.1395
     },
     {
       "stem": "apollonian_gasket_512",
@@ -60,8 +60,8 @@
       "mse": 7.154297,
       "mae": 0.64608,
       "psnr": 39.5851,
-      "encode_ms": 0.24,
-      "decode_ms": 0.1529
+      "encode_ms": 0.264,
+      "decode_ms": 0.1646
     },
     {
       "stem": "apollonian_gasket_512",
@@ -75,8 +75,8 @@
       "mse": 1.397182,
       "mae": 0.293316,
       "psnr": 46.6783,
-      "encode_ms": 0.2493,
-      "decode_ms": 0.1705
+      "encode_ms": 0.2847,
+      "decode_ms": 0.2044
     },
     {
       "stem": "lena",
@@ -90,8 +90,8 @@
       "mse": 0.0,
       "mae": 0.0,
       "psnr": null,
-      "encode_ms": 3.3633,
-      "decode_ms": 1.522
+      "encode_ms": 3.6261,
+      "decode_ms": 1.604
     },
     {
       "stem": "lena",
@@ -105,8 +105,8 @@
       "mse": 27.748821,
       "mae": 3.735966,
       "psnr": 33.6984,
-      "encode_ms": 0.3011,
-      "decode_ms": 0.175
+      "encode_ms": 0.2911,
+      "decode_ms": 0.1608
     },
     {
       "stem": "lena",
@@ -120,8 +120,8 @@
       "mse": 17.07412,
       "mae": 2.969658,
       "psnr": 35.8074,
-      "encode_ms": 0.309,
-      "decode_ms": 0.204
+      "encode_ms": 0.3102,
+      "decode_ms": 0.2029
     },
     {
       "stem": "lena",
@@ -135,8 +135,8 @@
       "mse": 10.710556,
       "mae": 2.40197,
       "psnr": 37.8327,
-      "encode_ms": 0.3477,
-      "decode_ms": 0.2719
+      "encode_ms": 0.3529,
+      "decode_ms": 0.2703
     },
     {
       "stem": "lena",
@@ -150,8 +150,8 @@
       "mse": 5.384857,
       "mae": 1.752953,
       "psnr": 40.8191,
-      "encode_ms": 0.3652,
-      "decode_ms": 0.3465
+      "encode_ms": 0.4159,
+      "decode_ms": 0.4083
     },
     {
       "stem": "baboon",
@@ -165,8 +165,8 @@
       "mse": 0.0,
       "mae": 0.0,
       "psnr": null,
-      "encode_ms": 3.4983,
-      "decode_ms": 1.4104
+      "encode_ms": 3.6189,
+      "decode_ms": 1.506
     },
     {
       "stem": "baboon",
@@ -180,8 +180,8 @@
       "mse": 191.814522,
       "mae": 10.138931,
       "psnr": 25.302,
-      "encode_ms": 0.341,
-      "decode_ms": 0.2778
+      "encode_ms": 0.3672,
+      "decode_ms": 0.2888
     },
     {
       "stem": "baboon",
@@ -195,8 +195,8 @@
       "mse": 109.190117,
       "mae": 7.757622,
       "psnr": 27.749,
-      "encode_ms": 0.3701,
-      "decode_ms": 0.3608
+      "encode_ms": 0.4032,
+      "decode_ms": 0.3981
     },
     {
       "stem": "baboon",
@@ -210,8 +210,8 @@
       "mse": 51.729279,
       "mae": 5.487457,
       "psnr": 30.9934,
-      "encode_ms": 0.4166,
-      "decode_ms": 0.4527
+      "encode_ms": 0.4817,
+      "decode_ms": 0.5193
     },
     {
       "stem": "baboon",
@@ -225,8 +225,8 @@
       "mse": 13.133389,
       "mae": 2.835072,
       "psnr": 36.947,
-      "encode_ms": 0.492,
-      "decode_ms": 0.6569
+      "encode_ms": 0.5297,
+      "decode_ms": 0.6718
     },
     {
       "stem": "sun_tzu_512",
@@ -240,8 +240,8 @@
       "mse": 0.0,
       "mae": 0.0,
       "psnr": null,
-      "encode_ms": 2.7616,
-      "decode_ms": 1.0389
+      "encode_ms": 2.9644,
+      "decode_ms": 1.0227
     },
     {
       "stem": "sun_tzu_512",
@@ -255,8 +255,8 @@
       "mse": 184.617485,
       "mae": 6.756386,
       "psnr": 25.4681,
-      "encode_ms": 0.3529,
-      "decode_ms": 0.3001
+      "encode_ms": 0.3337,
+      "decode_ms": 0.2603
     },
     {
       "stem": "sun_tzu_512",
@@ -270,8 +270,8 @@
       "mse": 83.096447,
       "mae": 4.760548,
       "psnr": 28.935,
-      "encode_ms": 0.392,
-      "decode_ms": 0.3434
+      "encode_ms": 0.3685,
+      "decode_ms": 0.3473
     },
     {
       "stem": "sun_tzu_512",
@@ -285,8 +285,8 @@
       "mse": 32.87886,
       "mae": 3.038109,
       "psnr": 32.9616,
-      "encode_ms": 0.398,
-      "decode_ms": 0.3972
+      "encode_ms": 0.403,
+      "decode_ms": 0.3985
     },
     {
       "stem": "sun_tzu_512",
@@ -300,8 +300,8 @@
       "mse": 0.434216,
       "mae": 0.295475,
       "psnr": 51.7537,
-      "encode_ms": 0.445,
-      "decode_ms": 0.5337
+      "encode_ms": 0.482,
+      "decode_ms": 0.5658
     }
   ]
 }

@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-IMAGES_ROOT="${REPO_ROOT}/data/images"
+IMAGES_ROOT="${IMAGES_ROOT:-${REPO_ROOT}/data/images}"
 
 usage() {
   echo "Usage: $0 [[<image type>] <image name>] [-i iterations] [-r range] [-d domain] [-p threads] [-P decode-threads] [-c] [--no-iter-save] [--skip-compression|-sc] [--skip-decompression|-sd] [--mr|--br] [--debug] [-- <java-args>...]"

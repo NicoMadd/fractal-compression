@@ -1,0 +1,73 @@
+% Sección "Resultados". Requiere: booktabs, float (para [H]).
+% Datos generados por data/experiments/run_fractal_experiments.sh,
+% measure_reference_metrics.py y summarize_results.py;
+% el resumen numérico completo está en data/experiments/results_summary.json.
+
+\section{Resultados}
+\label{sec:resultados}
+
+El Cuadro~\ref{tab:comparacion_metodos} reúne las mediciones de tasa, calidad y tiempo obtenidas para las cuatro imágenes bajo las tres geometrías fractales evaluadas y las cinco referencias PNG y JPEG. FBC $r{=}4$ corresponde a la geometría $r=4$, $d=8$; FBC $r{=}8$ a $r=8$, $d=16$; y FBC $r{=}16$ a $r=16$, $d=32$. La relación de compresión se mide respecto de la imagen sin comprimir de un byte por píxel, de modo que los valores menores a $1{:}1$ indican que la salida supera en tamaño a la entrada.
+
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{3pt}
+    \caption{Resultados de la evaluación experimental.}
+    \label{tab:comparacion_metodos}
+
+    \begin{tabular}{llcccccrr}
+        \toprule
+        \textbf{Imagen} &
+        \textbf{Método} &
+        \textbf{Relación} &
+        \textbf{bpp} &
+        \multicolumn{3}{c}{\textbf{PSNR (dB)}} &
+        \textbf{Cod.} &
+        \textbf{Dec.} \\
+        \cmidrule(lr){5-7}
+        & & & & \textbf{it. 5} & \textbf{it. 10} & \textbf{it. 20} &
+        \textbf{(ms)} & \textbf{(ms)} \\
+        \midrule
+
+        Apollonian & FBC $r{=}4$  & $0,62{:}1$  & $12,96$ & $25,74$ & $31,63$ & $32,80$  & $14\,450$ & $449$   \\
+                   & FBC $r{=}8$  & $2,46{:}1$  & $3,25$  & $24,73$ & $27,11$ & $26,99$  & $2\,472$  & $228$   \\
+                   & FBC $r{=}16$ & $9,79{:}1$  & $0,82$  & $24,20$ & $24,13$ & $24,17$  & $674$     & $236$   \\
+                   & PNG          & $11,38{:}1$ & $0,70$  & ---     & ---     & $\infty$ & $1,28$    & $0,60$  \\
+                   & JPEG 25      & $27,71{:}1$ & $0,29$  & ---     & ---     & $32,40$  & $0,25$    & $0,13$  \\
+                   & JPEG 50      & $20,18{:}1$ & $0,40$  & ---     & ---     & $35,39$  & $0,25$    & $0,14$  \\
+                   & JPEG 75      & $14,99{:}1$ & $0,53$  & ---     & ---     & $39,59$  & $0,26$    & $0,16$  \\
+                   & JPEG 90      & $10,42{:}1$ & $0,77$  & ---     & ---     & $46,68$  & $0,28$    & $0,20$  \\
+        \midrule
+
+        Lena       & FBC $r{=}4$  & $0,55{:}1$  & $14,57$ & $32,05$ & $35,61$ & $35,64$  & $14\,989$ & $440$   \\
+                   & FBC $r{=}8$  & $2,20{:}1$  & $3,63$  & $31,04$ & $31,09$ & $31,09$  & $2\,626$  & $222$   \\
+                   & FBC $r{=}16$ & $8,84{:}1$  & $0,91$  & $26,31$ & $26,48$ & $26,48$  & $734$     & $209$   \\
+                   & PNG          & $1,64{:}1$  & $4,89$  & ---     & ---     & $\infty$ & $3,63$    & $1,60$  \\
+                   & JPEG 25      & $19,30{:}1$ & $0,41$  & ---     & ---     & $33,70$  & $0,29$    & $0,16$  \\
+                   & JPEG 50      & $12,54{:}1$ & $0,64$  & ---     & ---     & $35,81$  & $0,31$    & $0,20$  \\
+                   & JPEG 75      & $8,05{:}1$  & $0,99$  & ---     & ---     & $37,83$  & $0,35$    & $0,27$  \\
+                   & JPEG 90      & $4,42{:}1$  & $1,81$  & ---     & ---     & $40,82$  & $0,42$    & $0,41$  \\
+        \midrule
+
+        Baboon     & FBC $r{=}4$  & $0,54{:}1$  & $14,76$ & $26,26$ & $27,22$ & $27,22$  & $15\,101$ & $394$   \\
+                   & FBC $r{=}8$  & $2,16{:}1$  & $3,70$  & $21,41$ & $21,45$ & $21,45$  & $2\,744$  & $237$   \\
+                   & FBC $r{=}16$ & $8,67{:}1$  & $0,92$  & $19,29$ & $19,35$ & $19,31$  & $647$     & $233$   \\
+                   & PNG          & $1,24{:}1$  & $6,44$  & ---     & ---     & $\infty$ & $3,62$    & $1,51$  \\
+                   & JPEG 25      & $8,43{:}1$  & $0,95$  & ---     & ---     & $25,30$  & $0,37$    & $0,29$  \\
+                   & JPEG 50      & $5,37{:}1$  & $1,49$  & ---     & ---     & $27,75$  & $0,40$    & $0,40$  \\
+                   & JPEG 75      & $3,58{:}1$  & $2,23$  & ---     & ---     & $30,99$  & $0,48$    & $0,52$  \\
+                   & JPEG 90      & $2,19{:}1$  & $3,65$  & ---     & ---     & $36,95$  & $0,53$    & $0,67$  \\
+        \midrule
+
+        Sun Tzu    & FBC $r{=}4$  & $0,57{:}1$  & $13,94$ & $20,92$ & $24,55$ & $24,71$  & $14\,966$ & $418$   \\
+                   & FBC $r{=}8$  & $2,28{:}1$  & $3,51$  & $16,42$ & $16,98$ & $16,93$  & $2\,583$  & $222$   \\
+                   & FBC $r{=}16$ & $9,05{:}1$  & $0,88$  & $13,95$ & $13,88$ & $13,87$  & $758$     & $228$   \\
+                   & PNG          & $2,07{:}1$  & $3,87$  & ---     & ---     & $\infty$ & $2,96$    & $1,02$  \\
+                   & JPEG 25      & $7,91{:}1$  & $1,01$  & ---     & ---     & $25,47$  & $0,33$    & $0,26$  \\
+                   & JPEG 50      & $5,41{:}1$  & $1,48$  & ---     & ---     & $28,93$  & $0,37$    & $0,35$  \\
+                   & JPEG 75      & $3,95{:}1$  & $2,03$  & ---     & ---     & $32,96$  & $0,40$    & $0,40$  \\
+                   & JPEG 90      & $2,60{:}1$  & $3,08$  & ---     & ---     & $51,75$  & $0,48$    & $0,57$  \\
+
+        \bottomrule
+    \end{tabular}
+\end{table}
