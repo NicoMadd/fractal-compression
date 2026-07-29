@@ -125,7 +125,7 @@ Sun Tzu           & PNG     & 126\,887 & 3,87 \\
                   & JPEG 90 & 100\,905 & 3,08 \\
 \bottomrule
 \end{tabular}
-\caption{Tamaño y bits por píxel de las referencias PNG y JPEG generadas a partir de los archivos PGM del experimento. PNG es sin pérdida; el número que acompaña a JPEG indica el nivel de calidad.}
+\caption{Tamaño y bits por píxel de las referencias PNG y JPEG generadas a partir de los archivos PGM del experimento. PNG es sin pérdida. El número que acompaña a JPEG indica el nivel de calidad.}
 \label{tab:referencias}
 \end{table}
 
@@ -153,9 +153,7 @@ Cada configuración se ejecutó una vez por imagen, sin calentamiento previo de 
 
 La salida del codificador fractal es un conjunto de asignaciones, una por bloque rango. Cada asignación requiere el índice del bloque de dominio seleccionado, el índice de la transformación aplicada y los coeficientes de contraste $s$ y brillo $o$. Si bien se almacena, la posición del bloque rango no se necesita. Las asignaciones se emiten en el orden de recorrido de la imagen, por lo que el bloque al que corresponde cada una queda determinado de forma implícita por su posición en la secuencia.
 
-<<<El costo de almacenamiento>>>
-
-El archivo \texttt{.fc} que produce la implementación almacena estos campos en representación textual con el fin de permitir al lector su inspección directa.
+El costo de almacenamiento de cada asignación depende de cómo se serialicen esos campos. El archivo \texttt{.fc} que produce la implementación los guarda en representación textual, en la misma línea que el PGM ASCII (P2) de entrada, para que el lector pueda inspeccionar e interpretar el codebook sin herramientas adicionales. Esa decisión prioriza la legibilidad frente a la compactación. Existen formatos binarios o con cuantización de $(s,o)$ que ocuparían mucho menos espacio y harían que las tasas y relaciones de compresión de la prueba fueran sustancialmente distintas a las obtenidas en este trabajo. Los resultados de tasa de este trabajo deben leerse, por tanto, bajo el formato textual adoptado, no como cota del método fractal en general.
 
 \subsection{Métricas y procedimiento experimental}
 

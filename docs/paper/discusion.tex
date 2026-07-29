@@ -1,0 +1,39 @@
+% Sección "Discusión". Analiza los valores del Cuadro~\ref{tab:comparacion_metodos}
+% en docs/paper/resultados.tex.
+% Estilo: no usar punto y coma (;) ni guion doble (--) en la redacción.
+% Texto base: docs/paper/discusion_original.tex (repartido en subsecciones).
+
+\section{Discusión}
+\label{sec:discusion}
+
+\subsection{Tasa}
+
+A partir de los resultados obtenidos podemos identificar que a medida que los rangos y el dominio usado para el FBC aumenta a su vez aumenta la tasa de compresión obtenida y en algunos casos hasta superando JPEG y PNG.
+
+En cuanto a la tasa de compresión y la relación de bits por píxel, vemos que la autosimilitud tampoco tiene impacto. A geometría fija, todas las imágenes generan la misma cantidad de asignaciones en el codebook, de modo que el contenido no cambia cuántos registros se almacenan. El formato textual del archivo \texttt{.fc} fija además un costo alto por asignación, lo que eleva los bits por píxel con independencia del contenido.
+
+La geometría de bloques domina la tasa. Además, el codebook textual \texttt{.fc} infla los bits por píxel reportados, de modo que parte de la ventaja aparente en tamaño depende del formato de salida y no solo del método.
+
+\subsection{Calidad}
+
+Tal como se mencionó al aumentar el tamaño del bloque rango podemos identificar que las mediciones de calidad PSNR, MAE y MSE se ven impactadas. Al agrandar el bloque rango, el impacto sobre la calidad es en el sentido de un \emph{empeoramiento}: baja el PSNR y suben el MSE y el MAE.
+
+En cuanto a la calidad sí vemos que hay una influencia. Las imágenes catalogadas como alta o media (Apollonian Gasket y Lena) obtuvieron mejores resultados que las de autosimilitud baja (Baboon y Sun Tzu) en PSNR, MSE y MAE. Lena alcanzó el mejor PSNR. Apollonian Gasket, pese a no superarla en PSNR, obtuvo el MAE más bajo del conjunto, lo que indica un error medio menor aunque con errores locales grandes en los bordes. Baboon y sobre todo Sun Tzu mostraron las peores métricas. El caso de texto fue el más desfavorable.
+
+En síntesis, el tipo de imagen y la autosimilitud percibida condicionan sobre todo la calidad de reconstrucción del FBC. La relación más clara es que una menor autosimilitud útil entre bloques (textura fina o tipografía) implica peor PSNR, MSE y MAE.
+
+\subsection{Tiempos}
+
+De la misma forma podemos identificar que baja el tiempo de compresión. Esto se debe a que al haber menos bloques contra los que comparar el tiempo de búsqueda de reducción de dominio se reduce al haber una menor cantidad de bloques. Mismo así vemos que se reduce en baja medida pero aún así el tiempo de decodificación.
+
+El tiempo de codificación cae de forma brusca (del orden de $15$\,s con rango $4$ a menos de $1$\,s con rango $16$), mientras que la decodificación solo se reduce de forma moderada (de $\sim 400$\,ms a $\sim 220$\,ms) y se estabiliza. Queda así la asimetría típica del esquema, con codificación costosa frente a decodificación relativamente barata, ambas muy por encima de los milisegundos de JPEG y PNG en este entorno.
+
+En cuanto a la pregunta de investigación, y enfocándonos en cada punto, en cuanto a tiempos la autosimilitud no tiene impacto dentro de las pruebas medidas. En cuanto a tiempos vemos que estos dependen, al menos en esta implementación, de la cantidad de bloques utilizados. No explican de forma relevante los tiempos bajo las geometrías usadas. La geometría de bloques domina el tiempo.
+
+\subsection{Comparación con JPEG y PNG}
+
+Esa superación de JPEG y PNG debe leerse como una comparación de \emph{relación de compresión} (tamaño), no de calidad a igual tasa. Con rango $16$ el FBC alcanza relaciones cercanas a $9{:}1$ y en imágenes como Lena o Baboon supera a PNG en tamaño. Frente a JPEG, a veces el archivo fractal es más chico, pero el PSNR es marcadamente inferior. En Apollonian Gasket, PNG sigue por delante en relación ($11{,}38{:}1$ frente a $\sim 9{,}8{:}1$ del FBC con rango $16$).
+
+\subsection{Limitaciones}
+
+El formato textual del archivo \texttt{.fc} fija un costo alto por asignación e infla los bits por píxel reportados, de modo que parte de la ventaja aparente en tamaño depende del formato de salida y no solo del método. Bajo las geometrías y el formato de codebook usados, el tipo de imagen y la autosimilitud percibida no explican de forma relevante la tasa ni los tiempos. La geometría de bloques domina la tasa y el tiempo.

@@ -1,0 +1,19 @@
+% Borrador del autor + aclaraciones acordadas.
+% La versión elaborada del asistente (alternativa) está en discusion.tex.
+
+\section{Discusión}
+\label{sec:discusion}
+
+A medida que aumentan el rango y el dominio del FBC, sube la tasa de compresión y en algunos casos supera a JPEG y PNG. También baja el tiempo de compresión: hay menos bloques y la búsqueda de dominio se acorta. El tiempo de decodificación baja en menor medida. Al agrandar el bloque rango, PSNR, MAE y MSE se ven impactados.
+
+Esa superación de JPEG y PNG es de \emph{relación de compresión} (tamaño), no de calidad a igual tasa. Con rango $16$ el FBC ronda $9{:}1$ y en Lena o Baboon supera a PNG en tamaño. Frente a JPEG, a veces el archivo fractal es más chico, pero el PSNR es marcadamente inferior. En Apollonian Gasket, PNG sigue delante ($11{,}38{:}1$ frente a $\sim 9{,}8{:}1$ del FBC con rango $16$). El codebook textual \texttt{.fc} infla los bits por píxel, así que parte de la ventaja aparente depende del formato y no solo del método.
+
+Al agrandar el rango, la calidad empeora: baja el PSNR y suben MSE y MAE. La codificación cae de forma brusca (del orden de $15$\,s con rango $4$ a menos de $1$\,s con rango $16$). La decodificación solo baja de forma moderada ($\sim 400$\,ms a $\sim 220$\,ms) y se estabiliza. Queda la asimetría típica: codificación costosa frente a decodificación relativamente barata, ambas muy por encima de los milisegundos de JPEG y PNG.
+
+Respecto de la pregunta de investigación: en tiempos la autosimilitud no tiene impacto en las pruebas. Los tiempos dependen, al menos en esta implementación, de la cantidad de bloques.
+
+En tasa y bits por píxel la autosimilitud tampoco tiene impacto. A geometría fija, todas las imágenes generan la misma cantidad de asignaciones en el codebook. El formato textual \texttt{.fc} fija un costo alto por asignación e infla los bits por píxel con independencia del contenido.
+
+En calidad sí hay influencia. Las imágenes de autosimilitud alta o media (Apollonian Gasket y Lena) superaron a las de baja (Baboon y Sun Tzu) en PSNR, MSE y MAE. Lena alcanzó el mejor PSNR. Apollonian, pese a no superarla en PSNR, obtuvo el MAE más bajo: error medio menor, con errores locales grandes en los bordes. Baboon y sobre todo Sun Tzu (texto) fueron los peores.
+
+En síntesis, el tipo de imagen y la autosimilitud percibida condicionan sobre todo la calidad del FBC. No explican de forma relevante la tasa ni los tiempos bajo las geometrías y el formato de codebook usados. Menor autosimilitud útil entre bloques (textura fina o tipografía) implica peor PSNR, MSE y MAE. La geometría de bloques domina la tasa y el tiempo.
