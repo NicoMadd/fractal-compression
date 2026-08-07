@@ -11,6 +11,8 @@ PGM ASCII (P2) representa imágenes en escala de grises mediante valores de inte
 
 \begin{table}[htbp]
 \centering
+\caption{Conjunto de imágenes utilizado en la evaluación experimental. El tamaño corresponde al archivo PGM ASCII de entrada.}
+\label{tab:conjunto_imagenes}
 \begin{tabular}{lcrc}
 \toprule
 Imagen & Dimensión & Tamaño (bytes) & Autosimilitud \\
@@ -21,8 +23,6 @@ Baboon & $512\times512$ & 996\,517 & Baja \\
 Sun Tzu & $512\times512$ & 1\,027\,181 & Baja (texto) \\
 \bottomrule
 \end{tabular}
-\caption{Conjunto de imágenes utilizado en la evaluación experimental. El tamaño corresponde al archivo PGM ASCII de entrada.}
-\label{tab:conjunto_imagenes}
 \end{table}
 
 \begin{figure}[htbp]
@@ -95,56 +95,29 @@ Para JPEG se evaluaron niveles de calidad de 25, 50, 75 y 90. Para PNG se utiliz
 
 \begin{table}[htbp]
 \centering
-\setlength{\tabcolsep}{10pt}
-\begin{tabular}{llrr}
-\toprule
-Imagen & Formato & Tamaño (bytes) & Bits por píxel \\
-\midrule
-Apollonian Gasket & PNG     &  23\,039 & 0,70 \\
-                  & JPEG 25 &   9\,461 & 0,29 \\
-                  & JPEG 50 &  12\,992 & 0,40 \\
-                  & JPEG 75 &  17\,487 & 0,53 \\
-                  & JPEG 90 &  25\,150 & 0,77 \\
-\midrule
-Lena              & PNG     & 160\,263 & 4,89 \\
-                  & JPEG 25 &  13\,581 & 0,41 \\
-                  & JPEG 50 &  20\,913 & 0,64 \\
-                  & JPEG 75 &  32\,559 & 0,99 \\
-                  & JPEG 90 &  59\,252 & 1,81 \\
-\midrule
-Baboon            & PNG     & 210\,918 & 6,44 \\
-                  & JPEG 25 &  31\,112 & 0,95 \\
-                  & JPEG 50 &  48\,852 & 1,49 \\
-                  & JPEG 75 &  73\,167 & 2,23 \\
-                  & JPEG 90 & 119\,506 & 3,65 \\
-\midrule
-Sun Tzu           & PNG     & 126\,887 & 3,87 \\
-                  & JPEG 25 &  33\,157 & 1,01 \\
-                  & JPEG 50 &  48\,442 & 1,48 \\
-                  & JPEG 75 &  66\,431 & 2,03 \\
-                  & JPEG 90 & 100\,905 & 3,08 \\
-\bottomrule
-\end{tabular}
 \caption{Tamaño y bits por píxel de las referencias PNG y JPEG generadas a partir de los archivos PGM del experimento. PNG es sin pérdida. El número que acompaña a JPEG indica el nivel de calidad.}
 \label{tab:referencias}
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+& \multicolumn{2}{c}{Apollonian} & \multicolumn{2}{c}{Lena} & \multicolumn{2}{c}{Baboon} & \multicolumn{2}{c}{Sun Tzu} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+Formato & Bytes & bpp & Bytes & bpp & Bytes & bpp & Bytes & bpp \\
+\midrule
+PNG     & 23\,039 & 0,70 & 160\,263 & 4,89 & 210\,918 & 6,44 & 126\,887 & 3,87 \\
+JPEG 25 &  9\,461 & 0,29 &  13\,581 & 0,41 &  31\,112 & 0,95 &  33\,157 & 1,01 \\
+JPEG 50 & 12\,992 & 0,40 &  20\,913 & 0,64 &  48\,852 & 1,49 &  48\,442 & 1,48 \\
+JPEG 75 & 17\,487 & 0,53 &  32\,559 & 0,99 &  73\,167 & 2,23 &  66\,431 & 2,03 \\
+JPEG 90 & 25\,150 & 0,77 &  59\,252 & 1,81 & 119\,506 & 3,65 & 100\,905 & 3,08 \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \subsection{Implementación y entorno de ejecución}
 \label{sec:entorno_ejecucion}
 
-La implementación de la compresión fractal fue desarrollada en Java, con codificación y decodificación paralelizadas mediante un pool de hilos de tamaño configurable. Los archivos de referencia PNG y JPEG se generaron con la biblioteca Pillow (que utiliza \textit{libjpeg} y \textit{zlib}) a partir de los mismos archivos PGM empleados por el compresor fractal. El código fuente se encuentra disponible en:
-
-\begin{center}
-\url{https://github.com/NicoMadd/fractal-compression/tree/research/paper-autosimilarity-influence-on-fractal-compression}
-\end{center}
-
-\begin{itemize}
-    \item Procesador: Apple M4 Pro (12 núcleos, arquitectura \texttt{aarch64}).
-    \item Memoria RAM: 24\,GiB.
-    \item Sistema operativo: macOS 15.1 (build 24B2082).
-    \item Versión de Java: OpenJDK 25.0.1, GraalVM CE 25.0.1+8.1 (HotSpot, modo mixto).
-    \item Cantidad de hilos: 12 hilos de compresión y 12 de descompresión.
-\end{itemize}
+La implementación de la compresión fractal fue desarrollada en Java, con codificación y decodificación paralelizadas mediante un pool de hilos de tamaño configurable. Los archivos de referencia PNG y JPEG se generaron con la biblioteca Pillow (que utiliza \textit{libjpeg} y \textit{zlib}) a partir de los mismos archivos PGM empleados por el compresor fractal. El código fuente se encuentra disponible en el repositorio público del proyecto~\cite{madeoRepositorio}. Los experimentos se realizaron en la siguiente arquitectura: un procesador Apple M4 Pro de 12 núcleos con arquitectura \texttt{aarch64}, 24\,GiB de memoria RAM y macOS 15.1 (build 24B2082). Se utilizó OpenJDK 25.0.1, GraalVM CE 25.0.1+8.1 (HotSpot, modo mixto), con 12 hilos para la compresión y 12 para la descompresión.
 
 Cada configuración se ejecutó una vez por imagen, sin calentamiento previo de la JVM, de modo que los tiempos reportados incluyen el costo de interpretación y de compilación JIT inicial. Por esta razón, los tiempos deben interpretarse como órdenes de magnitud comparativos entre configuraciones y no como mediciones de régimen estacionario.
 

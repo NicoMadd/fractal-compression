@@ -32,9 +32,6 @@
 
 
 \usepackage{url}
-\urldef{\mailsa}\path|nicomad@frba.utn.edu.ar|
-\urldef{\mailsb}\path|cad@uns.edu.ar|
-\urldef{\mailsc}\path|apousa@lidi.info.unlp.edu.ar|    
 \newcommand{\keywords}[1]{\par\addvspace\baselineskip
 \noindent\keywordname\enspace\ignorespaces#1}
 
@@ -54,30 +51,28 @@
 % their surnames. This ensures that the names appear correctly in
 % the running heads and the author index.
 %
-\author{Nicolás Madeo%
-\and Claudio Delrieux\and Adrian Pousa}
-%
+\author{Nicolás Madeo\inst{1}
+\and Claudio Delrieux\inst{2}
+\and Adrián Pousa\inst{3}}
 
-% (feature abused for this document to repeat the title also on left hand pages)
-
-% the affiliations are given next; don't give your e-mail address
-% unless you accept that it will be published
-\institute{UNLP\\
-\mailsa\\
-\mailsb\\
-\mailsc\\
+\institute{
+Universidad Tecnológica Nacional, Facultad Regional Buenos Aires\\
+\email{nicomad@frba.utn.edu.ar}
+\and
+Universidad Nacional del Sur\\
+\email{cad@uns.edu.ar}
+\and
+Universidad Nacional de La Plata, LIDI\\
+\email{apousa@lidi.info.unlp.edu.ar}
 }
 
-%
-% NB: a more complex sample for affiliations and the mapping to the
-% corresponding authors can be found in the file "llncs.dem"
-% (search for the string "\mainmatter" where a contribution starts).
-% "llncs.dem" accompanies the document class "llncs.cls".
-%
+
 \maketitle
+\pagestyle{empty}
+\thispagestyle{empty}
 
 \begin{abstract}
-La compresión fractal representa una imagen mediante un sistema de funciones iteradas (IFS) basado en la autosimilitud entre bloques rango y dominio. Su rendimiento depende del contenido y la codificación es mucho más costosa que la decodificación.En este trabajo se evalúa la influencia del tipo de imagen y de su autosimilitud percibida sobre la calidad (PSNR, MSE, MAE), la tasa (bpp y relación de compresión) y los tiempos de codificación/decodificación, comparando tres geometrías de bloques con JPEG y PNG. La autosimilitud permite reconstruir mejor las imagenes y el contenido tipográfico es el caso más desfavorable. La tasa queda dominada por la geometría y el formato textual del codebook. JPEG supera al método fractal en tasa-distorsión y tiempo de codificación. PNG refleja la redundancia local, no necesariamente la autosemejanza geométrica.
+La compresión fractal representa una imagen mediante un sistema de funciones iteradas (IFS) basado en la autosimilitud entre bloques rango y dominio. Su rendimiento depende del contenido y la codificación es mucho más costosa que la decodificación. En este trabajo se evalúa la influencia del tipo de imagen y de su autosimilitud percibida sobre la calidad (PSNR, MSE, MAE), la tasa (bpp y relación de compresión) y los tiempos de codificación/decodificación, comparando tres geometrías de bloques con JPEG y PNG. La autosimilitud permite reconstruir mejor las imágenes y el contenido tipográfico es el caso más desfavorable. La tasa queda dominada por la geometría y el formato textual del codebook. JPEG supera al método fractal en tasa-distorsión y tiempo de codificación. PNG refleja la redundancia local, no necesariamente la autosemejanza geométrica.
 \keywords{compresión fractal, IFS, autosimilitud, JPEG, PNG}
 \end{abstract}
 
@@ -113,8 +108,6 @@ Dado que la autosimilitud puede influir en la eficiencia del método, se identif
 
 El objetivo de este trabajo es evaluar la influencia del tipo de imagen y de su grado de autosimilitud sobre el rendimiento de la compresión fractal en bloques. Para ello, se analizarán la calidad de reconstrucción mediante las métricas PSNR, MSE y MAE, la relación de compresión y los tiempos de codificación y decodificación. Los resultados obtenidos se compararán con los correspondientes a los métodos JPEG y PNG.
 
-
-
 \section{Antecedentes}
 
 \subsection{Sistemas de funciones iteradas}
@@ -131,7 +124,7 @@ Los bloques dominio se obtienen a partir de la imagen original y tienen un tama�
 
 Una vez definidos los bloques dominio, los bloques rango y las transformaciones aplicables, se buscan similitudes entre cada bloque rango y los bloques dominio transformados. Luego se selecciona, para cada bloque rango, el bloque dominio transformado que produce el menor error.
 
-Las transformaciones geométricas pueden incluir reducción espacial, rotaciones y reflexiones. Las transformaciones de intensidad modifican el contraste y la luminancia del bloque. Una vez encontrada la mejor correspondencia, se almacenan los parámetros de la transformación, como la escala de contraste (s) y el desplazamiento de luminancia (o).
+Las transformaciones geométricas pueden incluir reducción espacial, rotaciones y reflexiones. Las transformaciones de intensidad modifican el contraste y la luminancia del bloque. Una vez encontrada la mejor correspondencia, se almacenan los parámetros de la transformación, cómo la escala de contraste (s) y el desplazamiento de luminancia (o).
 
 En este trabajo se utilizan imágenes PGM en formato ASCII, donde cada píxel se representa mediante un nivel de gris. Para imágenes en color, el procedimiento debería aplicarse considerando los distintos canales de color.
 
@@ -143,9 +136,6 @@ También debe existir un compromiso entre la calidad, la relación de compresió
 
 El rendimiento también depende del contenido de la imagen. Las imágenes con regiones uniformes o repetitivas facilitan la búsqueda de coincidencias. En cambio, aquellas con numerosos bordes o texturas, como las imágenes con texto, suelen requerir bloques más pequeños para conservar la calidad.
 
-% Sección "Materiales y métodos" alineada con la implementación real del
-% repositorio. Requiere: graphicx, subcaption, booktabs, hyperref.
-
 \section{Materiales y métodos}
 
 \subsection{Conjunto de imágenes}
@@ -156,6 +146,8 @@ PGM ASCII (P2) representa imágenes en escala de grises mediante valores de inte
 
 \begin{table}[htbp]
 \centering
+\caption{Conjunto de imágenes utilizado en la evaluación experimental. El tamaño corresponde al archivo PGM ASCII de entrada.}
+\label{tab:conjunto_imagenes}
 \begin{tabular}{lcrc}
 \toprule
 Imagen & Dimensión & Tamaño (bytes) & Autosimilitud \\
@@ -166,14 +158,12 @@ Baboon & $512\times512$ & 996\,517 & Baja \\
 Sun Tzu & $512\times512$ & 1\,027\,181 & Baja (texto) \\
 \bottomrule
 \end{tabular}
-\caption{Conjunto de imágenes utilizado en la evaluación experimental. El tamaño corresponde al archivo PGM ASCII de entrada.}
-\label{tab:conjunto_imagenes}
 \end{table}
 
 \begin{figure}[htbp]
     \centering
 
-    \begin{subfigure}[b]{0.23\textwidth}
+    \begin{subfigure}[b]{0.18\textwidth}
         \centering
         \includegraphics[
             width=\linewidth,
@@ -183,19 +173,19 @@ Sun Tzu & $512\times512$ & 1\,027\,181 & Baja (texto) \\
         \caption{Apollonian Gasket}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.23\textwidth}
+    \begin{subfigure}[b]{0.18\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/lena.png}
         \caption{Lena}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.23\textwidth}
+    \begin{subfigure}[b]{0.18\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/baboon.png}
         \caption{Baboon}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.23\textwidth}
+    \begin{subfigure}[b]{0.18\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/sun_tzu_512.png}
         \caption{Sun Tzu}
@@ -216,7 +206,7 @@ La autosimilitud fue clasificada de manera perceptiva antes de realizar los expe
     \item Baja (texto): predominio de tipografía y bordes agudos sobre fondo uniforme (Sun Tzu).
 \end{itemize}
 
-Sun Tzu se incluye como caso de contenido tipográfico, donde la autosimilitud geométrica entre bloques suele ser insuficiente para preservar la legibilidad de los caracteres.
+Sun Tzu se incluye cómo caso de contenido tipográfico, donde la autosimilitud geométrica entre bloques suele ser insuficiente para preservar la legibilidad de los caracteres.
 
 \subsection{Configuración de los métodos}
 
@@ -232,78 +222,51 @@ En los tres casos el bloque de dominio duplica el lado del bloque rango, por lo 
 
 Se utilizaron ocho transformaciones geométricas básicas: identidad, rotaciones de $90^\circ$, $180^\circ$ y $270^\circ$, reflexiones horizontal y vertical, y reflexiones respecto de las dos diagonales. Para cada bloque rango se evaluaron todos los bloques de dominio reducidos combinados con las ocho transformaciones. Para cada par se calcularon los coeficientes de contraste $s$ y brillo $o$ por mínimos cuadrados, y se conservó la combinación de menor error cuadrático. Para la búsqueda no se aplicó ningún umbral máximo de error ni criterio de terminación anticipada, de modo que el costo de codificación es determinista y depende únicamente de la geometría de bloques.
 
-Cada bloque rango queda descrito por la posición del dominio elegido, el índice de la transformación y el par $(s, o)$. El conjunto de estas asignaciones constituye el \emph{codebook} y es el artefacto que se mide como salida comprimida del método fractal, según se detalla en la Sección~\ref{sec:tamano_comprimido}.
+Cada bloque rango queda descrito por la posición del dominio elegido, el índice de la transformación y el par $(s, o)$. El conjunto de estas asignaciones constituye el \emph{codebook} y es el artefacto que se mide cómo salida comprimida del método fractal, según se detalla en la Sección~\ref{sec:tamano_comprimido}.
 
-La reconstrucción parte de una imagen inicial de ruido aleatorio y aplica de forma iterativa el sistema de funciones iteradas, lo que permite verificar que el punto fijo alcanzado no depende de la imagen de partida. La calidad se evaluó en las iteraciones 5, 10 y 20. Las iteraciones se indexan desde 0, por lo que las imágenes reportadas como iteración 5, 10 y 20 corresponden, respectivamente, a 6, 11 y 21 aplicaciones del operador de reconstrucción.
+La reconstrucción parte de una imagen inicial de ruido aleatorio y aplica de forma iterativa el sistema de funciones iteradas, lo que permite verificar que el punto fijo alcanzado no depende de la imagen de partida. La calidad se evaluó en las iteraciones 5, 10 y 20. Las iteraciones se indexan desde 0, por lo que las imágenes reportadas cómo iteración 5, 10 y 20 corresponden, respectivamente, a 6, 11 y 21 aplicaciones del operador de reconstrucción.
 
 Para JPEG se evaluaron niveles de calidad de 25, 50, 75 y 90. Para PNG se utilizó compresión sin pérdida con la configuración predeterminada del codificador. El Cuadro~\ref{tab:referencias} resume los tamaños obtenidos por estas referencias.
 
 \begin{table}[htbp]
 \centering
-\setlength{\tabcolsep}{10pt}
-\begin{tabular}{llrr}
-\toprule
-Imagen & Formato & Tamaño (bytes) & Bits por píxel \\
-\midrule
-Apollonian Gasket & PNG     &  23\,039 & 0,70 \\
-                  & JPEG 25 &   9\,461 & 0,29 \\
-                  & JPEG 50 &  12\,992 & 0,40 \\
-                  & JPEG 75 &  17\,487 & 0,53 \\
-                  & JPEG 90 &  25\,150 & 0,77 \\
-\midrule
-Lena              & PNG     & 160\,263 & 4,89 \\
-                  & JPEG 25 &  13\,581 & 0,41 \\
-                  & JPEG 50 &  20\,913 & 0,64 \\
-                  & JPEG 75 &  32\,559 & 0,99 \\
-                  & JPEG 90 &  59\,252 & 1,81 \\
-\midrule
-Baboon            & PNG     & 210\,918 & 6,44 \\
-                  & JPEG 25 &  31\,112 & 0,95 \\
-                  & JPEG 50 &  48\,852 & 1,49 \\
-                  & JPEG 75 &  73\,167 & 2,23 \\
-                  & JPEG 90 & 119\,506 & 3,65 \\
-\midrule
-Sun Tzu           & PNG     & 126\,887 & 3,87 \\
-                  & JPEG 25 &  33\,157 & 1,01 \\
-                  & JPEG 50 &  48\,442 & 1,48 \\
-                  & JPEG 75 &  66\,431 & 2,03 \\
-                  & JPEG 90 & 100\,905 & 3,08 \\
-\bottomrule
-\end{tabular}
 \caption{Tamaño y bits por píxel de las referencias PNG y JPEG generadas a partir de los archivos PGM del experimento. PNG es sin pérdida; el número que acompaña a JPEG indica el nivel de calidad.}
 \label{tab:referencias}
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+& \multicolumn{2}{c}{Apollonian} & \multicolumn{2}{c}{Lena} & \multicolumn{2}{c}{Baboon} & \multicolumn{2}{c}{Sun Tzu} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+Formato & Bytes & bpp & Bytes & bpp & Bytes & bpp & Bytes & bpp \\
+\midrule
+PNG     & 23\,039 & 0,70 & 160\,263 & 4,89 & 210\,918 & 6,44 & 126\,887 & 3,87 \\
+JPEG 25 &  9\,461 & 0,29 &  13\,581 & 0,41 &  31\,112 & 0,95 &  33\,157 & 1,01 \\
+JPEG 50 & 12\,992 & 0,40 &  20\,913 & 0,64 &  48\,852 & 1,49 &  48\,442 & 1,48 \\
+JPEG 75 & 17\,487 & 0,53 &  32\,559 & 0,99 &  73\,167 & 2,23 &  66\,431 & 2,03 \\
+JPEG 90 & 25\,150 & 0,77 &  59\,252 & 1,81 & 119\,506 & 3,65 & 100\,905 & 3,08 \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \subsection{Implementación y entorno de ejecución}
 \label{sec:entorno_ejecucion}
 
-La implementación de la compresión fractal fue desarrollada en Java, con codificación y decodificación paralelizadas mediante un pool de hilos de tamaño configurable. Los archivos de referencia PNG y JPEG se generaron con la biblioteca Pillow (que utiliza \textit{libjpeg} y \textit{zlib}) a partir de los mismos archivos PGM empleados por el compresor fractal. El código fuente se encuentra disponible en:
+La implementación de la compresión fractal fue desarrollada en Java, con codificación y decodificación paralelizadas mediante un pool de hilos de tamaño configurable. Los archivos de referencia PNG y JPEG se generaron con la biblioteca Pillow (que utiliza \textit{libjpeg} y \textit{zlib}) a partir de los mismos archivos PGM empleados por el compresor fractal. El código fuente se encuentra disponible en el repositorio público del proyecto~\cite{madeoRepositorio}. Los experimentos se realizaron en la siguiente arquitectura: un procesador Apple M4 Pro de 12 núcleos con arquitectura \texttt{aarch64}, 24\,GiB de memoria RAM y macOS 15.1 (build 24B2082). Se utilizó OpenJDK 25.0.1, GraalVM CE 25.0.1+8.1 (HotSpot, modo mixto), con 12 hilos para la compresión y 12 para la descompresión.
 
-\begin{center}
-\url{https://github.com/NicoMadd/fractal-compression/tree/research/paper-autosimilarity-influence-on-fractal-compression}
-\end{center}
-
-\begin{itemize}
-    \item Procesador: Apple M4 Pro (12 núcleos, arquitectura \texttt{aarch64}).
-    \item Memoria RAM: 24\,GiB.
-    \item Sistema operativo: macOS 15.1 (build 24B2082).
-    \item Versión de Java: OpenJDK 25.0.1, GraalVM CE 25.0.1+8.1 (HotSpot, modo mixto).
-    \item Cantidad de hilos: 12 hilos de compresión y 12 de descompresión.
-\end{itemize}
-
-Cada configuración se ejecutó una vez por imagen, sin calentamiento previo de la JVM, de modo que los tiempos reportados incluyen el costo de interpretación y de compilación JIT inicial. Por esta razón, los tiempos deben interpretarse como órdenes de magnitud comparativos entre configuraciones y no como mediciones de régimen estacionario.
+Cada configuración se ejecutó una vez por imagen, sin calentamiento previo de la JVM, de modo que los tiempos reportados incluyen el costo de interpretación y de compilación JIT inicial. Por esta razón, los tiempos deben interpretarse cómo órdenes de magnitud comparativos entre configuraciones y no cómo mediciones de régimen estacionario.
 
 \subsection{Medición del tamaño comprimido}
 \label{sec:tamano_comprimido}
 
 La salida del codificador fractal es un conjunto de asignaciones, una por bloque rango. Cada asignación requiere el índice del bloque de dominio seleccionado, el índice de la transformación aplicada y los coeficientes de contraste $s$ y brillo $o$. Si bien se almacena, la posición del bloque rango no se necesita. Las asignaciones se emiten en el orden de recorrido de la imagen, por lo que el bloque al que corresponde cada una queda determinado de forma implícita por su posición en la secuencia.
 
-El costo de almacenamiento de cada asignación depende de cómo se serialicen esos campos. El archivo \texttt{.fc} que produce la implementación los guarda en representación textual, en la misma línea que el PGM ASCII (P2) de entrada, para que el lector pueda inspeccionar e interpretar el codebook sin herramientas adicionales. Esa decisión prioriza la legibilidad frente a la compactación. Existen formatos binarios o con cuantización de $(s,o)$ que ocuparían mucho menos espacio y harían que las tasas y relaciones de compresión de la prueba fueran sustancialmente distintas a las obtenidas en este trabajo. Los resultados de tasa de este trabajo deben leerse, por tanto, bajo el formato textual adoptado, no como cota del método fractal en general.
+El costo de almacenamiento de cada asignación depende de cómo se serialicen esos campos. El archivo \texttt{.fc} que produce la implementación los guarda en representación textual, en la misma línea que el PGM ASCII (P2) de entrada, para que el lector pueda inspeccionar e interpretar el codebook sin herramientas adicionales. Esa decisión prioriza la legibilidad frente a la compactación. Existen formatos binarios o con cuantización de $(s,o)$ que ocuparían mucho menos espacio y harían que las tasas y relaciones de compresión de la prueba fueran sustancialmente distintas a las obtenidas en este trabajo. Los resultados de tasa de este trabajo deben leerse, por tanto, bajo el formato textual adoptado, no cómo cota del método fractal en general.
 
 
 \subsection{Métricas y procedimiento experimental}
 
-Se registraron PSNR, MSE, MAE, tamaño original, tamaño comprimido, bits por píxel, relación de compresión y tiempos de codificación y decodificación. Los bits por píxel se calculan como
+Se registraron PSNR, MSE, MAE, tamaño original, tamaño comprimido, bits por píxel, relación de compresión y tiempos de codificación y decodificación. Los bits por píxel se calculan cómo
 \[
 \mathrm{bpp} = \frac{8 \cdot B}{W \cdot H},
 \]
@@ -313,14 +276,9 @@ El PSNR se calcula sobre un rango dinámico de 255 niveles,
 \[
 \mathrm{PSNR} = 10 \log_{10}\!\left(\frac{255^{2}}{\mathrm{MSE}}\right),
 \]
-tomando como referencia la imagen PGM original y como estimación la imagen reconstruida en la iteración correspondiente. MSE y MAE se calculan píxel a píxel sobre la totalidad de la imagen.
+tomando cómo referencia la imagen PGM original y cómo estimación la imagen reconstruida en la iteración correspondiente. MSE y MAE se calculan píxel a píxel sobre la totalidad de la imagen.
 
 Para cada imagen se aplicaron las tres configuraciones fractales, los cuatro niveles de JPEG y PNG. Luego se reconstruyeron las imágenes y se compararon la calidad, los tamaños obtenidos y los tiempos de ejecución.
-
-% Sección "Resultados". Requiere: booktabs, float (para [H]).
-% Datos generados por data/experiments/run_fractal_experiments.sh,
-% measure_reference_metrics.py y summarize_results.py;
-% el resumen numérico completo está en data/experiments/results_summary.json.
 
 \section{Resultados}
 \label{sec:resultados}
@@ -334,7 +292,7 @@ El Cuadro~\ref{tab:comparacion_metodos} reúne las mediciones de tasa, calidad y
     \caption{Resultados de la evaluación experimental. MSE y MAE se reportan en la iteración 20 (FBC) o sobre la reconstrucción final (PNG/JPEG).}
     \label{tab:comparacion_metodos}
 
-    \begin{tabular}{llccccccccrr}
+        \begin{tabular}{llcccccccrr}
         \toprule
         \textbf{Imagen} &
         \textbf{Método} &
@@ -397,7 +355,7 @@ El Cuadro~\ref{tab:comparacion_metodos} reúne las mediciones de tasa, calidad y
 \section{Discusión}
 \label{sec:discusion}
 
-A medida que aumentan el rango y el dominio del FBC, sube la tasa de compresión y en algunos casos supera a JPEG y PNG. También baja el tiempo de compresión: hay menos bloques y la búsqueda de dominio se acorta. El tiempo de decodificación baja en menor medida. Al agrandar el bloque rango, PSNR, MAE y MSE se ven impactados.
+A medida que aumentan los tamaños de los bloques rango y dominio del FBC, aumenta la relación de compresión y disminuye la tasa expresada en bits por píxel. En algunos casos, la relación de compresión supera la obtenida por JPEG o PNG. También baja el tiempo de compresión: hay menos bloques y la búsqueda de dominio se acorta. El tiempo de decodificación baja en menor medida. Al aumentar el tamaño del bloque rango, disminuye el PSNR y aumentan el MSE y el MAE, lo que indica una pérdida de calidad de reconstrucción.
 
 Esa superación de JPEG y PNG es de \emph{relación de compresión} (tamaño), no de calidad a igual tasa. Con rango $16$ el FBC ronda $9{:}1$ y en Lena o Baboon supera a PNG en tamaño. Frente a JPEG, a veces el archivo fractal es más chico, pero el PSNR es marcadamente inferior. En Apollonian Gasket, PNG sigue delante ($11{,}38{:}1$ frente a $\sim 9{,}8{:}1$ del FBC con rango $16$). El codebook textual \texttt{.fc} infla los bits por píxel, así que parte de la ventaja aparente depende del formato y no solo del método.
 
@@ -405,9 +363,9 @@ Al agrandar el rango, la calidad empeora: baja el PSNR y suben MSE y MAE. La cod
 
 Respecto de la pregunta de investigación: en tiempos la autosimilitud no tiene impacto en las pruebas. Los tiempos dependen, al menos en esta implementación, de la cantidad de bloques.
 
-En tasa y bits por píxel la autosimilitud tampoco tiene impacto. A geometría fija, todas las imágenes generan la misma cantidad de asignaciones en el codebook. El formato textual \texttt{.fc} fija un costo alto por asignación e infla los bits por píxel con independencia del contenido.
+En la tasa y en los bits por píxel no se observa una relación clara con la clasificación de autosimilitud. A geometría fija, todas las imágenes generan la misma cantidad de asignaciones en el codebook. Sin embargo, el tamaño final presenta pequeñas variaciones debido a la longitud de la representación textual de los parámetros. La geometría de bloques continúa siendo el principal factor que determina el tamaño del archivo.
 
-En calidad sí hay influencia. Las imágenes de autosimilitud alta o media (Apollonian Gasket y Lena) superaron a las de baja (Baboon y Sun Tzu) en PSNR, MSE y MAE. Lena alcanzó el mejor PSNR. Apollonian, pese a no superarla en PSNR, obtuvo el MAE más bajo: error medio menor, con errores locales grandes en los bordes. Baboon y sobre todo Sun Tzu (texto) fueron los peores.
+En los casos evaluados, las imágenes clasificadas con autosimilitud alta o media presentaron mejores valores de calidad, con mayor PSNR y menores MSE y MAE, que las clasificadas con autosimilitud baja. Lena alcanzó el mejor PSNR. Apollonian, pese a no superarla en PSNR, obtuvo el MAE más bajo: error medio menor, con errores locales grandes en los bordes. Baboon y sobre todo Sun Tzu (texto) fueron los peores.
 
 En síntesis, el tipo de imagen y la autosimilitud percibida condicionan sobre todo la calidad del FBC. No explican de forma relevante la tasa ni los tiempos bajo las geometrías y el formato de codebook usados. Menor autosimilitud útil entre bloques (textura fina o tipografía) implica peor PSNR, MSE y MAE. La geometría de bloques domina la tasa y el tiempo.
 
@@ -415,12 +373,12 @@ En síntesis, el tipo de imagen y la autosimilitud percibida condicionan sobre t
 \section{Conclusiones}
 \label{sec:conclusiones}
 
-En este trabajo se evalúa la influencia del tipo de imagen y de la autosimilitud percibida sobre el rendimiento del FBC. Respecto a la pregunta de investigación, podemos determinar que para los casos evaluados sí se detecta una influencia de la autosimilitud en la calidad obtenida de la imagen. En cambio, la tasa y los tiempos de codificación y decodificación casi no dependen de la autosimilitud bajo las geometrías y el formato de codebook usados. La geometría de bloques, en cambio, tiene impacto sobre el tiempo de codificación, el de decodificación y la tasa de compresión obtenida. Frente a JPEG y PNG, podemos observar que en algunos casos la tasa de compresión del FBC fue más alta, pero a costa de perder calidad. Sin embargo, esos códecs aún presentan un mejor rendimiento en la relación entre tasa y distorsión y en el tiempo de codificación sobre los casos evaluados y frente a la implementación fractal realizada.
+En este trabajo se evalúa la influencia del tipo de imagen y de la autosimilitud percibida sobre el rendimiento del FBC. Respecto de la pregunta de investigación, los resultados sugieren una asociación entre la clasificación perceptiva de la autosimilitud y la calidad de reconstrucción obtenida en los casos evaluados. En cambio, la tasa y los tiempos de codificación y decodificación casi no dependen de la autosimilitud bajo las geometrías y el formato de codebook usados. La geometría de bloques, en cambio, tiene impacto sobre el tiempo de codificación, el de decodificación y la tasa de compresión obtenida. Frente a JPEG y PNG, podemos observar que en algunos casos la tasa de compresión del FBC fue más alta, pero a costa de perder calidad. Sin embargo, esos códecs aún presentan un mejor rendimiento en la relación entre tasa y distorsión y en el tiempo de codificación sobre los casos evaluados y frente a la implementación fractal realizada.
 
-Como trabajo futuro se podría investigar otras implementaciones de la compresión fractal con bloques de tamaño variable dentro de cada imagen (hoy el tamaño es fijo por corrida), cambiando el tipo de almacenamiento del codebook y aplicando mejoras de cómputo con unidades gráficas. De este modo se podrían hacer pruebas más contundentes que pongan a prueba los códecs antes comparados.
+Como trabajo futuro se podrían evaluar implementaciones de compresión fractal con bloques de tamaño variable dentro de una misma imagen, reemplazar la representación textual del codebook por una codificación binaria y aplicar técnicas de aceleración mediante unidades de procesamiento gráfico. También sería conveniente ampliar el conjunto de imágenes, utilizar una medida cuantitativa de autosimilitud y repetir las mediciones de tiempo para obtener resultados estadísticamente más robustos. Estas modificaciones permitirían realizar una comparación más representativa con JPEG y PNG.
 
 
-\begin{thebibliography}{5}
+\begin{thebibliography}{6}
 
 \bibitem{barnsley1988}
 Barnsley, M.F.:
@@ -449,8 +407,13 @@ PGM Format Specification.
 \url{https://netpbm.sourceforge.net/doc/pgm.html},
 consultado el 27 de julio de 2026.
 
+\bibitem{madeoRepositorio}
+Madeo, N.:
+Fractal Compression.
+Repositorio de código fuente en GitHub,
+\url{https://github.com/NicoMadd/fractal-compression/tree/research/paper-autosimilarity-influence-on-fractal-compression},
+consultado el 27 de julio de 2026.
+
 \end{thebibliography}
-
-
 
 \end{document}
