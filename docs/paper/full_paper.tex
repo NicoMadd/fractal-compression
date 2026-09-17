@@ -79,13 +79,13 @@ La compresión fractal representa una imagen mediante un sistema de funciones it
 
 \section{Introducción}
 
-Para representar una imagen digital de forma simple, es suficiente con almacenar cada uno de los píxeles, de forma ordenada, junto con el valor de color o intensidad de cada uno. Esto, si bien es fácil de interpretar, trae consigo un alto costo de almacenamiento. Hoy en día, con el alto volumen de datos manejados a través de dispositivos e Internet, es de suma importancia reducir los costos de almacenamiento y utilizar eficientemente el ancho de banda durante la transmisión. La compresión de datos, en este caso imágenes, busca resolver este problema. Aumentar la eficiencia de almacenamiento y el uso del ancho de banda trae consigo beneficios económicos, así cómo una reducción en los tiempos de transmisión.
+Para representar una imagen digital de forma simple, es suficiente con almacenar cada uno de los píxeles, de forma ordenada, junto con el valor de color o intensidad de cada uno. Esto, si bien es fácil de interpretar, trae consigo un alto costo de almacenamiento. Hoy en día, con el alto volumen de datos manejados a través de dispositivos e Internet, es de suma importancia reducir los costos de almacenamiento y utilizar eficientemente el ancho de banda durante la transmisión. La compresión de datos, en este caso imágenes, busca resolver este problema. Aumentar la eficiencia de almacenamiento y el uso del ancho de banda trae consigo beneficios económicos, así como una reducción en los tiempos de transmisión.
     
 \subsection{Métodos de compresión}
 
 Un método de compresión transforma una imagen original en una representación digital que requiere una menor cantidad de datos. Existen diversos métodos que aprovechan la redundancia de la información para reducir este tamaño.
 
-Dentro de los métodos de compresión podemos separarlos en dos categorías principales, \textbf{métodos con pérdida} y \textbf{métodos sin pérdida}. La diferencia radica en que los métodos con pérdida priorizan perder algunas partes del conjunto de datos original con tal de representarlo en un tamaño menor, pero manteniendo una calidad aceptable. En cambio, los métodos sin pérdida buscan representar el conjunto de datos original tal cómo se encontraba antes de ser comprimido.
+Dentro de los métodos de compresión podemos separarlos en dos categorías principales, \textbf{métodos con pérdida} y \textbf{métodos sin pérdida}. La diferencia radica en que los métodos con pérdida priorizan perder algunas partes del conjunto de datos original con tal de representarlo en un tamaño menor, pero manteniendo una calidad aceptable. En cambio, los métodos sin pérdida buscan representar el conjunto de datos original tal como se encontraba antes de ser comprimido.
 
 En este análisis vamos a estar enfocándonos en compresión de imágenes y algunos de sus métodos. Un ejemplo de compresión con pérdida es el formato JPEG \cite{wallace1991}, mientras que un ejemplo de compresión sin pérdida es el formato PNG \cite{png2003}.
 
@@ -124,7 +124,7 @@ Los bloques dominio se obtienen a partir de la imagen original y tienen un tama�
 
 Una vez definidos los bloques dominio, los bloques rango y las transformaciones aplicables, se buscan similitudes entre cada bloque rango y los bloques dominio transformados. Luego se selecciona, para cada bloque rango, el bloque dominio transformado que produce el menor error.
 
-Las transformaciones geométricas pueden incluir reducción espacial, rotaciones y reflexiones. Las transformaciones de intensidad modifican el contraste y la luminancia del bloque. Una vez encontrada la mejor correspondencia, se almacenan los parámetros de la transformación, cómo la escala de contraste (s) y el desplazamiento de luminancia (o).
+Las transformaciones geométricas pueden incluir reducción espacial, rotaciones y reflexiones. Las transformaciones de intensidad modifican el contraste y la luminancia del bloque. Una vez encontrada la mejor correspondencia, se almacenan los parámetros de la transformación, como la escala de contraste (s) y el desplazamiento de luminancia (o).
 
 En este trabajo se utilizan imágenes PGM en formato ASCII, donde cada píxel se representa mediante un nivel de gris. Para imágenes en color, el procedimiento debería aplicarse considerando los distintos canales de color.
 
@@ -206,7 +206,7 @@ La autosimilitud fue clasificada de manera perceptiva antes de realizar los expe
     \item Baja (texto): predominio de tipografía y bordes agudos sobre fondo uniforme (Sun Tzu).
 \end{itemize}
 
-Sun Tzu se incluye cómo caso de contenido tipográfico, donde la autosimilitud geométrica entre bloques suele ser insuficiente para preservar la legibilidad de los caracteres.
+Sun Tzu se incluye como caso de contenido tipográfico, donde la autosimilitud geométrica entre bloques suele ser insuficiente para preservar la legibilidad de los caracteres.
 
 \subsection{Configuración de los métodos}
 
@@ -222,9 +222,9 @@ En los tres casos el bloque de dominio duplica el lado del bloque rango, por lo 
 
 Se utilizaron ocho transformaciones geométricas básicas: identidad, rotaciones de $90^\circ$, $180^\circ$ y $270^\circ$, reflexiones horizontal y vertical, y reflexiones respecto de las dos diagonales. Para cada bloque rango se evaluaron todos los bloques de dominio reducidos combinados con las ocho transformaciones. Para cada par se calcularon los coeficientes de contraste $s$ y brillo $o$ por mínimos cuadrados, y se conservó la combinación de menor error cuadrático. Para la búsqueda no se aplicó ningún umbral máximo de error ni criterio de terminación anticipada, de modo que el costo de codificación es determinista y depende únicamente de la geometría de bloques.
 
-Cada bloque rango queda descrito por la posición del dominio elegido, el índice de la transformación y el par $(s, o)$. El conjunto de estas asignaciones constituye el \emph{codebook} y es el artefacto que se mide cómo salida comprimida del método fractal, según se detalla en la Sección~\ref{sec:tamano_comprimido}.
+Cada bloque rango queda descrito por la posición del dominio elegido, el índice de la transformación y el par $(s, o)$. El conjunto de estas asignaciones constituye el \emph{codebook} y es el artefacto que se mide como salida comprimida del método fractal, según se detalla en la Sección~\ref{sec:tamano_comprimido}.
 
-La reconstrucción parte de una imagen inicial de ruido aleatorio y aplica de forma iterativa el sistema de funciones iteradas, lo que permite verificar que el punto fijo alcanzado no depende de la imagen de partida. La calidad se evaluó en las iteraciones 5, 10 y 20. Las iteraciones se indexan desde 0, por lo que las imágenes reportadas cómo iteración 5, 10 y 20 corresponden, respectivamente, a 6, 11 y 21 aplicaciones del operador de reconstrucción.
+La reconstrucción parte de una imagen inicial de ruido aleatorio y aplica de forma iterativa el sistema de funciones iteradas, lo que permite verificar que el punto fijo alcanzado no depende de la imagen de partida. La calidad se evaluó en las iteraciones 5, 10 y 20. Las iteraciones se indexan desde 0, por lo que las imágenes reportadas como iteración 5, 10 y 20 corresponden, respectivamente, a 6, 11 y 21 aplicaciones del operador de reconstrucción.
 
 Para JPEG se evaluaron niveles de calidad de 25, 50, 75 y 90. Para PNG se utilizó compresión sin pérdida con la configuración predeterminada del codificador. El Cuadro~\ref{tab:referencias} resume los tamaños obtenidos por estas referencias.
 
@@ -254,19 +254,19 @@ JPEG 90 & 25\,150 & 0,77 &  59\,252 & 1,81 & 119\,506 & 3,65 & 100\,905 & 3,08 \
 
 La implementación de la compresión fractal fue desarrollada en Java, con codificación y decodificación paralelizadas mediante un pool de hilos de tamaño configurable. Los archivos de referencia PNG y JPEG se generaron con la biblioteca Pillow (que utiliza \textit{libjpeg} y \textit{zlib}) a partir de los mismos archivos PGM empleados por el compresor fractal. El código fuente se encuentra disponible en el repositorio público del proyecto~\cite{madeoRepositorio}. Los experimentos se realizaron en la siguiente arquitectura: un procesador Apple M4 Pro de 12 núcleos con arquitectura \texttt{aarch64}, 24\,GiB de memoria RAM y macOS 15.1 (build 24B2082). Se utilizó OpenJDK 25.0.1, GraalVM CE 25.0.1+8.1 (HotSpot, modo mixto), con 12 hilos para la compresión y 12 para la descompresión.
 
-Cada configuración se ejecutó una vez por imagen, sin calentamiento previo de la JVM, de modo que los tiempos reportados incluyen el costo de interpretación y de compilación JIT inicial. Por esta razón, los tiempos deben interpretarse cómo órdenes de magnitud comparativos entre configuraciones y no cómo mediciones de régimen estacionario.
+Cada configuración se ejecutó una vez por imagen, sin calentamiento previo de la JVM, de modo que los tiempos reportados incluyen el costo de interpretación y de compilación JIT inicial. Por esta razón, los tiempos deben interpretarse como órdenes de magnitud comparativos entre configuraciones y no como mediciones de régimen estacionario.
 
 \subsection{Medición del tamaño comprimido}
 \label{sec:tamano_comprimido}
 
 La salida del codificador fractal es un conjunto de asignaciones, una por bloque rango. Cada asignación requiere el índice del bloque de dominio seleccionado, el índice de la transformación aplicada y los coeficientes de contraste $s$ y brillo $o$. Si bien se almacena, la posición del bloque rango no se necesita. Las asignaciones se emiten en el orden de recorrido de la imagen, por lo que el bloque al que corresponde cada una queda determinado de forma implícita por su posición en la secuencia.
 
-El costo de almacenamiento de cada asignación depende de cómo se serialicen esos campos. El archivo \texttt{.fc} que produce la implementación los guarda en representación textual, en la misma línea que el PGM ASCII (P2) de entrada, para que el lector pueda inspeccionar e interpretar el codebook sin herramientas adicionales. Esa decisión prioriza la legibilidad frente a la compactación. Existen formatos binarios o con cuantización de $(s,o)$ que ocuparían mucho menos espacio y harían que las tasas y relaciones de compresión de la prueba fueran sustancialmente distintas a las obtenidas en este trabajo. Los resultados de tasa de este trabajo deben leerse, por tanto, bajo el formato textual adoptado, no cómo cota del método fractal en general.
+El costo de almacenamiento de cada asignación depende de cómo se serialicen esos campos. El archivo \texttt{.fc} que produce la implementación los guarda en representación textual, en la misma línea que el PGM ASCII (P2) de entrada, para que el lector pueda inspeccionar e interpretar el codebook sin herramientas adicionales. Esa decisión prioriza la legibilidad frente a la compactación. Existen formatos binarios o con cuantización de $(s,o)$ que ocuparían mucho menos espacio y harían que las tasas y relaciones de compresión de la prueba fueran sustancialmente distintas a las obtenidas en este trabajo. Los resultados de tasa de este trabajo deben leerse, por tanto, bajo el formato textual adoptado, no como cota del método fractal en general.
 
 
 \subsection{Métricas y procedimiento experimental}
 
-Se registraron PSNR, MSE, MAE, tamaño original, tamaño comprimido, bits por píxel, relación de compresión y tiempos de codificación y decodificación. Los bits por píxel se calculan cómo
+Se registraron PSNR, MSE, MAE, tamaño original, tamaño comprimido, bits por píxel, relación de compresión y tiempos de codificación y decodificación. Los bits por píxel se calculan como
 \[
 \mathrm{bpp} = \frac{8 \cdot B}{W \cdot H},
 \]
@@ -276,7 +276,7 @@ El PSNR se calcula sobre un rango dinámico de 255 niveles,
 \[
 \mathrm{PSNR} = 10 \log_{10}\!\left(\frac{255^{2}}{\mathrm{MSE}}\right),
 \]
-tomando cómo referencia la imagen PGM original y cómo estimación la imagen reconstruida en la iteración correspondiente. MSE y MAE se calculan píxel a píxel sobre la totalidad de la imagen.
+tomando como referencia la imagen PGM original y como estimación la imagen reconstruida en la iteración correspondiente. MSE y MAE se calculan píxel a píxel sobre la totalidad de la imagen.
 
 Para cada imagen se aplicaron las tres configuraciones fractales, los cuatro niveles de JPEG y PNG. Luego se reconstruyeron las imágenes y se compararon la calidad, los tamaños obtenidos y los tiempos de ejecución.
 
