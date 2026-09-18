@@ -92,11 +92,7 @@ En este análisis vamos a estar enfocándonos en compresión de imágenes y algu
 \subsection{Compresión fractal}
 La compresión fractal es un \textbf{método con pérdida} el cual representa a una imagen mediante un conjunto de transformaciones. Estas transformaciones conforman un sistema de funciones iteradas (IFS), que durante la decodificación se aplican repetidamente hasta alcanzar una representación cercana a la imagen original. La representación de estructuras complejas mediante sistemas de funciones iteradas fue desarrollada por Barnsley \cite{barnsley1988}.
 
-Es importante mencionar que la decodificación no requiere una imagen inicial particular, ya que puede comenzar a partir de cualquier imagen o incluso de ruido.
-
-Para entender este método, es necesario entender de dónde provienen estas transformaciones. Estas transformaciones se obtienen a partir de la autosimilitud entre distintas regiones de la imagen original.
-
-Esto es eficaz en gran medida para aquellas imágenes cuyas regiones son similares a otras. Es decir, aquellas imágenes que contengan regiones de sí mismas, que puedan representarse por otras regiones de la misma imagen, podrán reducir su tamaño.
+Es importante mencionar que la decodificación no requiere una imagen inicial particular, ya que puede comenzar a partir de cualquier imagen o incluso de ruido. Para entender este método, es necesario entender de dónde provienen estas transformaciones. Estas transformaciones se obtienen a partir de la autosimilitud entre distintas regiones de la imagen original. Esto es eficaz en gran medida para aquellas imágenes cuyas regiones son similares a otras. Es decir, aquellas imágenes que contengan regiones de sí mismas, que puedan representarse por otras regiones de la misma imagen, podrán reducir su tamaño.
 
 Sin embargo, existe una asimetría entre la codificación y decodificación de las imágenes con compresión fractal. Esto se debe a que obtener el conjunto de transformaciones requiere un gran costo computacional debido a la búsqueda de regiones autosimilares dentro de la imagen.
 
