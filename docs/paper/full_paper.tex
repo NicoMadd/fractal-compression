@@ -85,7 +85,7 @@ Para representar una imagen digital de forma simple, es suficiente con almacenar
 
 Un método de compresión transforma una imagen original en una representación digital que requiere una menor cantidad de datos. Existen diversos métodos que aprovechan la redundancia de la información para reducir este tamaño.
 
-Dentro de los métodos de compresión podemos separarlos en dos categorías principales, \textbf{métodos con pérdida} y \textbf{métodos sin pérdida}. La diferencia radica en que los métodos con pérdida priorizan perder algunas partes del conjunto de datos original con tal de representarlo en un tamaño menor, pero manteniendo una calidad aceptable. En cambio, los métodos sin pérdida buscan representar el conjunto de datos original tal como se encontraba antes de ser comprimido.
+Los métodos de compresión pueden separarse en dos categorías principales, \textbf{métodos con pérdida} y \textbf{métodos sin pérdida}. La diferencia radica en que los métodos con pérdida priorizan perder algunas partes del conjunto de datos original con tal de representarlo en un tamaño menor, pero manteniendo una calidad aceptable. En cambio, los métodos sin pérdida buscan representar el conjunto de datos original tal como se encontraba antes de ser comprimido.
 
 En este análisis vamos a estar enfocándonos en compresión de imágenes y algunos de sus métodos. Un ejemplo de compresión con pérdida es el formato JPEG \cite{wallace1991}, mientras que un ejemplo de compresión sin pérdida es el formato PNG \cite{png2003}.
 
@@ -140,7 +140,7 @@ El rendimiento también depende del contenido de la imagen. Las imágenes con re
 
 \subsection{Conjunto de imágenes}
 
-Para la evaluación se seleccionaron las imágenes Apollonian Gasket, Lena, Baboon y una imagen de un texto extraído del Arte de la Guerra de Sun Tzu. Las imágenes tienen todas un tamaño de $512\times512$ píxeles y se encuentran en los formatos PGM ASCII (P2)\cite{netpbmPGM}, PNG y JPEG, asegurando que todos los métodos partan exactamente del mismo contenido visual. Se definió utilizar estas dimensiones de modo que puedan aplicar a los tamaños de bloques evaluados.
+Para la evaluación se seleccionaron las imágenes Apollonian Gasket, Lena, Baboon y una imagen de un texto extraído del Arte de la Guerra de Sun Tzu. Las imágenes tienen todas un tamaño de $512\times512$ píxeles y se encuentran en los formatos PGM ASCII (P2)\cite{netpbmPGM}, PNG y JPEG, asegurando que todos los métodos partan exactamente del mismo contenido visual. Se eligieron estas dimensiones para que fueran compatibles con los tamaños de bloques evaluados.
 
 PGM ASCII (P2) representa imágenes en escala de grises mediante valores de intensidad almacenados sin compresión. Este es el formato de entrada usado por el compresor. Las imágenes del experimento y las referencias PNG/JPEG están disponibles en el repositorio del trabajo detallado en la Sección~\ref{sec:entorno_ejecucion}.
 
