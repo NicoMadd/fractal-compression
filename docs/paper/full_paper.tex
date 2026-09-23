@@ -276,12 +276,12 @@ tomando como referencia la imagen PGM original y como estimación la imagen reco
 
 Para cada imagen se aplicaron las tres configuraciones fractales, los cuatro niveles de JPEG y PNG. Luego se reconstruyeron las imágenes y se compararon la calidad, los tamaños obtenidos y los tiempos de ejecución.
 
-El tiempo de decodificación de FBC corresponde a la suma de las 21 aplicaciones temporizadas de la reconstrucción, desde la iteración 0 hasta la 20. El guardado de las reconstrucciones y el cálculo de métricas se registran por separado y no forman parte de ese tiempo. Para PNG y JPEG, los tiempos de codificación y decodificación se midieron en memoria con 11 repeticiones por operación: codificación a un búfer y decodificación desde el flujo comprimido. Se informa la mediana.
+El tiempo de decodificación del método de compresión fractal por bloques (\emph{Fractal Block Compression}, FBC) corresponde a la suma de las 21 aplicaciones temporizadas de la reconstrucción, desde la iteración 0 hasta la 20. El guardado de las reconstrucciones y el cálculo de métricas se registran por separado y no forman parte de ese tiempo. Para PNG y JPEG, los tiempos de codificación y decodificación se midieron en memoria con 11 repeticiones por operación: codificación a un búfer y decodificación desde el flujo comprimido. Se informa la mediana.
 
 \section{Resultados}
 \label{sec:resultados}
 
-El Cuadro~\ref{tab:comparacion_metodos} reúne las mediciones de tasa, calidad y tiempo obtenidas para las cuatro imágenes bajo las tres geometrías fractales evaluadas y las cinco referencias PNG y JPEG. El método de compresión fractal por bloques (\emph{Fractal Block Compression}, FBC) se evaluó con las geometrías $r{=}4$, $d=8$; $r{=}8$, $d=16$; y $r{=}16$, $d=32$. La relación de compresión se mide respecto de la imagen sin comprimir de un byte por píxel, de modo que los valores menores a $1{:}1$ indican que la salida supera en tamaño a la entrada. El PSNR se reporta en las iteraciones 5, 10 y 20; MSE y MAE corresponden a la iteración 20 (o a la reconstrucción final en PNG y JPEG).
+El Cuadro~\ref{tab:comparacion_metodos} reúne las mediciones de tasa, calidad y tiempo obtenidas para las cuatro imágenes bajo las tres geometrías fractales evaluadas y las cinco referencias PNG y JPEG. FBC se evaluó con las geometrías $r{=}4$, $d=8$; $r{=}8$, $d=16$; y $r{=}16$, $d=32$. La relación de compresión se mide respecto de la imagen sin comprimir de un byte por píxel, de modo que los valores menores a $1{:}1$ indican que la salida supera en tamaño a la entrada. El PSNR se reporta en las iteraciones 5, 10 y 20; MSE y MAE corresponden a la iteración 20 (o a la reconstrucción final en PNG y JPEG).
 
 \begin{table}[htbp]
     \centering
