@@ -49,3 +49,38 @@ chmod +x run.sh   # once, if needed
 Anything after `--` is forwarded to `Main` (same argument model as `PipelineParams` in the Java sources).
 
 Outputs go under repo-root `processes/<stem>/`: `codebooks/codebook_r{r}_d{d}.fc`, `original.pgm`, and under `iterations/` the iteration PGMs plus `benchmark.csv`.
+
+## Reproduce the paper experiment
+
+Run these commands from the repository root to regenerate the experiment assets, run the fractal-compression matrix, measure the PNG/JPEG references, and assemble the results:
+
+```bash
+python3 data/experiments/generate_experiment_assets.py
+bash data/experiments/run_fractal_experiments.sh
+python3 data/experiments/measure_reference_metrics.py
+python3 data/experiments/summarize_results.py
+```
+
+### Dependencies
+
+- **Java JDK** with `java` and `javac` available on `PATH`. The paper's runs used OpenJDK 25.0.1 / GraalVM CE 25.0.1+8.1 (HotSpot).
+- **Python 3** and `pip`.
+- **Pillow** is used to generate the PNG/JPEG assets and measure their in-memory encode/decode times.
+- **NumPy** is used to calculate the PNG/JPEG reference metrics. The summary script uses only the Python standard library.
+
+To install the Python packages in a virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install Pillow numpy
+```
+
+This repository does not pin Python or package versions. The reference-measurement script checks that an in-memory re-encode has the same byte count as the generated reference file, so using a different Pillow version may affect that check.
+
+### Experiment steps and outputs
+
+1. `generate_experiment_assets.py` reads the source PGM files from `data/images/pgma/` and writes the frozen 512×512 PGM, PNG, and JPEG inputs plus `data/experiments/assets_manifest.json`.
+2. `run_fractal_experiments.sh` runs the four images with the three geometries (`r=4,d=8`, `r=8,d=16`, and `r=16,d=32`), 20 decode iterations, 12 compression threads, and 12 decompression threads. It forces a fresh codebook for each run. Logs default to `processes/java/_experiment_logs/`; each run's `benchmark.csv` and `run_manifest.json` are archived under `data/experiments/results/<image>_r<range>_d<domain>/`.
+3. `measure_reference_metrics.py` writes the PNG/JPEG measurements to `data/experiments/reference_metrics.json`.
+4. `summarize_results.py` combines the archived FBC runs and reference metrics, writes `data/experiments/results_summary.json`, and prints the corresponding LaTeX rows to standard output. It does not edit the paper source.
