@@ -85,14 +85,14 @@ Para representar una imagen digital de forma simple, es suficiente con almacenar
 
 Un método de compresión transforma una imagen original en una representación digital que requiere una menor cantidad de datos. Existen diversos métodos que aprovechan la redundancia de la información para reducir este tamaño.
 
-Los métodos de compresión pueden separarse en dos categorías principales, \textbf{métodos con pérdida} y \textbf{métodos sin pérdida}. La diferencia radica en que los métodos con pérdida priorizan perder algunas partes del conjunto de datos original con tal de representarlo en un tamaño menor, pero manteniendo una calidad aceptable. En cambio, los métodos sin pérdida buscan representar el conjunto de datos original tal como se encontraba antes de ser comprimido.
+Los métodos de compresión pueden separarse en dos categorías principales, \textbf{métodos con pérdida} y \textbf{métodos sin pérdida}. La diferencia radica en que los métodos con pérdida descartan o aproximan parte de la información original para reducir el tamaño, procurando conservar una calidad aceptable. En cambio, los métodos sin pérdida buscan representar el conjunto de datos original tal como se encontraba antes de ser comprimido.
 
-Este trabajo se centra en la compresión de imágenes y algunos de sus métodos. Un ejemplo de compresión con pérdida es el formato JPEG \cite{wallace1991}, mientras que un ejemplo de compresión sin pérdida es el formato PNG \cite{png2003}.
+Este trabajo se centra en métodos de compresión de imágenes. Un ejemplo de compresión con pérdida es el formato JPEG \cite{wallace1991}, mientras que un ejemplo de compresión sin pérdida es el formato PNG \cite{png2003}.
 
 \subsection{Compresión fractal}
 La compresión fractal es un \textbf{método con pérdida} que representa una imagen mediante un conjunto de transformaciones. Estas transformaciones conforman un sistema de funciones iteradas (IFS), que durante la decodificación se aplican repetidamente hasta alcanzar una representación cercana a la imagen original. La representación de estructuras complejas mediante sistemas de funciones iteradas fue desarrollada por Barnsley \cite{barnsley1988}.
 
-Es importante mencionar que la decodificación no requiere una imagen inicial particular, ya que puede comenzar a partir de cualquier imagen o incluso de ruido. Para entender este método, es necesario entender de dónde provienen estas transformaciones. Estas transformaciones se obtienen a partir de la autosimilitud entre distintas regiones de la imagen original. Esto es eficaz en gran medida para aquellas imágenes cuyas regiones son similares a otras. Es decir, aquellas imágenes que contengan regiones de sí mismas, que puedan representarse por otras regiones de la misma imagen, podrán reducir su tamaño.
+La decodificación puede comenzar con cualquier imagen, incluso con ruido. El método aprovecha la autosimilitud entre regiones, cuando una puede representarse mediante otra, es posible reducir el tamaño de la representación.
 
 Sin embargo, existe una asimetría entre la codificación y decodificación de las imágenes con compresión fractal. Esto se debe a que obtener el conjunto de transformaciones requiere un gran costo computacional debido a la búsqueda de regiones autosimilares dentro de la imagen.
 
